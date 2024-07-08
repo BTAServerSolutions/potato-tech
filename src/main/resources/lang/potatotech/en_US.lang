@@ -1,0 +1,111 @@
+item.potatotech.potato.name=Potato
+item.potatotech.potato.desc=Won't kill you in your sleep (: .
+
+item.potatotech.wrench.name=Wrench
+item.potatotech.wrench.desc=Doesn't give you a plumbing license.
+
+item.potatotech.wood_crushing_hammer.name = Wood Crushing Hammer
+item.potatotech.wood_crushing_hammer.desc = Try crushing sand!
+
+item.potatotech.stone_crushing_hammer.name = Stone Crushing Hammer
+item.potatotech.stone_crushing_hammer.desc = Try crushing sand!
+
+item.potatotech.iron_crushing_hammer.name = Iron Crushing Hammer
+item.potatotech.iron_crushing_hammer.desc = Try crushing sand!
+
+item.potatotech.diamond_crushing_hammer.name = Diamond Crushing Hammer
+item.potatotech.diamond_crushing_hammer.desc = Try crushing sand! Expensive!
+
+item.potatotech.steel_crushing_hammer.name = Steel Crushing Hammer
+item.potatotech.steel_crushing_hammer.desc = Try crushing sand!
+
+item.potatotech.potato_knish.name=Potato Knish
+item.potatotech.potato_knish.desc=To be Trusted
+
+tile.potatotech.chute.name=Chute
+tile.potatotech.chute.desc=Automates item collection, gives life meaning.
+
+item.potatotech.energy_connector.name=LV Energy Connector
+item.potatotech.energy_connector.desc=Provides energy to your machines
+
+tile.potatotech.energy_connector.name=Energy Connector
+tile.potatotech.energy_connector.desc=Provides energy to your machines
+
+item.potatotech.wire_spool.name=LV Wire Spool
+item.potatotech.wire_spool.desc=Used to connect two connectors.
+
+item.potatotech.redstone_alloy.name=Redstone Alloy
+item.potatotech.redstone_alloy.desc=Who needs copper anyway?
+
+item.potatotech.redstone_iron_mix.name=Redstone-Iron Mix
+item.potatotech.redstone_iron_mix.desc=Try melting it!
+
+tile.potatotech.potato.name=Potato Block
+tile.potatotech.potato.desc=Not to be trusted!
+
+item.potatotech.iron_gear.name=Iron Gear
+item.potatotech.iron_gear.desc=It turns.
+
+item.potatotech.steel_gear.name=Steel Gear
+item.potatotech.steel_gear.desc=It turns better.
+
+tile.potatotech.pipe.name=Pipe
+tile.potatotech.pipe.desc=Doesn't contain a warp zone.
+
+tile.potatotech.filter.name=Filter
+tile.potatotech.filter.desc=Does what you should do to your room.
+
+tile.potatotech.directional_pipe.name=Directional Pipe
+tile.potatotech.directional_pipe.desc=Shiny.
+
+tile.potatotech.block_crusher.name=Block Crusher
+tile.potatotech.block_crusher.desc=Crushes blocks, but not candy.
+
+tile.potatotech.block_placer.name=Block Placer
+tile.potatotech.block_placer.desc=It will rePlace your job.
+
+tile.potatotech.tree_chopper.name=Tree Chopper
+tile.potatotech.tree_chopper.desc=For those who are too lazy to cut down trees.
+
+tile.potatotech.iron_machine_block.name=Iron Machine Block
+tile.potatotech.iron_machine_block.desc=A basic building block for simple machines.
+
+tile.potatotech.steel_machine_block.name=Steel Machine Block
+tile.potatotech.steel_machine_block.desc=A basic building block for more advanced machines.
+
+tile.potatotech.mining_drill.name=Mining Drill
+tile.potatotech.mining_drill.desc=THIS IS NOT A DRILL!
+
+tile.potatotech.advanced_dispenser.name=Advanced Dispenser
+tile.potatotech.advanced_dispenser.desc=It can use bone meal.
+
+tile.potatotech.furnace_burner.name=Furnace Burner
+tile.potatotech.furnace_burner.desc=Getting hot in here!
+
+tile.potatotech.furnace_burner_on.name=Furnace Burner
+tile.potatotech.furnace_burner_on.desc=Getting hot in here!
+
+tile.potatotech.stirling_engine_lv.name=LV Stirling Engine
+tile.potatotech.stirling_engine_lv.desc=From hot to kinetic, party hard!
+
+tile.potatotech.stirling_engine_mv.name=MV Stirling Engine
+tile.potatotech.stirling_engine_mv.desc=Party harder!
+
+tile.potatotech.coil.name=LV Coil
+tile.potatotech.coil.desc=Transforms kinetic energy bellow into electric energy.
+
+tile.potatotech.test_area_maker.name=Test Area Maker
+tile.potatotech.test_area_maker.desc=Makes your chunk a perfect testing area, removes all blocks above.
+
+tile.potatotech.auto_crafter.name=Auto Crafter
+tile.potatotech.auto_crafter.desc=No, it does not have a face, you're delusional.
+
+tile.potatotech.capacitor.name=LV Capacitor
+tile.potatotech.capacitor.desc=Stores 100000 Eu.
+
+tile.potatotech.heater.name=Heater
+tile.potatotech.heater.desc=Heats furnaces with Eu.
+
+tile.potatotech.dust.name=Dust
+tile.potatotech.dust.desc=Not angel, do not consume.
+
