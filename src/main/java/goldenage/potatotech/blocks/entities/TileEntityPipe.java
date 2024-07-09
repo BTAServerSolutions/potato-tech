@@ -4,6 +4,7 @@ import com.mojang.nbt.CompoundTag;
 import com.mojang.nbt.ListTag;
 import goldenage.potatotech.PipeStack;
 import goldenage.potatotech.Util;
+import net.minecraft.core.block.BlockChest;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.net.packet.Packet;
@@ -15,14 +16,29 @@ import java.util.*;
 
 public class TileEntityPipe extends TileEntity {
     public PipeStack[] stacks;
-    public int stackTimer = 10;
+
+	// 0 - normal
+	// 1 - insert
+	// 2 - extract
+	// 3 - disable
+	public int[] modeBySide;
+	public int maxInputTimer = 4;
+	public int inputTimer = maxInputTimer;
+
+	public int maxPipeStackTimer = 2;
+
     public TileEntityPipe() {
 		stacks = new PipeStack[7];
+		modeBySide = new int[6];
     }
 
     public void dropItems() {
-        for (PipeStack stack : stacks) {
-            if (stack != null) worldObj.dropItem(x, y, z, stack.stack);
+        for (int i = 0; i < stacks.length; i++) {
+			PipeStack stack = stacks[i];
+            if (stack != null) {
+				worldObj.dropItem(x, y, z, stack.stack);
+				stacks[i] = null;
+			}
         }
     }
 
@@ -40,19 +56,39 @@ public class TileEntityPipe extends TileEntity {
         for (PipeStack stack : stacks) {
             float[] pos = new float[3];
 			if (stack != null) {
+				float t = (float)stack.timer / (float) maxPipeStackTimer;
+				if (t > 1.0) t = 1.0f;
+
 				if (i > 0) {
 					Direction dir = Direction.getDirectionById(i - 1);
-					float xof = dir.getOffsetX();
-					float yof = dir.getOffsetY();
-					float zof = dir.getOffsetZ();
 
-					pos[0] = 0.5f + xof * 0.325f;
-					pos[1] = 0.5f + yof * 0.325f;
-					pos[2] = 0.5f + zof * 0.325f;
+					float x1 = dir.getOffsetX() * 0.325f;
+					float y1 = dir.getOffsetY() * 0.325f;
+					float z1 = dir.getOffsetZ() * 0.325f;
+
+					float x0 = x1 + stack.direction.getOffsetX() * 0.325f;
+					float y0 = y1 + stack.direction.getOffsetY() * 0.325f;
+					float z0 = z1 + stack.direction.getOffsetZ() * 0.325f;
+
+					float xof = x0 * (1-t) + x1 * t;
+					float yof = y0 * (1-t) + y1 * t;
+					float zof = z0 * (1-t) + z1 * t;
+
+					pos[0] = 0.5f + xof;
+					pos[1] = 0.5f + yof;
+					pos[2] = 0.5f + zof;
 				} else {
-					pos[0] = 0.5f;
-					pos[1] = 0.5f;
-					pos[2] = 0.5f;
+					float x0 = stack.direction.getOffsetX() * 0.325f;
+					float y0 = stack.direction.getOffsetY() * 0.325f;
+					float z0 = stack.direction.getOffsetZ() * 0.325f;
+
+					float xof = x0 * (1-t);
+					float yof = y0 * (1-t);
+					float zof = z0 * (1-t);
+
+					pos[0] = 0.5f + xof;
+					pos[1] = 0.5f + yof;
+					pos[2] = 0.5f + zof;
 				}
 			} else {
 				pos[0] = 0.5f;
@@ -65,24 +101,6 @@ public class TileEntityPipe extends TileEntity {
         return l;
     }
 
-    public boolean isDirectional() {
-        int meta = worldObj.getBlockMetadata(x, y, z);
-        return (meta & (1 << 2)) != 0;
-    }
-
-    public Direction getDirection() {
-        int meta = worldObj.getBlockMetadata(x, y, z);
-        return Direction.getDirectionById(meta >> 3);
-    }
-    public boolean isPointingTo(int x, int y, int z) {
-        int meta = worldObj.getBlockMetadata(this.x, this.y, this.z);
-        Direction dir = Direction.getDirectionById(meta >> 3);
-        boolean sameX = dir.getOffsetX() == this.x - x;
-        boolean sameY = dir.getOffsetY() == this.y - y;
-        boolean sameZ = dir.getOffsetZ() == this.z - z;
-        return sameX && sameY && sameZ;
-    }
-
     @Override
     public void readFromNBT(CompoundTag nbttagcompound) {
         super.readFromNBT(nbttagcompound);
@@ -93,6 +111,10 @@ public class TileEntityPipe extends TileEntity {
             this.stacks[i] = PipeStack.readPipeStackFromNbt(nbttagcompound1);
 			if (this.stacks[i].stack == null) this.stacks[i] = null;
         }
+
+		for (int i = 0; i < modeBySide.length; i++) {
+			modeBySide[i] = nbttagcompound.getInteger("mode"+i);
+		}
 
         //visualConnections = nbttagcompound.getInteger("visualConnections");
         //visualColor = nbttagcompound.getInteger("visualColor");
@@ -116,44 +138,55 @@ public class TileEntityPipe extends TileEntity {
 			}
         }
         nbttagcompound.put("Items", nbttaglist);
-        //nbttagcompound.putInt("visualConnections", visualConnections);
-        //nbttagcompound.putInt("visualColor", visualColor);
+
+		for (int i = 0; i < modeBySide.length; i++) {
+			nbttagcompound.putInt("mode"+i, modeBySide[i]);
+		}
     }
 
-    @Override
-    public void tick() {
-		int meta = worldObj.getBlockMetadata(x, y, z);
-		int type = meta & 3;
+	private void inputItems() {
+		for (Direction dir : Direction.directions) {
+			if (modeBySide[dir.getId()] == 2) {
+				PipeStack stack = stacks[dir.getId() + 1];
+				if (stack == null) {
+					stack = Util.getItemFromInventory(worldObj, x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ(), dir, 0);
+					if (stack != null) stack.timer = 0;
+					stacks[dir.getId() + 1] = stack;
+				}
+			}
+		}
+	}
 
-		// Input
+	private void outputItems() {
+		// Output
+		for (Direction dir : Direction.directions) {
+			PipeStack stack = stacks[dir.getId() + 1];
+			if (stack != null && stack.direction == dir.getOpposite() && stack.timer >= maxPipeStackTimer) {
+				TileEntity te = worldObj.getBlockTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
+				if (te instanceof IInventory) {
+					if (modeBySide[dir.getId()] <= 1) {
+						IInventory inventory = (IInventory) te;
+						if (Objects.equals(inventory.getInvName(), "Chest")) {
+							inventory = BlockChest.getInventory(worldObj, x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
+						}
 
-		stackTimer--;
-		if (stackTimer <= 0) {
-			stackTimer = 5;
-			if (type == 1) {
-				for (Direction dir : Direction.values()) {
-					PipeStack stack = stacks[dir.getId() + 1];
-					if (stack == null) {
-						stack = Util.getItemFromInventory(worldObj, x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ(), dir, 0);
-						stacks[dir.getId() + 1] = stack;
+						boolean inserted = Util.insertOnInventory(inventory, stack.stack, dir);
+						if (inserted) stacks[dir.getId() + 1] = null;
 					}
 				}
 			}
 		}
+	}
 
-		// Output
-		for (Direction dir : Direction.values()) {
+	private void moveItems() {
+		for (Direction dir : Direction.directions) {
 			PipeStack stack = stacks[dir.getId() + 1];
-			if (stack != null && stack.direction == dir.getOpposite()) {
+			if (stack != null && stack.direction == dir.getOpposite() && stack.timer >= maxPipeStackTimer) {
 				TileEntity te = worldObj.getBlockTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-				if (te instanceof IInventory) {
-					if (type == 2) {
-						boolean inserted = Util.insertOnInventory((IInventory) te, stack.stack, dir);
-						if (inserted) stacks[dir.getId() + 1] = null;
-					}
-				} else if (te instanceof TileEntityPipe) {
+				if (te instanceof TileEntityPipe) {
 					TileEntityPipe p = (TileEntityPipe) te;
 					if (p.stacks[dir.getOpposite().getId() + 1] == null) {
+						stack.timer = 0;
 						p.stacks[dir.getOpposite().getId() + 1] = stack;
 						stacks[dir.getId() + 1] = null;
 					}
@@ -161,39 +194,64 @@ public class TileEntityPipe extends TileEntity {
 			}
 		}
 
-		// Move
-		{
-			PipeStack stack = stacks[0];
-			if (stack != null) {
-				List<Direction> freeDir = new ArrayList<>();
-				for (int i = 0; i < 6; i++) {
-					PipeStack stack2 = stacks[i + 1];
-					Direction dir = Direction.getDirectionById(i);
-					TileEntity te = worldObj.getBlockTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-					if (stack2 == null && (te instanceof IInventory || te instanceof TileEntityPipe) && i != stack.direction.getId()) {
+		if (stacks[0] != null && stacks[0].timer >= maxPipeStackTimer) {
+			List<Direction> freeDir = new ArrayList<>();
+			for (int i = 0; i < 6; i++) {
+				PipeStack stack2 = stacks[i + 1];
+				Direction dir = Direction.getDirectionById(i);
+				TileEntity te = worldObj.getBlockTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
+				if (stack2 == null && (te instanceof IInventory || te instanceof TileEntityPipe) && i != stacks[0].direction.getId() && modeBySide[i] < 2) {
+					if (te instanceof TileEntityPipe) {
+						if (((TileEntityPipe)te).modeBySide[dir.getOpposite().getId()] == 3) continue;
+						if (((TileEntityPipe)te).modeBySide[dir.getOpposite().getId()] == 1) continue;
+					}
+					if (this.modeBySide[i] == 1) {
+						freeDir.clear();
 						freeDir.add(Direction.getDirectionById(i));
+						break;
+					}
+					freeDir.add(Direction.getDirectionById(i));
+				}
+			}
+
+			if (!freeDir.isEmpty()) {
+				int selected = (int) (Math.random() * freeDir.size());
+				Direction dir = freeDir.get(selected);
+				stacks[0].direction = dir.getOpposite();
+				stacks[0].timer = 0;
+				stacks[dir.getId() + 1] = stacks[0];
+				stacks[0] = null;
+			}
+		}
+
+		boolean isPowered = worldObj.isBlockIndirectlyGettingPowered(x, y, z) || worldObj.isBlockGettingPowered(x, y, z);
+		if (!isPowered) {
+			for (int i = 0; i < 6; i++) {
+				PipeStack stack = stacks[i + 1];
+				if (stack != null && stack.direction == Direction.getDirectionById(i) && stack.timer >= maxPipeStackTimer) {
+					if (stacks[0] == null) {
+						stacks[0] = stack;
+						stacks[0].timer = 0;
+						stacks[i + 1] = null;
 					}
 				}
-
-				if (!freeDir.isEmpty()) {
-					int selected = (int) (Math.random() * freeDir.size());
-					Direction dir = freeDir.get(selected);
-					stack.direction = dir.getOpposite();
-					stacks[dir.getId() + 1] = stack;
-					stacks[0] = null;
-				}
 			}
 		}
+	}
 
-		for (int i = 0; i < 6; i++) {
-			PipeStack stack = stacks[i + 1];
-			if (stack != null && stack.direction == Direction.getDirectionById(i)) {
-				if (stacks[0] == null) {
-					stacks[0] = stack;
-					stacks[i + 1] = null;
-				}
-			}
+    @Override
+    public void tick() {
+        for (PipeStack pipeStack : stacks) if (pipeStack != null) pipeStack.timer++;
+
+		outputItems();
+
+		inputTimer--;
+		if (inputTimer < 0) {
+			inputItems();
+			inputTimer = maxInputTimer;
 		}
+
+		moveItems();
 	}
 
     @Override

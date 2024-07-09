@@ -58,7 +58,6 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 
 		int blockNum = config.getInt("starting_block_id");
 
-
 		blockTestAreaMaker = new BlockBuilder(MOD_ID)
 			.setTextures("potatotech:block/potato")
 			.build(new BlockTestAreaMaker("test_area_maker", blockNum++, Material.metal));

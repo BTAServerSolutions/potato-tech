@@ -31,7 +31,7 @@ public class BlockTestAreaMaker extends Block {
 		for (int yi = 0; yi <= y; yi++) {
 			for (int zi = startZ; zi <= endZ; zi++) {
 				for (int xi = startX; xi <= endX; xi++) {
-					world.setBlockWithNotify(xi, yi, zi, (zi & 1) == (xi & 1) ? Block.basaltPolished.id : Block.limestonePolished.id);
+					world.setBlockWithNotify(xi, yi, zi, (zi & 1) == (xi & 1) ? Block.basaltPolished.id : Block.basalt.id);
 				}
 			}
 		}

@@ -2,6 +2,7 @@ package goldenage.potatotech.blocks;
 
 import goldenage.potatotech.PotatoTech;
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
+import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockTileEntity;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.block.material.Material;
@@ -15,11 +16,9 @@ import net.minecraft.core.world.World;
 import java.util.Random;
 
 public class BlockPipe extends BlockTileEntity {
-    public boolean isDirectional;
     public BlockPipe(String key, int id, Material material, Boolean isDirectional) {
         super(key, id, material);
         this.setBlockBounds(0.25f, 0.25f, 0.25f, 0.75f, 0.75f, 0.75f);
-        this.isDirectional = isDirectional;
     }
 
     @Override
@@ -37,31 +36,6 @@ public class BlockPipe extends BlockTileEntity {
         return false;
     }
 
-	@Override
-    public void onNeighborBlockChange(World world, int x, int y, int z, int blockId) {
-        super.onNeighborBlockChange(world, x, y, z, blockId);
-        TileEntityPipe te = (TileEntityPipe) world.getBlockTileEntity(x, y, z);
-        if (te != null) {
-            //te.needToChangeVisuals = true;
-        }
-    }
-
-    @Override
-    public void onBlockPlaced(World world, int x, int y, int z, Side side, EntityLiving entity, double sideHeight) {
-        if (entity instanceof EntityPlayer) {
-            if (isDirectional) {
-                int meta = side.getDirection().getId() << 3;
-                meta |= (1 << 2);
-
-                world.setBlockMetadataWithNotify(x, y, z, meta);
-            }
-        }
-        TileEntityPipe te = (TileEntityPipe)world.getBlockTileEntity(x, y, z);
-        if (te != null) {
-            //te.calcVisualConnections();
-        }
-    }
-
     @Override
     public void onBlockRemoved(World world, int x, int y, int z, int data) {
         TileEntityPipe te = (TileEntityPipe)world.getBlockTileEntity(x, y, z);
@@ -73,24 +47,31 @@ public class BlockPipe extends BlockTileEntity {
 
 	@Override
 	public boolean onBlockRightClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xHit, double yHit) {
-        //TileEntityPipe te = (TileEntityPipe)world.getBlockTileEntity(x, y, z);
+        TileEntityPipe te = (TileEntityPipe)world.getBlockTileEntity(x, y, z);
         ItemStack heldItem = player.getHeldItem();
         if (heldItem != null && heldItem.itemID == PotatoTech.itemWrench.id) {
-            int meta = world.getBlockMetadata(x, y, z);
-            int type = meta & 3;
-            type--;
-            if (type < 0) type = 2;
-            meta = (meta & (~0x03)) | type;
-            world.setBlockMetadata(x, y, z, meta);
-            world.notifyBlocksOfNeighborChange(x, y, z, this.id);
-            world.markBlockNeedsUpdate(x, y, z);
-            world.playSoundEffect(player, SoundCategory.WORLD_SOUNDS, (double)x + 0.5, (double)y + 0.5, (double)z + 0.5, "random.click", 0.3f, meta == 0 ? 0.5f : 0.6f);
+			int mode = te.modeBySide[side.getId()];
+			mode = (mode + 1) % 4;
+			te.modeBySide[side.getId()] = mode;
 
-            //if (te != null) te.calcVisualConnections();
+			world.markBlockNeedsUpdate(x, y, z);
+			world.playSoundEffect(player, SoundCategory.WORLD_SOUNDS, (double) x + 0.5, (double) y + 0.5, (double) z + 0.5, "random.click", 0.3f, mode % 2 == 0 ? 0.5f : 0.6f);
             return true;
-        }
-        //if (te != null) te.calcVisualConnections();
+        } else if (heldItem == null) {
+			te.dropItems();
+		}
         return false;
     }
+
+	@Override
+	public void onNeighborBlockChange(World world, int x, int y, int z, int blockId) {
+		if (blockId > 0 && Block.blocksList[blockId].canProvidePower()) {
+			boolean flag = world.isBlockIndirectlyGettingPowered(x, y, z) || world.isBlockGettingPowered(x, y, z);
+			if (flag) {
+				world.scheduleBlockUpdate(x, y, z, this.id, 0);
+			}
+		}
+	}
+
 
 }

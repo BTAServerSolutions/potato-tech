@@ -4,7 +4,9 @@ import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.BlockChest;
 import net.minecraft.core.block.entity.TileEntity;
+import net.minecraft.core.block.entity.TileEntityChest;
 import net.minecraft.core.block.entity.TileEntityFlag;
+import net.minecraft.core.block.entity.TileEntityFurnace;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.IInventory;
 import net.minecraft.core.util.helper.Direction;
@@ -343,6 +345,7 @@ public class Util {
 				TileEntityAutoCrafter ac = (TileEntityAutoCrafter) inventory;
 				hasInserted = ac.insertItem(stack);
 			} else*/ {
+
 				ItemStack chestStack;
 				while (j < inventorySize) {
 					chestStack = inventory.getStackInSlot(j);
