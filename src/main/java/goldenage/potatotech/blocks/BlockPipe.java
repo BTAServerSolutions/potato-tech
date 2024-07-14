@@ -3,6 +3,7 @@ package goldenage.potatotech.blocks;
 import goldenage.potatotech.PotatoTech;
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.core.block.Block;
+import net.minecraft.core.block.BlockFence;
 import net.minecraft.core.block.BlockTileEntity;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.block.material.Material;
@@ -16,17 +17,18 @@ import net.minecraft.core.world.World;
 import java.util.Random;
 
 public class BlockPipe extends BlockTileEntity {
-    public BlockPipe(String key, int id, Material material, Boolean isDirectional) {
-        super(key, id, material);
-        this.setBlockBounds(0.25f, 0.25f, 0.25f, 0.75f, 0.75f, 0.75f);
-    }
+
+	public BlockPipe(String key, int id, Material material) {
+		super(key, id, material);
+		this.setBlockBounds(0.25f, 0.25f, 0.25f, 0.75f, 0.75f, 0.75f);
+	}
 
     @Override
     protected TileEntity getNewBlockEntity() {
         return new TileEntityPipe();
     }
 
-    @Override
+	@Override
     public boolean isSolidRender() {
         return false;
     }

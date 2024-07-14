@@ -4,6 +4,9 @@
   "package": "goldenage.potatotech.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "EntityPlayerMixin",
+    "EntityPlayerMPMixin",
+    "EntityPlayerSPMixin"
   ],
   "client": [
   ],

@@ -31,6 +31,9 @@
 		"beforeGameStart":[
 			"goldenage.potatotech.PotatoTech"
 		],
+		"afterGameStart":[
+			"goldenage.potatotech.PotatoTech"
+		],
 		"beforeClientStart": [
 			"goldenage.potatotech.PotatoTech"
 		],

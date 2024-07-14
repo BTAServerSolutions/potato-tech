@@ -115,9 +115,6 @@ public class TileEntityPipe extends TileEntity {
 		for (int i = 0; i < modeBySide.length; i++) {
 			modeBySide[i] = nbttagcompound.getInteger("mode"+i);
 		}
-
-        //visualConnections = nbttagcompound.getInteger("visualConnections");
-        //visualColor = nbttagcompound.getInteger("visualColor");
     }
 
     @Override
@@ -144,7 +141,7 @@ public class TileEntityPipe extends TileEntity {
 		}
     }
 
-	private void inputItems() {
+	public void inputItems() {
 		for (Direction dir : Direction.directions) {
 			if (modeBySide[dir.getId()] == 2) {
 				PipeStack stack = stacks[dir.getId() + 1];
@@ -157,13 +154,13 @@ public class TileEntityPipe extends TileEntity {
 		}
 	}
 
-	private void outputItems() {
+	public void outputItems() {
 		// Output
 		for (Direction dir : Direction.directions) {
 			PipeStack stack = stacks[dir.getId() + 1];
 			if (stack != null && stack.direction == dir.getOpposite() && stack.timer >= maxPipeStackTimer) {
 				TileEntity te = worldObj.getBlockTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-				if (te instanceof IInventory) {
+				if (te instanceof IInventory && !(te instanceof TileEntityPipe)) {
 					if (modeBySide[dir.getId()] <= 1) {
 						IInventory inventory = (IInventory) te;
 						if (Objects.equals(inventory.getInvName(), "Chest")) {
@@ -178,7 +175,7 @@ public class TileEntityPipe extends TileEntity {
 		}
 	}
 
-	private void moveItems() {
+	public void moveItems() {
 		for (Direction dir : Direction.directions) {
 			PipeStack stack = stacks[dir.getId() + 1];
 			if (stack != null && stack.direction == dir.getOpposite() && stack.timer >= maxPipeStackTimer) {
@@ -204,7 +201,10 @@ public class TileEntityPipe extends TileEntity {
 					if (te instanceof TileEntityPipe) {
 						if (((TileEntityPipe)te).modeBySide[dir.getOpposite().getId()] == 3) continue;
 						if (((TileEntityPipe)te).modeBySide[dir.getOpposite().getId()] == 1) continue;
+					} else if (modeBySide[i] == 1 && !Util.canInsertOnInventory(worldObj, x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ(), dir.getOpposite(), stacks[0].stack)) {
+						continue;
 					}
+
 					if (this.modeBySide[i] == 1) {
 						freeDir.clear();
 						freeDir.add(Direction.getDirectionById(i));
@@ -258,4 +258,5 @@ public class TileEntityPipe extends TileEntity {
     public Packet getDescriptionPacket() {
         return new Packet140TileEntityData(this);
     }
+
 }

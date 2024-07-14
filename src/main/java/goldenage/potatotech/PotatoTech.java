@@ -1,14 +1,13 @@
 package goldenage.potatotech;
 
-import goldenage.potatotech.blocks.BlockPipe;
-import goldenage.potatotech.blocks.BlockTestAreaMaker;
+import goldenage.potatotech.blocks.*;
+import goldenage.potatotech.blocks.entities.TileEntityCrusher;
+import goldenage.potatotech.blocks.entities.TileEntityFilter;
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
+import goldenage.potatotech.blocks.models.BlockModelCrusher;
 import goldenage.potatotech.blocks.models.BlockModelPipe;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.block.model.BlockModel;
-import net.minecraft.client.render.block.model.BlockModelBasket;
-import net.minecraft.client.render.block.model.BlockModelFence;
 import net.minecraft.client.render.stitcher.AtlasStitcher;
 import net.minecraft.client.render.stitcher.TextureRegistry;
 import net.minecraft.core.block.Block;
@@ -23,7 +22,6 @@ import turniplabs.halplibe.helper.ItemBuilder;
 import turniplabs.halplibe.util.ClientStartEntrypoint;
 import turniplabs.halplibe.util.ConfigHandler;
 import turniplabs.halplibe.util.GameStartEntrypoint;
-import turniplabs.halplibe.util.RecipeEntrypoint;
 
 import java.io.IOException;
 import java.net.URI;
@@ -51,6 +49,9 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 	public static Item itemWrench;
 	public static Block blockTestAreaMaker;
 	public static Block blockPipe;
+	public static Block blockCrusher;
+	public static Block blockPlacer;
+	public static Block blockFilter;
 
 	@Override
     public void onInitialize() {
@@ -65,12 +66,36 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 		blockPipe = new BlockBuilder(MOD_ID)
 			.setTextures("potatotech:block/pipe")
 			.setBlockModel(BlockModelPipe::new)
-			.build(new BlockPipe("pipe", blockNum++, Material.metal, false));
+			.build(new BlockPipe("pipe", blockNum++, Material.metal));
+
+		blockNum++;
+
+		blockCrusher = new BlockBuilder(MOD_ID)
+			.setTextures("potatotech:block/block_crusher_side")
+			.setTopTexture("potatotech:block/block_crusher_front")
+			.setBottomTexture("potatotech:block/block_crusher_back")
+			.setBlockModel(BlockModelCrusher::new)
+			.build(new BlockCrusher("block_crusher", blockNum++, Material.stone));
+
+		blockPlacer = new BlockBuilder(MOD_ID)
+			.setTextures("potatotech:block/block_placer_side")
+			.setTopTexture("potatotech:block/block_placer_front")
+			.setBottomTexture("potatotech:block/block_placer_back")
+			.setBlockModel(BlockModelCrusher::new)
+			.build(new BlockPlacer("block_placer", blockNum++, Material.stone));
+
+		blockFilter = new BlockBuilder(MOD_ID)
+			.setTextures("potatotech:block/block_filter")
+			.build(new BlockFilter("filter", blockNum++, Material.wood));
 
 		int itemNum = config.getInt("starting_item_id");
 		itemWrench = new ItemBuilder(MOD_ID).setIcon("potatotech:item/wrench").build(new Item("wrench", itemNum++));
 
 		EntityHelper.createSpecialTileEntity(TileEntityPipe.class, "pipe.tile", TileEntityRendererPipe::new);
+		EntityHelper.createTileEntity(TileEntityCrusher.class, "crusher.tile");
+		EntityHelper.createTileEntity(TileEntityFilter.class, "filter.tile");
+
+
 	}
 
 	public void loadTextures(AtlasStitcher stitcher){
@@ -144,12 +169,11 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 
 	@Override
 	public void beforeGameStart() {
-
 	}
 
 	@Override
 	public void afterGameStart() {
-
+		BlockCrusher.initCrusherResults();
 	}
 
 	@Override

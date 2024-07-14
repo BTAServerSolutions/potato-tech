@@ -1,5 +1,6 @@
 package goldenage.potatotech;
 
+import goldenage.potatotech.blocks.entities.TileEntityFilter;
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.BlockChest;
@@ -315,6 +316,7 @@ public class Util {
 
 
 
+
 	public static boolean insertOnInventoryNoCatch(IInventory inventory, ItemStack stack, Direction direction) {
 		boolean hasInserted = false;
 		if (inventory == null) {
@@ -327,47 +329,33 @@ public class Util {
 		int inventorySize = inventory.getSizeInventory();
 		String inventoryName = inventory.getInvName();
 
-		boolean isFromIronChests = Objects.equals(inventoryName, "Iron Chest")
-			|| Objects.equals(inventoryName, "Gold Chest")
-			|| Objects.equals(inventoryName, "Diamond Chest")
-			|| Objects.equals(inventoryName, "Steel Chest")
-			|| Objects.equals(inventoryName, "Big Chest");
-
 		if (Objects.equals(inventoryName, "Chest")
 			|| Objects.equals(inventoryName, "Large Chest")
 			|| Objects.equals(inventoryName, "Trap")
 			|| Objects.equals(inventoryName, "Filter")
-			|| Objects.equals(inventoryName, "Auto Crafter")
-			|| isFromIronChests
 		) {
 			int j = 0;
-			/*if (Objects.equals(inventoryName, "Auto Crafter") && inventory instanceof TileEntityAutoCrafter) {
-				TileEntityAutoCrafter ac = (TileEntityAutoCrafter) inventory;
-				hasInserted = ac.insertItem(stack);
-			} else*/ {
+			ItemStack chestStack;
+			while (j < inventorySize) {
+				chestStack = inventory.getStackInSlot(j);
 
-				ItemStack chestStack;
-				while (j < inventorySize) {
-					chestStack = inventory.getStackInSlot(j);
-
-					if (chestStack == null) {
-						if (!inventoryName.equals("Filter") && !inventoryName.equals("Auto Crafter")) {
-							inventory.setInventorySlotContents(j, stack);
-							hasInserted = true;
-						}
-						break;
-					}
-
-					if (chestStack.canStackWith(stack) && chestStack.stackSize < chestStack.getMaxStackSize()) {
-						chestStack.stackSize++;
-						inventory.setInventorySlotContents(j, chestStack);
-
+				if (chestStack == null) {
+					if (!inventoryName.equals("Filter") && !inventoryName.equals("Auto Crafter")) {
+						inventory.setInventorySlotContents(j, stack);
 						hasInserted = true;
-						break;
 					}
-
-					j++;
+					break;
 				}
+
+				if (chestStack.canStackWith(stack) && chestStack.stackSize < chestStack.getMaxStackSize()) {
+					chestStack.stackSize++;
+					inventory.setInventorySlotContents(j, chestStack);
+
+					hasInserted = true;
+					break;
+				}
+
+				j++;
 			}
 		} else if (inventory instanceof TileEntityFlag) {
             int targetSlot = 36;
@@ -418,6 +406,78 @@ public class Util {
 		return  hasInserted;
 	}
 
+
+	public static boolean canInsertOnInventory(World world, int x, int y, int z, Direction dir, ItemStack item) {
+		TileEntity te = world.getBlockTileEntity(x, y, z);
+
+		if (te == null) {
+			return false;
+		}
+
+		if (!(te instanceof IInventory)) {
+			return false;
+		}
+
+		if (te instanceof TileEntityFilter) {
+			return ((TileEntityFilter) te).canInsertItem(item);
+		}
+
+		IInventory inventory = (IInventory)te;
+		int inventorySize = inventory.getSizeInventory();
+		String inventoryName = inventory.getInvName();
+
+		if (Objects.equals(inventoryName, "Chest")
+			|| Objects.equals(inventoryName, "Large Chest")
+			|| Objects.equals(inventoryName, "Trap")
+			|| Objects.equals(inventoryName, "Filter")
+		) {
+			int j = 0;
+			ItemStack chestStack;
+			while (j < inventorySize) {
+				chestStack = inventory.getStackInSlot(j);
+				if (chestStack == null) {
+					return true;
+				}
+				if (chestStack.canStackWith(item) && chestStack.stackSize < chestStack.getMaxStackSize()) {
+					return true;
+				}
+				j++;
+			}
+		} else if (inventory instanceof TileEntityFlag) {
+			int targetSlot = 36;
+			ItemStack flagStack = inventory.getStackInSlot(targetSlot);
+
+			if (flagStack == null) {
+				return true;
+			} else {
+                return flagStack.canStackWith(item);
+			}
+		} else {
+			int fuelSlot = 1;
+			int inputSlot = 0;
+
+			if (Objects.equals(inventoryName, "Trommel")) {
+				fuelSlot = 4;
+				for (; inputSlot < 3; inputSlot++) {
+					ItemStack s = inventory.getStackInSlot(inputSlot);
+					if (s == null || s.canStackWith(item) && s.stackSize < s.getMaxStackSize()) break;
+				}
+			}
+
+			int targetSlot = dir == Direction.UP ? fuelSlot : inputSlot;
+
+			ItemStack furnaceStack = inventory.getStackInSlot(targetSlot);
+
+			if (furnaceStack == null) {
+				return true;
+			} else {
+                return furnaceStack.canStackWith(item);
+			}
+		}
+
+		return false;
+	}
+
 	public static boolean insertOnInventory(IInventory inventory, ItemStack stack, Direction direction) {
 		boolean result = false;
 		try {
@@ -428,5 +488,100 @@ public class Util {
 		return result;
 	}
 
+	public static PipeStack peekItemFromInventory(World world, int x, int y, int z, Direction dir, int stackTimer) {
+		PipeStack result = null;
+		try {
+			result = peekItemFromInventoryNoCatch(world, x, y, z, dir, stackTimer);
+		} catch (Exception e) {
+			PotatoTech.LOGGER.error(e.getMessage());
+		}
+		return result;
+	}
 
+	public static PipeStack peekItemFromInventoryNoCatch(World world, int x, int y, int z, Direction dir, int stackTimer) {
+		PipeStack returnStack = null;
+		TileEntity te = world.getBlockTileEntity(x, y, z);
+		if (te instanceof IInventory) {
+			IInventory inventory = (IInventory) te;
+			String inventoryName = inventory.getInvName();
+
+			boolean isFromIronChests = inventoryName.equals("Iron Chest")
+				|| inventoryName.equals("Gold Chest")
+				|| inventoryName.equals("Diamond Chest")
+				|| inventoryName.equals("Steel Chest")
+				|| inventoryName.equals("Big Chest");
+
+			if (inventoryName.equals("Chest")) {
+				inventory = BlockChest.getInventory(world, x, y ,z);
+			}
+
+			if (inventoryName.equals("Chest")
+				|| inventoryName.equals("Trap")
+				|| inventoryName.equals("Filter")
+				|| inventoryName.equals("Large Chest")
+				|| isFromIronChests
+			) {
+				int inventorySize = inventory.getSizeInventory();
+				ItemStack stack = null;
+				int j = 0;
+
+				if (!inventoryName.equals("Filter")) {
+					while (stack == null && j < inventorySize) stack = inventory.getStackInSlot(j++);
+					if (stack != null && stack.stackSize <= 1) {
+						returnStack = null;
+					}
+				} else {
+					while (stack == null && j < inventorySize) {
+						stack = inventory.getStackInSlot(j++);
+						if (stack != null && stack.stackSize++ <= 1) {
+							returnStack = null;
+						}
+					}
+				}
+
+				if (stack != null && j > 0) {
+					returnStack = new PipeStack(stack.copy(), dir, stackTimer);
+					return returnStack;
+				}
+			} else if (inventoryName.equals("Trommel")) {
+				int inventorySize = 4;
+				ItemStack stack = null;
+				int j = 0;
+				while (stack == null && j < inventorySize) stack = inventory.getStackInSlot(j++);
+
+				if (stack != null && j > 0) {
+					returnStack = new PipeStack(stack, dir, stackTimer);
+					return returnStack;
+				}
+			} else if (inventoryName.equals("Auto Crafter")) {
+				/*TileEntityAutoCrafter ac = (TileEntityAutoCrafter) te;
+				ItemStack stack = ac.craftResult.getStackInSlot(0).copy();
+				if (stack != null) {
+					returnStack = new PipeStack(stack, dir, stackTimer);
+				} else {
+					ItemStack extra = ac.extraOutputs.getStackInSlot(0).copy();
+					if (extra != null) {
+						returnStack = new PipeStack(extra, dir, stackTimer);
+					}
+				}*/
+			} else if (inventory.getSizeInventory() > 2){
+				ItemStack stack = inventory.getStackInSlot(2).copy();
+				if (stack != null) {
+					returnStack = new PipeStack(stack, dir, stackTimer);
+				}
+			}
+		}/* else if (te instanceof TileEntityChute && dir == Direction.UP) {
+			TileEntityChute.ChuteEntry firstKey = null;
+			for (Map.Entry<TileEntityChute.ChuteEntry, Integer> entry : ((TileEntityChute) te).contents.entrySet()) {
+				firstKey = entry.getKey();
+				break;
+			}
+			if (firstKey == null) return null;
+
+			ItemStack stack = new ItemStack(firstKey.getItem(), 1, firstKey.metadata);
+			returnStack = new PipeStack(stack, dir, stackTimer);
+		}*/
+
+		return returnStack;
+	}
 }
