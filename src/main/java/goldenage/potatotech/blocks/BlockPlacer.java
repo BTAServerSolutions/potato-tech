@@ -1,9 +1,9 @@
 package goldenage.potatotech.blocks;
 
-
 import goldenage.potatotech.PipeStack;
 import goldenage.potatotech.Util;
-import goldenage.potatotech.blocks.entities.TileEntityCrusher;
+import goldenage.potatotech.blocks.entities.*;
+import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.client.entity.player.EntityPlayerSP;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockDispenser;
@@ -42,14 +42,14 @@ public class BlockPlacer extends BlockTileEntityRotatable {
 	}
 
 	@Override
+    protected TileEntity getNewBlockEntity() {
+        return new TileEntityPlacer();
+    }
+
+	@Override
 	public void onBlockAdded(World world, int i, int j, int k) {
 		super.onBlockAdded(world, i, j, k);
 		this.setDefaultDirection(world, i, j, k);
-	}
-
-	@Override
-	protected TileEntity getNewBlockEntity() {
-		return new TileEntityCrusher();
 	}
 
 	public static boolean isPowered(int data) {
@@ -62,13 +62,16 @@ public class BlockPlacer extends BlockTileEntityRotatable {
 		boolean hasNeighborSignal = this.getNeighborSignal(world, x, y, z, dir.getId());
 
 		if (hasNeighborSignal) {
-			if (!isPowered(meta)) world.triggerEvent(x, y, z, 0, dir.getId());
-			meta = dir.getId();
-			meta |= 8;
+			if (!isPowered(meta)) {
+	    		meta = dir.getId();
+    			meta |= 8;
+        		world.setBlockMetadata(x, y, z, meta);
+			    world.triggerEvent(x, y, z, 0, dir.getId());
+		    }
 		} else {
 			meta = dir.getId();
+			world.setBlockMetadata(x, y, z, meta);
 		}
-		world.setBlockMetadata(x, y, z, meta);
 	}
 
 	private boolean getNeighborSignal(World world, int x, int y, int z, int direction) {
@@ -118,14 +121,20 @@ public class BlockPlacer extends BlockTileEntityRotatable {
 		int ty = y + dir.getOffsetY();
 		int tz = z + dir.getOffsetZ();
 
-		TileEntityCrusher te = (TileEntityCrusher) world.getBlockTileEntity(x, y, z);
+		TileEntityPlacer te = (TileEntityPlacer) world.getBlockTileEntity(x, y, z);
 
 		ItemStack blockToPlace = te.getRandomStackFromInventory();
 
 		if (blockToPlace == null) return;
-
 		world.playSoundEffect(2000, tx, ty, tz, blockToPlace.itemID);
-		boolean placed = world.setBlockWithNotify(tx, ty, tz, blockToPlace.itemID);
+		Block b = world.getBlock(tx, ty, tz);
+		boolean canOverride = b == null || b.hasTag(BlockTags.PLACE_OVERWRITES);
+
+		if (blockToPlace.itemID >= 16384 || !canOverride) {
+		    world.dropItem(tx, ty, tz, blockToPlace);
+		} else {
+		    world.setBlockWithNotify(tx, ty, tz, blockToPlace.itemID);
+		}
 	}
 
 	public boolean onBlockRightClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xPlaced, double yPlaced) {
