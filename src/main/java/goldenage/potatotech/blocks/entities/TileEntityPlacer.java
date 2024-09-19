@@ -6,31 +6,28 @@ import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.entity.player.EntityPlayer;
 import net.minecraft.core.item.IDispensable;
 import net.minecraft.core.item.ItemPlaceable;
+import net.minecraft.core.item.block.ItemBlock;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.IInventory;
 
 import java.util.Random;
 
-public class TileEntityCrusher extends TileEntity implements IInventory {
-
+public class TileEntityPlacer extends TileEntity implements IInventory {
 	private ItemStack[] contents = new ItemStack[9];
 
 	private final Random random = new Random();
 
-	public TileEntityCrusher() {
+	public TileEntityPlacer() {
 	}
 
-    @Override
 	public int getSizeInventory() {
 		return 9;
 	}
 
-    @Override
 	public ItemStack getStackInSlot(int i) {
 		return this.contents[i];
 	}
 
-    @Override
 	public ItemStack decrStackSize(int i, int j) {
 		if (this.contents[i] != null) {
 			ItemStack itemstack1;
@@ -60,14 +57,13 @@ public class TileEntityCrusher extends TileEntity implements IInventory {
 			}
 		}
 
-		if (i >= 0 && this.getStackInSlot(i).getItem() instanceof ItemPlaceable) {
+		if (i >= 0) {
 			return this.decrStackSize(i, 1);
 		} else {
 			return null;
 		}
 	}
 
-    @Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
 		this.contents[i] = itemstack;
 		if (itemstack != null && itemstack.stackSize > this.getInventoryStackLimit()) {
@@ -78,7 +74,7 @@ public class TileEntityCrusher extends TileEntity implements IInventory {
 	}
 
 	public String getInvName() {
-		return "BlockCrusher";
+		return "BlockPlacer";
 	}
 
 	public void readFromNBT(CompoundTag nbttagcompound) {
@@ -96,7 +92,6 @@ public class TileEntityCrusher extends TileEntity implements IInventory {
 
 	}
 
-    @Override
 	public void writeToNBT(CompoundTag nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		ListTag nbttaglist = new ListTag();
@@ -113,12 +108,10 @@ public class TileEntityCrusher extends TileEntity implements IInventory {
 		nbttagcompound.put("Items", nbttaglist);
 	}
 
-    @Override
 	public int getInventoryStackLimit() {
 		return 64;
 	}
 
-    @Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		if (this.worldObj.getBlockTileEntity(this.x, this.y, this.z) != this) {
 			return false;
@@ -127,7 +120,6 @@ public class TileEntityCrusher extends TileEntity implements IInventory {
 		}
 	}
 
-    @Override
 	public void sortInventory() {
 	}
 }

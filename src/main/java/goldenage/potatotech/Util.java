@@ -282,12 +282,12 @@ public class Util {
 						if (stack.stackSize <= 0) stack = null;
 						inventory.setInventorySlotContents(36, stack);
 					}
-				} else if (inventory.getSizeInventory() > 2){
-					ItemStack stack = inventory.getStackInSlot(2);
+				} else if (inventory.getSizeInventory() > 0) {
+					ItemStack stack = inventory.getStackInSlot(0);
 					if (stack != null) {
 						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
 						if (stack.stackSize <= 0) stack = null;
-						inventory.setInventorySlotContents(2, stack);
+						inventory.setInventorySlotContents(0, stack);
 					}
 				}
 			}

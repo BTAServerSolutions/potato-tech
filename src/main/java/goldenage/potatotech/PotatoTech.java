@@ -1,9 +1,7 @@
 package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.*;
-import goldenage.potatotech.blocks.entities.TileEntityCrusher;
-import goldenage.potatotech.blocks.entities.TileEntityFilter;
-import goldenage.potatotech.blocks.entities.TileEntityPipe;
+import goldenage.potatotech.blocks.entities.*;
 import goldenage.potatotech.blocks.models.BlockModelCrusher;
 import goldenage.potatotech.blocks.models.BlockModelPipe;
 import net.fabricmc.api.ModInitializer;
@@ -93,6 +91,7 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 
 		EntityHelper.createSpecialTileEntity(TileEntityPipe.class, "pipe.tile", TileEntityRendererPipe::new);
 		EntityHelper.createTileEntity(TileEntityCrusher.class, "crusher.tile");
+		EntityHelper.createTileEntity(TileEntityPlacer.class, "placer.tile");
 		EntityHelper.createTileEntity(TileEntityFilter.class, "filter.tile");
 
 
@@ -160,7 +159,7 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 		}
 
 		try {
-			TextureRegistry.initializeAllFiles(MOD_ID, stitcher);
+			TextureRegistry.initializeAllFiles(MOD_ID, stitcher, true);
 		} catch (URISyntaxException | IOException e) {
 			throw new RuntimeException("Failed to load textures.", e);
 		}

@@ -1,6 +1,7 @@
 package goldenage.potatotech.blocks;
 
 import goldenage.potatotech.Util;
+import goldenage.potatotech.blocks.entities.*;
 import net.minecraft.core.block.*;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.block.entity.TileEntityChest;
@@ -30,7 +31,7 @@ public class BlockCrusher extends BlockTileEntityRotatable {
 		crushResults.put(Block.cobbleLimestone, new ItemStack[]{new ItemStack(Block.gravel)});
 		crushResults.put(Block.cobbleStoneMossy, new ItemStack[]{new ItemStack(Block.gravel)});
 		crushResults.put(Block.gravel, new ItemStack[]{new ItemStack(Block.sand)});
-		crushResults.put(Block.dirt, new ItemStack[]{new ItemStack(Item.ammoPebble), new ItemStack(Item.ammoPebble)});
+		crushResults.put(Block.dirt, new ItemStack[]{new ItemStack(Item.ammoPebble, 2)});
 	}
 
 	@Override
@@ -67,7 +68,7 @@ public class BlockCrusher extends BlockTileEntityRotatable {
 
 	@Override
 	protected TileEntity getNewBlockEntity() {
-		return new TileEntity();
+		return new TileEntityCrusher();
 	}
 
 	private boolean getNeighborSignal(World world, int x, int y, int z, int direction) {
@@ -152,16 +153,18 @@ public class BlockCrusher extends BlockTileEntityRotatable {
 						if (!hasInserted) return;
 					}
 				}
-			} /*else if (outTe instanceof TileEntityPipe) {
-				TileEntityPipe pipe = (TileEntityPipe) outTe;
-				if (breakResult.length > 1) return;
-				boolean hasAdded = pipe.addToStack(breakResult[0], dir);
-				if (!hasAdded) return;
-			}*/ else {
-				for (ItemStack stack : breakResult) {
-					world.dropItem(ix, iy, iz, stack);
-				}
-			}
+			} else {
+			    boolean hasInserted = true;
+			    for (ItemStack stack : breakResult) {
+    			    hasInserted = Util.insertOnInventory((IInventory) world.getBlockTileEntity(x, y, z), stack, Direction.NONE);
+    			    if (!hasInserted) break;
+			    }
+                if (!hasInserted) {
+                    for (ItemStack stack : breakResult) {
+               	        world.dropItem(ix, iy, iz, stack);
+                    }
+                }
+            }
 		}
 		if (breakBlock){
 			world.playSoundEffect(2001, tx, ty, tz, block.id);
