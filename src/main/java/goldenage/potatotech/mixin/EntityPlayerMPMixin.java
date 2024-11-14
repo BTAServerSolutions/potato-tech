@@ -3,6 +3,7 @@ package goldenage.potatotech.mixin;
 import goldenage.potatotech.IPotatoGui;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.entity.player.EntityPlayer;
+import net.minecraft.core.player.inventory.IInventory;
 import net.minecraft.core.world.World;
 import net.minecraft.server.entity.player.EntityPlayerMP;
 import net.minecraft.server.net.handler.NetServerHandler;
@@ -32,5 +33,10 @@ public abstract class EntityPlayerMPMixin extends EntityPlayer implements IPotat
 	//TODO: change display methods to have xyz argument and stack argument
 
 	public void diplayBlockFilterGui(TileEntity tileEntity, String id) {
+	}
+
+
+	public void diplayBlockCrusherGui(IInventory tileInventory) {
+
 	}
 }

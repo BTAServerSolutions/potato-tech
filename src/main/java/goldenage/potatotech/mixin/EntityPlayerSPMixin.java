@@ -2,6 +2,7 @@ package goldenage.potatotech.mixin;
 
 
 import goldenage.potatotech.IPotatoGui;
+import goldenage.potatotech.gui.GuiBlockCrusher;
 import goldenage.potatotech.gui.GuiFilter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.EntityPlayerSP;
@@ -23,5 +24,10 @@ public abstract class EntityPlayerSPMixin extends EntityPlayer implements IPotat
 
 	public void diplayBlockFilterGui(IInventory tileInventory) {
 		this.mc.displayGuiScreen(new GuiFilter(this.inventory, tileInventory));
+	}
+
+
+	public void diplayBlockCrusherGui(IInventory tileInventory) {
+		this.mc.displayGuiScreen(new GuiBlockCrusher(this.inventory, tileInventory));
 	}
 }

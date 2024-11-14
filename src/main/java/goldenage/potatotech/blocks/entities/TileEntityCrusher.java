@@ -2,6 +2,8 @@ package goldenage.potatotech.blocks.entities;
 
 import com.mojang.nbt.CompoundTag;
 import com.mojang.nbt.ListTag;
+import goldenage.potatotech.PotatoTech;
+import net.minecraft.core.block.Block;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.entity.player.EntityPlayer;
 import net.minecraft.core.item.IDispensable;
@@ -9,6 +11,8 @@ import net.minecraft.core.item.ItemPlaceable;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.IInventory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class TileEntityCrusher extends TileEntity implements IInventory {
@@ -52,15 +56,20 @@ public class TileEntityCrusher extends TileEntity implements IInventory {
 
 	public ItemStack getRandomStackFromInventory() {
 		int i = -1;
-		int j = 1;
+
+		ArrayList<Integer> available_items = new ArrayList<>();
 
 		for(int k = 0; k < this.contents.length; ++k) {
-			if (this.contents[k] != null && this.random.nextInt(j++) == 0) {
-				i = k;
+			if (this.contents[k] != null) {
+				available_items.add(k);
 			}
 		}
 
-		if (i >= 0 && this.getStackInSlot(i).getItem() instanceof ItemPlaceable) {
+		if (!available_items.isEmpty()) {
+			i = available_items.get(random.nextInt(available_items.size()));
+		}
+
+		if (i >= 0 && (this.getStackInSlot(i).getItem().id < Block.blocksList.length || this.getStackInSlot(i).getItem() instanceof ItemPlaceable)) {
 			return this.decrStackSize(i, 1);
 		} else {
 			return null;

@@ -1,12 +1,13 @@
 package goldenage.potatotech.blocks;
 
+import goldenage.potatotech.IPotatoGui;
 import goldenage.potatotech.Util;
 import goldenage.potatotech.blocks.entities.*;
 import net.minecraft.core.block.*;
 import net.minecraft.core.block.entity.TileEntity;
-import net.minecraft.core.block.entity.TileEntityChest;
 import net.minecraft.core.block.material.Material;
 import net.minecraft.core.entity.EntityLiving;
+import net.minecraft.core.entity.player.EntityPlayer;
 import net.minecraft.core.enums.EnumDropCause;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 
 public class BlockCrusher extends BlockTileEntityRotatable {
 	public static HashMap<Block, ItemStack[]> crushResults = new HashMap<>();
+
 	public BlockCrusher(String key, int id, Material material) {
 		super(key, id, material);
 	}
@@ -117,7 +119,7 @@ public class BlockCrusher extends BlockTileEntityRotatable {
 		int iy = y - dir.getOffsetY();
 		int iz = z - dir.getOffsetZ();
 
-		TileEntity outTe = world.getBlockTileEntity(ix, iy, iz) ;
+		TileEntity outTe = world.getBlockTileEntity(ix, iy, iz);
 
 		int tx = x + dir.getOffsetX();
 		int ty = y + dir.getOffsetY();
@@ -127,49 +129,55 @@ public class BlockCrusher extends BlockTileEntityRotatable {
 		if (block == null) return;
 
 		int tmeta = world.getBlockMetadata(tx, ty, tz);
-		TileEntity te = world.getBlockTileEntity(tx, ty ,tz);
+		TileEntity te = world.getBlockTileEntity(tx, ty, tz);
 
 		boolean breakBlock = false;
 		ItemStack[] breakResult = crushResults.get(block);
-		if (breakResult != null){
+		if (breakResult != null) {
 			breakResult = Util.cloneStackArray(breakResult);
 			breakBlock = true;
-		} else if (block.getHardness() >= 0){
+		} else if (block.getHardness() >= 0) {
 			breakResult = block.getBreakResult(world, EnumDropCause.PROPER_TOOL, tx, ty, tz, tmeta, te);
 			breakBlock = true;
 		}
 
 		if (!world.isClientSide && breakResult != null && breakResult.length > 0) {
-			if (outTe instanceof IInventory) {
-				IInventory inventory;
-				if (outTe instanceof TileEntityChest) {
-					inventory = BlockChest.getInventory(world, ix, iy, iz);
-				} else {
-					inventory = (IInventory) outTe;
-				}
-				if (inventory != null) {
-					for (ItemStack stack : breakResult) {
-						boolean hasInserted = Util.insertOnInventory(inventory, stack, dir);
-						if (!hasInserted) return;
+			TileEntityCrusher crusher = (TileEntityCrusher) world.getBlockTileEntity(x, y, z);
+
+			boolean inserted = false;
+			for (ItemStack result: breakResult) {
+				for (int i = 0; i < 9; i++) {
+					ItemStack stack = crusher.getStackInSlot(i);
+					if (stack != null && stack.canStackWith(result)) {
+						stack.stackSize += result.stackSize;
+						crusher.setInventorySlotContents(i, stack.copy());
+						inserted = true;
+						break;
+					} else if (stack == null) {
+						crusher.setInventorySlotContents(i, result.copy());
+						inserted = true;
+						break;
 					}
 				}
-			} else {
-			    boolean hasInserted = true;
-			    for (ItemStack stack : breakResult) {
-    			    hasInserted = Util.insertOnInventory((IInventory) world.getBlockTileEntity(x, y, z), stack, Direction.NONE);
-    			    if (!hasInserted) break;
-			    }
-                if (!hasInserted) {
-                    for (ItemStack stack : breakResult) {
-               	        world.dropItem(ix, iy, iz, stack);
-                    }
-                }
-            }
+			}
+			if (!inserted) {
+				for (ItemStack stack : breakResult) {
+					world.dropItem(ix, iy, iz, stack);
+				}
+			}
 		}
-		if (breakBlock){
+		if (breakBlock) {
 			world.playSoundEffect(2001, tx, ty, tz, block.id);
 			world.setBlockWithNotify(tx, ty, tz, 0);
 		}
+	}
+
+	public boolean onBlockRightClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xPlaced, double yPlaced) {
+		if (!world.isClientSide) {
+			IInventory inv = (IInventory) world.getBlockTileEntity(x, y, z);
+			((IPotatoGui) player).diplayBlockCrusherGui(inv);
+		}
+		return true;
 	}
 }
 

@@ -1,26 +1,20 @@
 package goldenage.potatotech.blocks;
 
-import goldenage.potatotech.PipeStack;
-import goldenage.potatotech.Util;
+import goldenage.potatotech.IPotatoGui;
 import goldenage.potatotech.blocks.entities.*;
 import net.minecraft.core.block.tag.BlockTags;
-import net.minecraft.client.entity.player.EntityPlayerSP;
 import net.minecraft.core.block.Block;
-import net.minecraft.core.block.BlockDispenser;
 import net.minecraft.core.block.BlockRotatable;
 import net.minecraft.core.block.BlockTileEntityRotatable;
 import net.minecraft.core.block.entity.TileEntity;
-import net.minecraft.core.block.entity.TileEntityDispenser;
 import net.minecraft.core.block.material.Material;
 import net.minecraft.core.entity.EntityLiving;
 import net.minecraft.core.entity.player.EntityPlayer;
-import net.minecraft.core.item.ItemPlaceable;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.IInventory;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
-import net.minecraft.server.entity.player.EntityPlayerMP;
 
 
 public class BlockPlacer extends BlockTileEntityRotatable {
@@ -122,6 +116,8 @@ public class BlockPlacer extends BlockTileEntityRotatable {
 		int tz = z + dir.getOffsetZ();
 
 		TileEntityPlacer te = (TileEntityPlacer) world.getBlockTileEntity(x, y, z);
+		Block block = world.getBlock(tx, ty, tz);
+		if (block != null) return;
 
 		ItemStack blockToPlace = te.getRandomStackFromInventory();
 
@@ -139,8 +135,8 @@ public class BlockPlacer extends BlockTileEntityRotatable {
 
 	public boolean onBlockRightClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xPlaced, double yPlaced) {
         if (!world.isClientSide) {
-            //TileEntityDispenser tileentitydispenser = (TileEntityDispenser) world.getBlockTileEntity(x, y, z);
-            //player.displayGUIDispenser(tileentitydispenser);
+            IInventory inv = (IInventory) world.getBlockTileEntity(x, y, z);
+			((IPotatoGui)player).diplayBlockCrusherGui(inv);
         }
         return true;
     }

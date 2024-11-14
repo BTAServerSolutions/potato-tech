@@ -224,6 +224,8 @@ public class Util {
 				if (Objects.equals(inventoryName, "Chest")
 					|| Objects.equals(inventoryName, "Trap")
 					|| Objects.equals(inventoryName, "Filter")
+					|| Objects.equals(inventoryName, "BlockCrusher")
+					|| Objects.equals(inventoryName, "BlockPlacer")
 					|| Objects.equals(inventoryName, "Large Chest")
 					|| isFromIronChests
 				) {
@@ -332,6 +334,8 @@ public class Util {
 		if (Objects.equals(inventoryName, "Chest")
 			|| Objects.equals(inventoryName, "Large Chest")
 			|| Objects.equals(inventoryName, "Trap")
+			|| Objects.equals(inventoryName, "BlockCrusher")
+			|| Objects.equals(inventoryName, "BlockPlacer")
 			|| Objects.equals(inventoryName, "Filter")
 		) {
 			int j = 0;
@@ -429,6 +433,8 @@ public class Util {
 		if (Objects.equals(inventoryName, "Chest")
 			|| Objects.equals(inventoryName, "Large Chest")
 			|| Objects.equals(inventoryName, "Trap")
+			|| Objects.equals(inventoryName, "BlockCrusher")
+			|| Objects.equals(inventoryName, "BlockPlacer")
 			|| Objects.equals(inventoryName, "Filter")
 		) {
 			int j = 0;
@@ -518,6 +524,8 @@ public class Util {
 			if (inventoryName.equals("Chest")
 				|| inventoryName.equals("Trap")
 				|| inventoryName.equals("Filter")
+				|| inventoryName.equals("BlockCrusher")
+				|| inventoryName.equals("BlockPlacer")
 				|| inventoryName.equals("Large Chest")
 				|| isFromIronChests
 			) {
