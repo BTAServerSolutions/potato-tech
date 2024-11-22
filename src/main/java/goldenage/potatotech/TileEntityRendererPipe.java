@@ -6,6 +6,7 @@ import net.minecraft.client.render.EntityRenderDispatcher;
 import net.minecraft.client.render.LightmapHelper;
 import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
+import net.minecraft.client.render.block.model.BlockModelPlanksPainted;
 import net.minecraft.client.render.block.model.BlockModelStandard;
 import net.minecraft.client.render.entity.ItemEntityRenderer;
 import net.minecraft.client.render.item.model.ItemModel;
@@ -17,6 +18,7 @@ import net.minecraft.client.render.tileentity.TileEntityRenderer;
 import net.minecraft.client.util.helper.Textures;
 import net.minecraft.core.Global;
 import net.minecraft.core.block.Block;
+import net.minecraft.core.block.BlockPlanksPainted;
 import net.minecraft.core.block.BlockStone;
 import net.minecraft.core.entity.EntityItem;
 import net.minecraft.core.item.Item;
@@ -25,6 +27,7 @@ import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.world.World;
 import org.lwjgl.opengl.GL11;
 
+import java.nio.channels.Pipe;
 import java.util.List;
 import java.util.Random;
 
@@ -32,6 +35,26 @@ public class TileEntityRendererPipe extends TileEntityRenderer<TileEntityPipe> {
     private static final ItemEntityRenderer itemEntityRenderer = new ItemEntityRenderer();
     private EntityItem itemEntity = null;
 	private long timer = 0;
+
+	int[] colors = {
+		0xFF_FF_FF_FF, // Normal
+		0xFF_09_09_09, // black
+		0xFF_FF_00_00, // red
+		0xFF_00_AA_00, // green
+		0xFF_80_30_20, // brown
+		0xFF_00_00_FF, // blue
+		0xFF_A0_00_FF, // purple
+		0xFF_00_C0_FF, // cyan
+		0xFF_C0_C0_C0, // silver
+		0xFF_50_50_50, // gray
+		0xFF_FF_A0_A0, // pink
+		0xFF_20_FF_20, // lime
+		0xFF_C0_FF_20, // yellow
+		0xFF_90_90_FF, // lightblue
+		0xFF_FF_30_FF, // magenta
+		0xFF_FF_90_00, // orange
+		0xFF_FF_FF_FF, // White
+	};
 
 	@Override
     public void onWorldChanged(World world) {
@@ -55,9 +78,11 @@ public class TileEntityRendererPipe extends TileEntityRenderer<TileEntityPipe> {
 
         List<float[]> blockPos = tileEntity.getStacksInPipePosition();
         List<ItemStack> stacks = tileEntity.getStacksInPipe();
+		PipeStack[] pipeStacks = tileEntity.stacks;
 
         for (int i = 0; i < blockPos.size(); i++) {
             ItemStack stack = stacks.get(i);
+			PipeStack pipeStack = pipeStacks[i];
 			if (stack == null) continue;
 
 			float[] pos = blockPos.get(i);
@@ -80,7 +105,6 @@ public class TileEntityRendererPipe extends TileEntityRenderer<TileEntityPipe> {
 			ItemStack itemstack = itemEntity.item;
             Item item = itemstack.getItem();
             if (item != null) {
-                GL11.glPushMatrix();
                 byte renderCount = 1;
                 if (itemEntity.item.stackSize > 1) {
                     renderCount = 2;
@@ -98,6 +122,7 @@ public class TileEntityRendererPipe extends TileEntityRenderer<TileEntityPipe> {
                 GL11.glEnable(3042);
                 BlockModel.setRenderBlocks(itemEntityRenderer.renderBlocks);
 
+				GL11.glPushMatrix();
                 if (itemstack.itemID < Block.blocksList.length &&
                     Block.blocksList[itemstack.itemID] != null)
                 {
@@ -112,7 +137,6 @@ public class TileEntityRendererPipe extends TileEntityRenderer<TileEntityPipe> {
                         blockModel.renderBlockOnInventory(tessellator, itemstack.getMetadata(), brightness, null);
                     }
                 } else {
-
 					if (mc.gameSettings.items3D.value) {
 						GL11.glTranslatef((float) (x + pos[0]) , (float) (y + pos[1] - yOffset - 0.1) , (float) (z + pos[2]));
 						GL11.glScalef(0.75f, 0.75f, 0.75f);
@@ -122,10 +146,24 @@ public class TileEntityRendererPipe extends TileEntityRenderer<TileEntityPipe> {
 					}
                     ItemModelDispatcher.getInstance().getDispatch(item).renderAsItemEntity(Tessellator.instance, itemEntity, new Random(), itemstack, renderCount, 0, brightness, 1);
                 }
+				GL11.glPopMatrix();
+
+				if (pipeStack.color > 0) {
+					GL11.glEnable(GL11.GL_BLEND);
+					GL11.glPushMatrix();
+					int color = colors[pipeStack.color];
+					TextureRegistry.blockAtlas.bindTexture();
+					float itemSize = 0.35f;
+					GL11.glTranslatef((float) (x + pos[0]) , (float) (y + pos[1]) , (float) (z + pos[2]));
+					GL11.glScalef(itemSize, itemSize, itemSize);
+					BlockModel blockModel = BlockModelDispatcher.getInstance().getDispatch(PotatoTech.blockPipeStack);
+					blockModel.renderBlockOnInventory(tessellator, color, brightness, null);
+					GL11.glPopMatrix();
+					GL11.glDisable(GL11.GL_BLEND);
+				}
 
                 GL11.glDisable(3042);
                 GL11.glDisable(32826);
-                GL11.glPopMatrix();
             }
         }
     }

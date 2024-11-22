@@ -5,6 +5,7 @@ import com.mojang.nbt.ListTag;
 import goldenage.potatotech.PipeStack;
 import goldenage.potatotech.Util;
 import net.minecraft.core.block.BlockChest;
+import net.minecraft.core.block.BlockSign;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.net.packet.Packet;
@@ -21,15 +22,21 @@ public class TileEntityPipe extends TileEntity {
 	// 1 - insert
 	// 2 - extract
 	// 3 - disable
-	public int[] modeBySide;
-	public int maxInputTimer = 4;
-	public int inputTimer = maxInputTimer;
+	public short[] modeBySide;
+	public short[] colorBySide;
+	public int maxInputTimer;
+	public int inputTimer;
 
-	public int maxPipeStackTimer = 2;
+	public int maxPipeStackTimer;
 
     public TileEntityPipe() {
 		stacks = new PipeStack[7];
-		modeBySide = new int[6];
+		modeBySide = new short[6];
+		colorBySide = new short[6];
+
+		maxInputTimer = 12;
+		inputTimer = maxInputTimer;
+		maxPipeStackTimer = 6;
     }
 
     public void dropItems() {
@@ -113,7 +120,10 @@ public class TileEntityPipe extends TileEntity {
         }
 
 		for (int i = 0; i < modeBySide.length; i++) {
-			modeBySide[i] = nbttagcompound.getInteger("mode"+i);
+			modeBySide[i] = nbttagcompound.getShort("mode"+i);
+		}
+		for (int i = 0; i < colorBySide.length; i++) {
+			colorBySide[i] = nbttagcompound.getShort("color"+i);
 		}
     }
 
@@ -137,7 +147,10 @@ public class TileEntityPipe extends TileEntity {
         nbttagcompound.put("Items", nbttaglist);
 
 		for (int i = 0; i < modeBySide.length; i++) {
-			nbttagcompound.putInt("mode"+i, modeBySide[i]);
+			nbttagcompound.putShort("mode"+i, modeBySide[i]);
+		}
+		for (int i = 0; i < colorBySide.length; i++) {
+			nbttagcompound.putShort("color"+i, colorBySide[i]);
 		}
     }
 
@@ -147,7 +160,10 @@ public class TileEntityPipe extends TileEntity {
 				PipeStack stack = stacks[dir.getId() + 1];
 				if (stack == null) {
 					stack = Util.getItemFromInventory(worldObj, x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ(), dir, 0);
-					if (stack != null) stack.timer = 0;
+					if (stack != null) {
+						stack.timer = 0;
+						stack.color = colorBySide[dir.getId()];
+					}
 					stacks[dir.getId() + 1] = stack;
 				}
 			}
@@ -203,6 +219,16 @@ public class TileEntityPipe extends TileEntity {
 						if (((TileEntityPipe)te).modeBySide[dir.getOpposite().getId()] == 1) continue;
 					} else if (modeBySide[i] == 1 && !Util.canInsertOnInventory(worldObj, x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ(), dir.getOpposite(), stacks[0].stack)) {
 						continue;
+					}
+
+					if (this.colorBySide[i] > 0) {
+						if (this.colorBySide[i] == stacks[0].color) {
+							freeDir.clear();
+							freeDir.add(Direction.getDirectionById(i));
+							break;
+						} else {
+							continue;
+						}
 					}
 
 					if (this.modeBySide[i] == 1) {

@@ -52,6 +52,12 @@ item.potatotech.steel_gear.desc=It turns better.
 tile.potatotech.pipe.name=Pipe
 tile.potatotech.pipe.desc=Doesn't contain a warp zone.
 
+tile.potatotech.pipe.name=Golden Pipe
+tile.potatotech.pipe.desc=Speedy
+
+tile.potatotech.pipe.name=Diamond Pipe
+tile.potatotech.pipe.desc=Gotta Go Fast
+
 tile.potatotech.filter.name=Filter
 tile.potatotech.filter.desc=Does what you should do to your room.
 
