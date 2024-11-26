@@ -331,13 +331,51 @@ public class Util {
 		int inventorySize = inventory.getSizeInventory();
 		String inventoryName = inventory.getInvName();
 
-		if (Objects.equals(inventoryName, "Chest")
-			|| Objects.equals(inventoryName, "Large Chest")
-			|| Objects.equals(inventoryName, "Trap")
-			|| Objects.equals(inventoryName, "BlockCrusher")
-			|| Objects.equals(inventoryName, "BlockPlacer")
-			|| Objects.equals(inventoryName, "Filter")
-		) {
+		if (Objects.equals(inventoryName, "Furnace") || Objects.equals(inventoryName, "Blast Furnace") || Objects.equals(inventoryName, "Trommel")) {
+			int fuelSlot = 1;
+			int inputSlot = 0;
+
+			if (Objects.equals(inventoryName, "Trommel")) {
+				fuelSlot = 4;
+				for (; inputSlot < 3; inputSlot++) {
+					ItemStack s = inventory.getStackInSlot(inputSlot);
+					int maxStackSize = inventory.getInventoryStackLimit() != 64 ? inventory.getInventoryStackLimit() : s.getMaxStackSize();
+					if (s == null || s.canStackWith(stack) && s.stackSize < maxStackSize) break;
+				}
+			}
+
+			int targetSlot = direction == Direction.UP ? fuelSlot : inputSlot;
+
+			ItemStack furnaceStack = inventory.getStackInSlot(targetSlot);
+
+			if (furnaceStack == null) {
+				inventory.setInventorySlotContents(targetSlot, stack);
+				hasInserted = true;
+			} else {
+				int maxStackSize = inventory.getInventoryStackLimit() != 64 ? inventory.getInventoryStackLimit() : furnaceStack.getMaxStackSize();
+				if (furnaceStack.canStackWith(stack) && furnaceStack.stackSize < maxStackSize) {
+					furnaceStack.stackSize++;
+					inventory.setInventorySlotContents(targetSlot, furnaceStack);
+					hasInserted = true;
+				}
+			}
+		} else if (inventory instanceof TileEntityFlag) {
+            int targetSlot = 36;
+			ItemStack flagStack = inventory.getStackInSlot(targetSlot);
+
+			if (flagStack == null) {
+				inventory.setInventorySlotContents(targetSlot, stack);
+				hasInserted = true;
+			} else {
+				int maxStackSize = inventory.getInventoryStackLimit() != 64 ? inventory.getInventoryStackLimit() : flagStack.getMaxStackSize();
+				if (flagStack.canStackWith(stack) && flagStack.stackSize < maxStackSize) {
+					flagStack.stackSize++;
+					inventory.setInventorySlotContents(targetSlot, flagStack);
+					hasInserted = true;
+				}
+			}
+		} else {
+		    // May be a chest or other mass-storage device
 			int j = 0;
 			ItemStack chestStack;
 			while (j < inventorySize) {
@@ -351,7 +389,8 @@ public class Util {
 					break;
 				}
 
-				if (chestStack.canStackWith(stack) && chestStack.stackSize < chestStack.getMaxStackSize()) {
+				int maxStackSize = inventory.getInventoryStackLimit() != 64 ? inventory.getInventoryStackLimit() : chestStack.getMaxStackSize();
+				if (chestStack.canStackWith(stack) && chestStack.stackSize < maxStackSize) {
 					chestStack.stackSize++;
 					inventory.setInventorySlotContents(j, chestStack);
 
@@ -361,53 +400,9 @@ public class Util {
 
 				j++;
 			}
-		} else if (inventory instanceof TileEntityFlag) {
-            int targetSlot = 36;
-			ItemStack flagStack = inventory.getStackInSlot(targetSlot);
-
-			if (flagStack == null) {
-				inventory.setInventorySlotContents(targetSlot, stack);
-				hasInserted = true;
-			} else {
-				int maxStackSize = flagStack.getMaxStackSize();
-				if (flagStack.canStackWith(stack) && flagStack.stackSize < maxStackSize) {
-					flagStack.stackSize++;
-					inventory.setInventorySlotContents(targetSlot, flagStack);
-					hasInserted = true;
-				}
-			}
-		} else {
-			int fuelSlot = 1;
-			int inputSlot = 0;
-
-			if (Objects.equals(inventoryName, "Trommel")) {
-				fuelSlot = 4;
-				for (; inputSlot < 3; inputSlot++) {
-					ItemStack s = inventory.getStackInSlot(inputSlot);
-					if (s == null || s.canStackWith(stack) && s.stackSize < s.getMaxStackSize()) break;
-				}
-			}
-
-			int targetSlot = direction == Direction.UP ? fuelSlot : inputSlot;
-
-			ItemStack furnaceStack = inventory.getStackInSlot(targetSlot);
-
-			if (furnaceStack == null) {
-				inventory.setInventorySlotContents(targetSlot, stack);
-				hasInserted = true;
-			} else {
-				int maxStackSize = furnaceStack.getMaxStackSize();
-				maxStackSize = Math.min(maxStackSize, 8);
-
-				if (furnaceStack.canStackWith(stack) && furnaceStack.stackSize < maxStackSize) {
-					furnaceStack.stackSize++;
-					inventory.setInventorySlotContents(targetSlot, furnaceStack);
-					hasInserted = true;
-				}
-			}
 		}
 
-		return  hasInserted;
+		return hasInserted;
 	}
 
 
@@ -444,7 +439,8 @@ public class Util {
 				if (chestStack == null) {
 					return true;
 				}
-				if (chestStack.canStackWith(item) && chestStack.stackSize < chestStack.getMaxStackSize()) {
+				int maxStackSize = inventory.getInventoryStackLimit() != 64 ? inventory.getInventoryStackLimit() : chestStack.getMaxStackSize();
+				if (chestStack.canStackWith(item) && chestStack.stackSize < maxStackSize) {
 					return true;
 				}
 				j++;
@@ -466,7 +462,8 @@ public class Util {
 				fuelSlot = 4;
 				for (; inputSlot < 3; inputSlot++) {
 					ItemStack s = inventory.getStackInSlot(inputSlot);
-					if (s == null || s.canStackWith(item) && s.stackSize < s.getMaxStackSize()) break;
+					int maxStackSize = inventory.getInventoryStackLimit() != 64 ? inventory.getInventoryStackLimit() : s.getMaxStackSize();
+					if (s == null || s.canStackWith(item) && s.stackSize < maxStackSize) break;
 				}
 			}
 
