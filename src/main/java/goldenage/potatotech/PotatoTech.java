@@ -15,15 +15,19 @@ import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockGlass;
 import net.minecraft.core.block.material.Material;
 import net.minecraft.core.data.DataLoader;
+import net.minecraft.core.data.registry.recipe.RecipeNamespace;
 import net.minecraft.core.item.Item;
+import net.minecraft.core.item.ItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import turniplabs.halplibe.helper.BlockBuilder;
 import turniplabs.halplibe.helper.EntityHelper;
 import turniplabs.halplibe.helper.ItemBuilder;
+import turniplabs.halplibe.helper.RecipeBuilder;
 import turniplabs.halplibe.util.ClientStartEntrypoint;
 import turniplabs.halplibe.util.ConfigHandler;
 import turniplabs.halplibe.util.GameStartEntrypoint;
+import turniplabs.halplibe.util.RecipeEntrypoint;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,7 +39,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientStartEntrypoint {
+public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientStartEntrypoint, RecipeEntrypoint {
     public static final String MOD_ID = "potatotech";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -119,77 +123,6 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 		EntityHelper.createTileEntity(TileEntityCrusher.class, "crusher.tile");
 		EntityHelper.createTileEntity(TileEntityPlacer.class, "placer.tile");
 		EntityHelper.createTileEntity(TileEntityFilter.class, "filter.tile");
-
-
-	}
-
-	public void loadTextures(AtlasStitcher stitcher){
-
-		// This is awful, but required until 7.2-pre2 comes out
-		String id = TextureRegistry.stitcherMap.entrySet().stream().filter((e)->e.getValue() == stitcher).map(Map.Entry::getKey).collect(Collectors.toSet()).stream().findFirst().orElse(null);
-		if(id == null){
-			throw new RuntimeException("Failed to load textures: invalid atlas provided!");
-		}
-		LOGGER.info("Loading "+id+" textures...");
-		long start = System.currentTimeMillis();
-
-		String path = String.format("%s/%s/%s", "/assets", MOD_ID, stitcher.directoryPath);
-		URI uri;
-		try {
-			LOGGER.info("path: " + path);
-			URL url = DataLoader.class.getResource(path);
-			LOGGER.info("path: " + url);
-			uri = url.toURI();
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
-		FileSystem fileSystem = null;
-		Path myPath;
-		if (uri.getScheme().equals("jar")) {
-			try {
-				fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			myPath = fileSystem.getPath(path);
-		} else {
-			myPath = Paths.get(uri);
-		}
-
-		Stream<Path> walk;
-		try {
-			walk = Files.walk(myPath, Integer.MAX_VALUE);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		Iterator<Path> it = walk.iterator();
-
-		while (it.hasNext()) {
-			Path file = it.next();
-			String name = file.getFileName().toString();
-			if (name.endsWith(".png")) {
-				String path1 = file.toString().replace(file.getFileSystem().getSeparator(), "/");
-				String cutPath = path1.split(path)[1];
-				cutPath = cutPath.substring(0, cutPath.length() - 4);
-				TextureRegistry.getTexture(MOD_ID + ":"+ id + cutPath);
-			}
-		}
-
-		walk.close();
-		if (fileSystem != null) {
-			try {
-				fileSystem.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		try {
-			TextureRegistry.initializeAllFiles(MOD_ID, stitcher, true);
-		} catch (URISyntaxException | IOException e) {
-			throw new RuntimeException("Failed to load textures.", e);
-		}
-		LOGGER.info(String.format("Loaded "+id+" textures (took %sms).", System.currentTimeMillis() - start));
 	}
 
 	@Override
@@ -207,8 +140,15 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 
 	@Override
 	public void afterClientStart() {
-		//loadTextures(TextureRegistry.blockAtlas);
-		//loadTextures(TextureRegistry.itemAtlas);
-		//Minecraft.getMinecraft(Minecraft.class).renderEngine.refreshTextures(new ArrayList<>());
+	}
+
+	@Override
+	public void onRecipesReady() {
+		PotatoTechRecipeRegistry.InitRecipes();
+	}
+
+	@Override
+	public void initNamespaces() {
+		PotatoTechRecipeRegistry.InitNameSpaces();
 	}
 }
