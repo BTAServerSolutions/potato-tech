@@ -39,6 +39,12 @@
 		],
 		"afterClientStart": [
 			"goldenage.potatotech.PotatoTech"
+		],
+		"onRecipesReady": [
+			"goldenage.potatotech.PotatoTech"
+		],
+		"initNamespaces": [
+			"goldenage.potatotech.PotatoTech"
 		]
 	},
 	"mixins": [
