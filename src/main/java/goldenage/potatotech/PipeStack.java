@@ -1,6 +1,7 @@
 package goldenage.potatotech;
 
-import com.mojang.nbt.CompoundTag;
+import com.mojang.nbt.tags.CompoundTag;
+import net.minecraft.core.block.entity.TileEntityChest;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.helper.Direction;
 

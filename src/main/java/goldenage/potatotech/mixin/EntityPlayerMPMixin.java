@@ -6,6 +6,7 @@ import net.minecraft.core.entity.player.EntityPlayer;
 import net.minecraft.core.player.inventory.IInventory;
 import net.minecraft.core.world.World;
 import net.minecraft.server.entity.player.EntityPlayerMP;
+import net.minecraft.server.entity.player.PlayerServer;
 import net.minecraft.server.net.handler.NetServerHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,7 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 
 
 @Mixin(value = EntityPlayerMP.class,remap = false)
-public abstract class EntityPlayerMPMixin extends EntityPlayer implements IPotatoGui {
+public abstract class EntityPlayerMPMixin extends PlayerServer implements IPotatoGui {
 	private EntityPlayerMPMixin(World world) {
 		super(world);
 	}
