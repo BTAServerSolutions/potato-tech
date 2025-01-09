@@ -66,7 +66,7 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 
 	@Override
     public void onInitialize() {
-        LOGGER.info("ExampleMod initialized.");
+        LOGGER.info("PotatoTech initialized.");
 
 		int blockNum = config.getInt("starting_block_id");
 
