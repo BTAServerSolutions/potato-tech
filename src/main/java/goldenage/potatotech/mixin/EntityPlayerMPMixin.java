@@ -35,8 +35,9 @@ public abstract class EntityPlayerMPMixin extends EntityPlayer implements IPotat
 	public void diplayBlockFilterGui(TileEntity tileEntity, String id) {
 	}
 
-
 	public void diplayBlockCrusherGui(IInventory tileInventory) {
+	}
 
+	public void diplayBlockCrafterGui(IInventory tileInventory) {
 	}
 }

@@ -103,8 +103,8 @@ tile.potatotech.coil.desc=Transforms kinetic energy bellow into electric energy.
 tile.potatotech.test_area_maker.name=Test Area Maker
 tile.potatotech.test_area_maker.desc=Makes your chunk a perfect testing area, removes all blocks above.
 
-tile.potatotech.auto_crafter.name=Auto Crafter
-tile.potatotech.auto_crafter.desc=No, it does not have a face, you're delusional.
+tile.potatotech.block_crafter.name=Auto Crafter
+tile.potatotech.block_crafter.desc=No, it does not have a face, you're delusional.
 
 tile.potatotech.capacitor.name=LV Capacitor
 tile.potatotech.capacitor.desc=Stores 100000 Eu.
@@ -114,4 +114,3 @@ tile.potatotech.heater.desc=Heats furnaces with Eu.
 
 tile.potatotech.dust.name=Dust
 tile.potatotech.dust.desc=Not angel, do not consume.
-

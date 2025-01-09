@@ -9,6 +9,7 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.block.color.BlockColorCustom;
 import net.minecraft.client.render.block.model.BlockModelTransparent;
+import net.minecraft.client.render.block.model.BlockModelHorizontalRotation;
 import net.minecraft.client.render.stitcher.AtlasStitcher;
 import net.minecraft.client.render.stitcher.TextureRegistry;
 import net.minecraft.core.block.Block;
@@ -60,6 +61,7 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 	public static Block blockCrusher;
 	public static Block blockPlacer;
 	public static Block blockFilter;
+	public static Block blockCrafter;
 
 	public static Block blockPipeGold;
 	public static Block blockPipeDiamond;
@@ -84,7 +86,6 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 			.setBlockModel(BlockModelBlockPipeStack::new)
 			.setBlockColor(block -> new BlockColorBlockPipeStack())
 			.build(new BlockGlass("pipe_stack", blockNum++, Material.metal));
-
 
 		blockCrusher = new BlockBuilder(MOD_ID)
 			.setTextures("potatotech:block/block_crusher_side")
@@ -114,6 +115,14 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 			.setBlockModel(BlockModelPipe::new)
 			.build(new BlockDiamondPipe("diamond_pipe", blockNum++, Material.metal));
 
+		blockCrafter = new BlockBuilder(MOD_ID)
+            .setTextures("potatotech:block/block_iron_machine_side")
+            .setTopTexture("potatotech:block/block_auto_crafter_top")
+            .setBottomTexture("potatotech:block/block_iron_machine")
+            .setNorthTexture("potatotech:block/block_auto_crafter_front")
+            .setBlockModel(BlockModelHorizontalRotation::new)
+			.build(new BlockCrafter("block_crafter", blockNum++, Material.metal));
+
 		int itemNum = config.getInt("starting_item_id");
 		itemWrench = new ItemBuilder(MOD_ID).setIcon("potatotech:item/wrench").build(new Item("wrench", itemNum++));
 
@@ -123,6 +132,7 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 		EntityHelper.createTileEntity(TileEntityCrusher.class, "crusher.tile");
 		EntityHelper.createTileEntity(TileEntityPlacer.class, "placer.tile");
 		EntityHelper.createTileEntity(TileEntityFilter.class, "filter.tile");
+		EntityHelper.createTileEntity(TileEntityCrafter.class, "crafter.tile");
 	}
 
 	@Override

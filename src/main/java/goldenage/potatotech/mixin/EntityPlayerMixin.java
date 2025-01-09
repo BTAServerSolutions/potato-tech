@@ -10,10 +10,11 @@ import org.spongepowered.asm.mixin.Mixin;
 public abstract class EntityPlayerMixin implements IPotatoGui {
 
 	public void displayBlockFilterGui(TileEntity tileEntity)  {
-
 	}
 
 	public void diplayBlockCrusherGui(IInventory tileInventory) {
+	}
 
+	public void diplayBlockCrafterGui(IInventory tileInventory) {
 	}
 }
