@@ -52,7 +52,6 @@ public class PotatoTechRecipeRegistry extends RecipeRegistry {
 	}
 
 	public static void InitNameSpaces() {
-
 		// So, you can use this template to add more groups if needed.
 		// Constant for a group of crafting recipes related to the workbench.
 		final RecipeGroup<RecipeEntryCrafting<?, ?>> WORKBENCH =

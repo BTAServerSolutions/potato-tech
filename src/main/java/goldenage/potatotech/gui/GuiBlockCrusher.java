@@ -6,7 +6,6 @@ import net.minecraft.core.player.inventory.InventoryPlayer;
 import org.lwjgl.opengl.GL11;
 
 public class GuiBlockCrusher extends GuiContainer {
-
 	public GuiBlockCrusher(InventoryPlayer inventoryplayer, IInventory tileentity) {
 		super(new ContainerBlockCrusher(inventoryplayer, tileentity));
 	}
