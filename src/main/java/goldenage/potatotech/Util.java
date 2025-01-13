@@ -242,11 +242,18 @@ public class Util {
 					}
 
 					if (stack != null && j > 0) {
-						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
+						short color = 0;
+						if (Objects.equals(inventoryName, "Filter")) {
+							TileEntityFilter filter = (TileEntityFilter) inventory;
+							color = filter.getColorInSlot(j - 1);
+						}
+
+						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer, color);
 						if (stack.stackSize <= 0) stack = null;
 						inventory.setInventorySlotContents(j - 1, stack);
 						return returnStack;
 					}
+
 				} else if (Objects.equals(inventoryName, "Trommel")) {
 					int inventorySize = 4;
 					ItemStack stack = null;

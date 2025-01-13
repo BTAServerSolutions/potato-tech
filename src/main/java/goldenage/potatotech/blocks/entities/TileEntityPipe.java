@@ -162,7 +162,9 @@ public class TileEntityPipe extends TileEntity {
 					stack = Util.getItemFromInventory(worldObj, x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ(), dir, 0);
 					if (stack != null) {
 						stack.timer = 0;
-						stack.color = colorBySide[dir.getId()];
+						if (stack.color == 0) {
+							stack.color = colorBySide[dir.getId()];
+						}
 					}
 					stacks[dir.getId() + 1] = stack;
 				}
@@ -215,10 +217,24 @@ public class TileEntityPipe extends TileEntity {
 				TileEntity te = worldObj.getBlockTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
 				if (stack2 == null && (te instanceof IInventory || te instanceof TileEntityPipe) && i != stacks[0].direction.getId() && modeBySide[i] < 2) {
 					if (te instanceof TileEntityPipe) {
-						if (((TileEntityPipe)te).modeBySide[dir.getOpposite().getId()] == 3) continue;
-						if (((TileEntityPipe)te).modeBySide[dir.getOpposite().getId()] == 1) continue;
-					} else if (modeBySide[i] == 1 && !Util.canInsertOnInventory(worldObj, x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ(), dir.getOpposite(), stacks[0].stack)) {
-						continue;
+						TileEntityPipe pipe = (TileEntityPipe) te;
+						int pipeMode = pipe.modeBySide[dir.getOpposite().getId()];
+						boolean cannotMove = (pipeMode == 3) || (pipeMode == 1);
+						//cannotMove |= pipe.stacks[dir.getOpposite().getId()] != null;
+						if (cannotMove) continue;
+					} else {
+						boolean canInsert = modeBySide[i] == 1;
+						canInsert &= !Util.canInsertOnInventory(
+							worldObj,
+							x + dir.getOffsetX(),
+							y + dir.getOffsetY(),
+							z + dir.getOffsetZ(),
+							dir.getOpposite(),
+							stacks[0].stack);
+
+						if (canInsert) {
+							continue;
+						}
 					}
 
 					if (this.colorBySide[i] > 0) {

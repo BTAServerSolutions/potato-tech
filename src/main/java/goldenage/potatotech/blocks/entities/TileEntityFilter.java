@@ -4,8 +4,76 @@ import com.mojang.nbt.CompoundTag;
 import com.mojang.nbt.ListTag;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.entity.player.EntityPlayer;
+import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.IInventory;
+
+class FilterPaintInventory implements IInventory {
+	public ItemStack[] contents = new ItemStack[9];
+
+	@Override
+	public int getSizeInventory() {
+		return 9;
+	}
+
+	@Override
+	public ItemStack getStackInSlot(int i) {
+		return contents[i];
+	}
+
+	@Override
+	public ItemStack decrStackSize(int i, int j) {
+		if (this.contents[i] != null) {
+			if (this.contents[i].stackSize <= j) {
+				ItemStack itemstack = this.contents[i];
+				this.contents[i] = null;
+				this.onInventoryChanged();
+				return itemstack;
+			}
+			ItemStack itemstack1 = this.contents[i].splitStack(j);
+			if (this.contents[i].stackSize <= 0) {
+				this.contents[i] = null;
+			}
+			this.onInventoryChanged();
+			return itemstack1;
+		}
+		return null;
+	}
+
+	@Override
+	public void setInventorySlotContents(int i, ItemStack itemStack) {
+		this.contents[i] = itemStack;
+		if (itemStack != null && itemStack.stackSize > this.getInventoryStackLimit()) {
+			itemStack.stackSize = this.getInventoryStackLimit();
+		}
+		this.onInventoryChanged();
+	}
+
+	@Override
+	public String getInvName() {
+		return "FilterPaint";
+	}
+
+	@Override
+	public int getInventoryStackLimit() {
+		return 1;
+	}
+
+	@Override
+	public void onInventoryChanged() {
+
+	}
+
+	@Override
+	public boolean canInteractWith(EntityPlayer entityPlayer) {
+		return false;
+	}
+
+	@Override
+	public void sortInventory() {
+
+	}
+}
 
 public class TileEntityFilter extends TileEntity implements IInventory {
     private ItemStack[] filterContents;
@@ -17,6 +85,7 @@ public class TileEntityFilter extends TileEntity implements IInventory {
     public TileEntityFilter() {
         this(9);
     }
+	public FilterPaintInventory paintInventory = new FilterPaintInventory();
 
     @Override
     public int getSizeInventory() {
@@ -28,6 +97,13 @@ public class TileEntityFilter extends TileEntity implements IInventory {
         return this.filterContents[i];
     }
 
+	public short getColorInSlot(int i) {
+		ItemStack stack = paintInventory.getStackInSlot(i);
+		if (stack == null || stack.itemID != Item.dye.id) {
+			return 0;
+		}
+		return (short)(stack.getMetadata() + 1);
+	}
 
     @Override
     public ItemStack decrStackSize(int i, int j) {
@@ -74,28 +150,46 @@ public class TileEntityFilter extends TileEntity implements IInventory {
     @Override
     public void readFromNBT(CompoundTag nbttagcompound) {
         super.readFromNBT(nbttagcompound);
-        ListTag nbttaglist = nbttagcompound.getList("Items");
-        this.filterContents = new ItemStack[this.getSizeInventory()];
-        for (int i = 0; i < nbttaglist.tagCount(); ++i) {
-            CompoundTag nbttagcompound1 = (CompoundTag)nbttaglist.tagAt(i);
-            int j = nbttagcompound1.getByte("Slot") & 0xFF;
-            if (j >= this.filterContents.length) continue;
-            this.filterContents[j] = ItemStack.readItemStackFromNbt(nbttagcompound1);
-        }
+		ListTag nbttaglist = nbttagcompound.getList("Items");
+		this.filterContents = new ItemStack[this.getSizeInventory()];
+		for (int i = 0; i < nbttaglist.tagCount(); ++i) {
+			CompoundTag nbttagcompound1 = (CompoundTag) nbttaglist.tagAt(i);
+			int j = nbttagcompound1.getByte("Slot") & 0xFF;
+			if (j >= this.filterContents.length) continue;
+			this.filterContents[j] = ItemStack.readItemStackFromNbt(nbttagcompound1);
+		}
+
+		ListTag nbttaglist2 = nbttagcompound.getList("ItemsC");
+		for (int i = 0; i < nbttaglist2.tagCount(); ++i) {
+			CompoundTag nbttagcompound1 = (CompoundTag) nbttaglist2.tagAt(i);
+			int j = nbttagcompound1.getByte("Slot") & 0xFF;
+			if (j >= this.paintInventory.contents.length) continue;
+			this.paintInventory.contents[j] = ItemStack.readItemStackFromNbt(nbttagcompound1);
+		}
     }
 
     @Override
     public void writeToNBT(CompoundTag nbttagcompound) {
         super.writeToNBT(nbttagcompound);
-        ListTag nbttaglist = new ListTag();
-        for (int i = 0; i < this.filterContents.length; ++i) {
-            if (this.filterContents[i] == null) continue;
-            CompoundTag nbttagcompound1 = new CompoundTag();
-            nbttagcompound1.putByte("Slot", (byte)i);
-            this.filterContents[i].writeToNBT(nbttagcompound1);
-            nbttaglist.addTag(nbttagcompound1);
-        }
-        nbttagcompound.put("Items", nbttaglist);
+		ListTag nbttaglist = new ListTag();
+		for (int i = 0; i < this.filterContents.length; ++i) {
+			if (this.filterContents[i] == null) continue;
+			CompoundTag nbttagcompound1 = new CompoundTag();
+			nbttagcompound1.putByte("Slot", (byte) i);
+			this.filterContents[i].writeToNBT(nbttagcompound1);
+			nbttaglist.addTag(nbttagcompound1);
+		}
+		nbttagcompound.put("Items", nbttaglist);
+
+		ListTag nbttaglist2 = new ListTag();
+		for (int i = 0; i < this.paintInventory.contents.length; ++i) {
+			if (this.paintInventory.contents[i] == null) continue;
+			CompoundTag nbttagcompound1 = new CompoundTag();
+			nbttagcompound1.putByte("Slot", (byte) i);
+			this.paintInventory.contents[i].writeToNBT(nbttagcompound1);
+			nbttaglist2.addTag(nbttagcompound1);
+		}
+		nbttagcompound.put("ItemsC", nbttaglist2);
     }
 
     @Override

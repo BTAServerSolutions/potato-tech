@@ -49,6 +49,48 @@ public class PotatoTechRecipeRegistry extends RecipeRegistry {
 			.addInput('R', Item.dustRedstone)
 			.addInput('M', Block.meshGold)
 			.create("Filter", new ItemStack(PotatoTech.blockFilter, 1));
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape(
+				"C C",
+				"CPC",
+				"CRC"
+			)
+			.addInput('C', "minecraft:cobblestones")
+			.addInput('R', Item.dustRedstone)
+			.addInput('P', Block.pistonBase)
+			.create("Placer", new ItemStack(PotatoTech.blockPlacer));
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape(
+				"COC",
+				"CPC",
+				"CRC"
+			)
+			.addInput('C', "minecraft:cobblestones")
+			.addInput('O', Block.obsidian)
+			.addInput('P', Block.pistonBase)
+			.addInput('R', Item.dustRedstone)
+			.create("Crusher", new ItemStack(PotatoTech.blockCrusher));
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape(
+				" I ",
+				" II",
+				"I  "
+			)
+			.addInput('I', Item.ingotIron)
+			.create("Wrench", new ItemStack(PotatoTech.itemWrench));
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape(
+				"IRI",
+				"RWR",
+				"IRI"
+			)
+			.addInput('I', Item.ingotIron)
+			.addInput('W', Block.workbench)
+			.addInput('R', Item.dustRedstone)
+			.create("Crafter", new ItemStack(PotatoTech.blockCrafter));
 	}
 
 	public static void InitNameSpaces() {
