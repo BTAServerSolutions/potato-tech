@@ -66,6 +66,11 @@ public class BlockPipe extends BlockTileEntity {
 			te.colorBySide[side.getId()] = (short) (heldItem.getMetadata() + 1);
 			world.markBlockNeedsUpdate(x, y, z);
 			return true;
+        } else if (heldItem.getItem().getClass().getName().equals("goocraft4evr.nonamedyes.item.ItemModDye")) {
+            // NoNameDyes support
+			te.colorBySide[side.getId()] = (short) (heldItem.getMetadata() + 17);
+			world.markBlockNeedsUpdate(x, y, z);
+			return true;
 		} else if (heldItem.itemID == Item.paper.id) {
 			te.colorBySide[side.getId()] = 0;
 			world.markBlockNeedsUpdate(x, y, z);

@@ -54,6 +54,21 @@ public class TileEntityRendererPipe extends TileEntityRenderer<TileEntityPipe> {
 		0xFF_FF_30_FF, // magenta
 		0xFF_FF_90_00, // orange
 		0xFF_FF_FF_FF, // White
+		// NoNamedYes support
+		0xFF_CA_30_4A, // Crimson
+        0xFF_6E_1E_1B, // Maroon
+        0xFF_A4_B9_A8, // Ash Gray
+        0xFF_90_8D_2C, // Olive
+        0xFF_C8_84_40, // Ochre
+        0xFF_FF_C3_76, // Buff
+        0xFF_61_E0_C2, // Verdigris
+        0xFF_EA_E2_8F, // Light Yellow
+        0xFF_4F_3E_D6, // Indigo
+        0xFF_D0_FC_2C, // Xanthic
+        0xFF_C1_68_34, // Cinnamon
+        0xFF_2F_27_81, // Navy Blue
+        0xFF_74_2F_8A, // Royal Purple
+        0xFF_3D_8A_6F  // Viridian
 	};
 
 	@Override

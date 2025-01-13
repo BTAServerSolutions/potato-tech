@@ -72,6 +72,21 @@ public class BlockModelPipe<T extends BlockPipe> extends BlockModelStandard<T> {
 		{1.0f, 0.2f, 1.0f}, // magenta
 		{1.0f, 0.7f, 0.0f}, // orange
 		{5.0f, 5.0f, 5.0f}, // white
+		// NND
+		{0.79f, 0.19f, 0.29f}, // Crimson
+		{0.43f, 0.12f, 0.11f}, // Maroon
+		{0.64f, 0.73f, 0.66f}, // Ash Gray
+		{0.56f, 0.55f, 0.17f}, // Olive
+		{0.78f, 0.52f, 0.25f}, // Ochre
+		{1.00f, 0.76f, 0.46f}, // Buff
+		{0.38f, 0.88f, 0.76f}, // Verdigris
+		{0.92f, 0.89f, 0.56f}, // Light Yellow
+		{0.31f, 0.24f, 0.84f}, // Indigo
+		{0.82f, 0.99f, 0.17f}, // Xanthic
+		{0.76f, 0.41f, 0.20f}, // Cinnamon
+		{0.18f, 0.15f, 0.51f}, // Navy Blue
+		{0.45f, 0.18f, 0.54f}, // Royal Purple
+		{0.24f, 0.54f, 0.44f}  // Viridian
 	};
 
 	public BlockModelPipe(Block block) {
