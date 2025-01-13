@@ -99,10 +99,14 @@ public class TileEntityFilter extends TileEntity implements IInventory {
 
 	public short getColorInSlot(int i) {
 		ItemStack stack = paintInventory.getStackInSlot(i);
-		if (stack == null || stack.itemID != Item.dye.id) {
+		if (stack == null) {
 			return 0;
-		}
-		return (short)(stack.getMetadata() + 1);
+		} else if (stack.itemID == Item.dye.id) {
+		    return (short)(stack.getMetadata() + 1);
+	    } else if (stack.getItem().getClass().getName().equals("goocraft4evr.nonamedyes.item.ItemModDye")) {
+            return (short)(stack.getMetadata() + 17);
+        }
+        return 0;
 	}
 
     @Override
