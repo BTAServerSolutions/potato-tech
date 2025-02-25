@@ -1,12 +1,9 @@
 package goldenage.potatotech;
 
 import net.minecraft.client.render.block.color.BlockColor;
-import net.minecraft.client.render.colorizer.Colorizer;
 import net.minecraft.core.world.WorldSource;
 
 public class BlockColorBlockPipeStack extends BlockColor {
-
-
 		public BlockColorBlockPipeStack() {
 		}
 

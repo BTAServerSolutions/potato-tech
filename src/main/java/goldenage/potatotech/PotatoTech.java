@@ -1,29 +1,15 @@
 package goldenage.potatotech;
 
-import goldenage.potatotech.blocks.*;
-import goldenage.potatotech.blocks.entities.*;
-import goldenage.potatotech.blocks.models.BlockModelBlockPipeStack;
-import goldenage.potatotech.blocks.models.BlockModelPipe;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.render.block.model.BlockModelHorizontalRotation;
-import net.minecraft.core.block.Block;
-import net.minecraft.core.block.BlockGlass;
-import net.minecraft.core.block.material.Material;
-import net.minecraft.core.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import turniplabs.halplibe.helper.BlockBuilder;
-import turniplabs.halplibe.helper.EntityHelper;
-import turniplabs.halplibe.helper.ItemBuilder;
-import turniplabs.halplibe.util.ClientStartEntrypoint;
 import turniplabs.halplibe.util.ConfigHandler;
 import turniplabs.halplibe.util.GameStartEntrypoint;
-import turniplabs.halplibe.util.RecipeEntrypoint;
 
 import java.util.*;
 
 
-public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientStartEntrypoint, RecipeEntrypoint {
+public class PotatoTech implements ModInitializer, GameStartEntrypoint {
     public static final String MOD_ID = "potatotech";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -36,94 +22,18 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 		config.updateConfig();
 	}
 
-	public static Item itemWrench;
-	public static Block blockTestAreaMaker;
-	public static Block blockPipe;
-
-	public static Block blockPipeStack;
-	public static Block blockFilter;
-	public static Block blockCrafter;
-
-	public static Block blockPipeGold;
-	public static Block blockPipeDiamond;
-
 	@Override
-    public void onInitialize() {
-        LOGGER.info("PotatoTech initialized.");
-
-		int blockNum = config.getInt("starting_block_id");
-
-		blockTestAreaMaker = new BlockBuilder(MOD_ID)
-			.setTextures("potatotech:block/potato")
-			.build(new BlockTestAreaMaker("test_area_maker", blockNum++, Material.metal));
-
-		blockPipe = new BlockBuilder(MOD_ID)
-			.setTextures("potatotech:block/pipe")
-			.setBlockModel(BlockModelPipe::new)
-			.build(new BlockPipe("pipe", blockNum++, Material.metal));
-
-		blockPipeStack = new BlockBuilder(MOD_ID)
-			.setTextures("potatotech:block/pipe_stack")
-			.setBlockModel(BlockModelBlockPipeStack::new)
-			.setBlockColor(block -> new BlockColorBlockPipeStack())
-			.build(new BlockGlass("pipe_stack", blockNum++, Material.metal));
-
-		blockFilter = new BlockBuilder(MOD_ID)
-			.setTextures("potatotech:block/block_filter")
-			.build(new BlockFilter("filter", blockNum++, Material.wood));
-
-		blockPipeGold = new BlockBuilder(MOD_ID)
-			.setTextures("potatotech:block/gold_pipe")
-			.setBlockModel(BlockModelPipe::new)
-			.build(new BlockGoldPipe("gold_pipe", blockNum++, Material.metal));
-
-		blockPipeDiamond = new BlockBuilder(MOD_ID)
-			.setTextures("potatotech:block/diamond_pipe")
-			.setBlockModel(BlockModelPipe::new)
-			.build(new BlockDiamondPipe("diamond_pipe", blockNum++, Material.metal));
-
-		blockCrafter = new BlockBuilder(MOD_ID)
-            .setTextures("potatotech:block/block_iron_machine_side")
-            .setTopTexture("potatotech:block/block_auto_crafter_top")
-            .setBottomTexture("potatotech:block/block_iron_machine")
-            .setNorthTexture("potatotech:block/block_auto_crafter_front")
-            .setBlockModel(BlockModelHorizontalRotation::new)
-			.build(new BlockCrafter("block_crafter", blockNum++, Material.metal));
-
-		int itemNum = config.getInt("starting_item_id");
-		itemWrench = new ItemBuilder(MOD_ID).setIcon("potatotech:item/wrench").build(new Item("wrench", itemNum++));
-
-		EntityHelper.createSpecialTileEntity(TileEntityPipe.class, "pipe.tile", TileEntityRendererPipe::new);
-		EntityHelper.createSpecialTileEntity(TileEntityGoldPipe.class, "gold_pipe.tile", TileEntityRendererPipe::new);
-		EntityHelper.createSpecialTileEntity(TileEntityDiamondPipe.class, "diamond_pipe.tile", TileEntityRendererPipe::new);
-		EntityHelper.createTileEntity(TileEntityFilter.class, "filter.tile");
-		EntityHelper.createTileEntity(TileEntityCrafter.class, "crafter.tile");
+	public void onInitialize() {
+		LOGGER.info("Potato Tech initialized");
 	}
 
 	@Override
 	public void beforeGameStart() {
+		LOGGER.info("init");
 	}
 
 	@Override
 	public void afterGameStart() {
-		BlockCrusher.initCrusherResults();
-	}
-
-	@Override
-	public void beforeClientStart() {
-	}
-
-	@Override
-	public void afterClientStart() {
-	}
-
-	@Override
-	public void onRecipesReady() {
-		PotatoTechRecipeRegistry.InitRecipes();
-	}
-
-	@Override
-	public void initNamespaces() {
-		PotatoTechRecipeRegistry.InitNameSpaces();
+		LOGGER.info("init");
 	}
 }
