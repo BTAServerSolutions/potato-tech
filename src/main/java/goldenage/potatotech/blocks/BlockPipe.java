@@ -3,12 +3,12 @@ package goldenage.potatotech.blocks;
 import goldenage.potatotech.PotatoTech;
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.core.block.Block;
-import net.minecraft.core.block.BlockFence;
-import net.minecraft.core.block.BlockTileEntity;
+import net.minecraft.core.block.BlockLogic;
+import net.minecraft.core.block.BlockLogicFurnace;
 import net.minecraft.core.block.entity.TileEntity;
+import net.minecraft.core.block.entity.TileEntityFurnace;
 import net.minecraft.core.block.material.Material;
-import net.minecraft.core.entity.EntityLiving;
-import net.minecraft.core.entity.player.EntityPlayer;
+import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.sound.SoundCategory;
@@ -17,25 +17,15 @@ import net.minecraft.core.world.World;
 
 import java.util.Random;
 
-public class BlockPipe extends BlockTileEntity {
-
-	public BlockPipe(String key, int id, Material material) {
-		super(key, id, material);
+public class BlockPipe extends BlockLogic {
+	public BlockPipe(Block<?> block, Material material) {
+		super(block, material);
 		this.setBlockBounds(0.25f, 0.25f, 0.25f, 0.75f, 0.75f, 0.75f);
+		block.withEntity(TileEntityPipe::new);
 	}
-
-    @Override
-    protected TileEntity getNewBlockEntity() {
-        return new TileEntityPipe();
-    }
 
 	@Override
     public boolean isSolidRender() {
-        return false;
-    }
-
-    @Override
-    public boolean renderAsNormalBlock() {
         return false;
     }
 
@@ -49,8 +39,8 @@ public class BlockPipe extends BlockTileEntity {
     }
 
 	@Override
-	public boolean onBlockRightClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xHit, double yHit) {
-        TileEntityPipe te = (TileEntityPipe)world.getBlockTileEntity(x, y, z);
+	public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
+        TileEntityPipe te = (TileEntityPipe)world.getTileEntity(x, y, z);
         ItemStack heldItem = player.getHeldItem();
         if (heldItem == null) {
 			te.dropItems();

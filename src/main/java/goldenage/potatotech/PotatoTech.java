@@ -3,41 +3,24 @@ package goldenage.potatotech;
 import goldenage.potatotech.blocks.*;
 import goldenage.potatotech.blocks.entities.*;
 import goldenage.potatotech.blocks.models.BlockModelBlockPipeStack;
-import goldenage.potatotech.blocks.models.BlockModelCrusher;
 import goldenage.potatotech.blocks.models.BlockModelPipe;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.block.color.BlockColorCustom;
-import net.minecraft.client.render.block.model.BlockModelTransparent;
 import net.minecraft.client.render.block.model.BlockModelHorizontalRotation;
-import net.minecraft.client.render.stitcher.AtlasStitcher;
-import net.minecraft.client.render.stitcher.TextureRegistry;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockGlass;
 import net.minecraft.core.block.material.Material;
-import net.minecraft.core.data.DataLoader;
-import net.minecraft.core.data.registry.recipe.RecipeNamespace;
 import net.minecraft.core.item.Item;
-import net.minecraft.core.item.ItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import turniplabs.halplibe.helper.BlockBuilder;
 import turniplabs.halplibe.helper.EntityHelper;
 import turniplabs.halplibe.helper.ItemBuilder;
-import turniplabs.halplibe.helper.RecipeBuilder;
 import turniplabs.halplibe.util.ClientStartEntrypoint;
 import turniplabs.halplibe.util.ConfigHandler;
 import turniplabs.halplibe.util.GameStartEntrypoint;
 import turniplabs.halplibe.util.RecipeEntrypoint;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.*;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientStartEntrypoint, RecipeEntrypoint {
@@ -58,8 +41,6 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 	public static Block blockPipe;
 
 	public static Block blockPipeStack;
-	public static Block blockCrusher;
-	public static Block blockPlacer;
 	public static Block blockFilter;
 	public static Block blockCrafter;
 
@@ -86,20 +67,6 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 			.setBlockModel(BlockModelBlockPipeStack::new)
 			.setBlockColor(block -> new BlockColorBlockPipeStack())
 			.build(new BlockGlass("pipe_stack", blockNum++, Material.metal));
-
-		blockCrusher = new BlockBuilder(MOD_ID)
-			.setTextures("potatotech:block/block_crusher_side")
-			.setTopTexture("potatotech:block/block_crusher_front")
-			.setBottomTexture("potatotech:block/block_crusher_back")
-			.setBlockModel(BlockModelCrusher::new)
-			.build(new BlockCrusher("block_crusher", blockNum++, Material.stone));
-
-		blockPlacer = new BlockBuilder(MOD_ID)
-			.setTextures("potatotech:block/block_placer_side")
-			.setTopTexture("potatotech:block/block_placer_front")
-			.setBottomTexture("potatotech:block/block_placer_back")
-			.setBlockModel(BlockModelCrusher::new)
-			.build(new BlockPlacer("block_placer", blockNum++, Material.stone));
 
 		blockFilter = new BlockBuilder(MOD_ID)
 			.setTextures("potatotech:block/block_filter")
@@ -129,8 +96,6 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint, ClientSt
 		EntityHelper.createSpecialTileEntity(TileEntityPipe.class, "pipe.tile", TileEntityRendererPipe::new);
 		EntityHelper.createSpecialTileEntity(TileEntityGoldPipe.class, "gold_pipe.tile", TileEntityRendererPipe::new);
 		EntityHelper.createSpecialTileEntity(TileEntityDiamondPipe.class, "diamond_pipe.tile", TileEntityRendererPipe::new);
-		EntityHelper.createTileEntity(TileEntityCrusher.class, "crusher.tile");
-		EntityHelper.createTileEntity(TileEntityPlacer.class, "placer.tile");
 		EntityHelper.createTileEntity(TileEntityFilter.class, "filter.tile");
 		EntityHelper.createTileEntity(TileEntityCrafter.class, "crafter.tile");
 	}

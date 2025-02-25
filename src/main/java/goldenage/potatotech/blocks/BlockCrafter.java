@@ -7,6 +7,8 @@ import goldenage.potatotech.blocks.entities.TileEntityCrafter;
 // TODO
 //import goldenage.potatotech.blocks.entities.TileEntityBurner;
 import net.minecraft.core.block.Block;
+import net.minecraft.core.entity.player.Player;
+import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.block.BlockTileEntityRotatable;
 import net.minecraft.core.block.entity.TileEntity;
@@ -58,9 +60,9 @@ public class BlockCrafter extends BlockTileEntityRotatable {
     }
 
     @Override
-    public boolean onBlockRightClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xHit, double yHit) {
+    public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
         if (!world.isClientSide) {
-            IInventory inventory = (IInventory) world.getBlockTileEntity(x, y, z);
+            Container inventory = (Container) world.getTileEntity(x, y, z);
 			((IPotatoGui) player).diplayBlockCrafterGui(inventory);
         }
         return true;
@@ -72,7 +74,7 @@ public class BlockCrafter extends BlockTileEntityRotatable {
         int blockId = world.getBlockId(x,y,z);
         // TODO
         //if (blockId == PotatoLogisticsMod.blockFurnaceBurner.id || blockId == PotatoLogisticsMod.blockFurnaceBurnerOn.id) {return;}
-        TileEntityCrafter tileEntityCrafter = (TileEntityCrafter) world.getBlockTileEntity(x, y, z);
+        TileEntityCrafter tileEntityCrafter = (TileEntityCrafter) world.getTileEntity(x, y, z);
         for (int l = 0; l < tileEntityCrafter.getSizeInventory(); ++l) {
             ItemStack itemstack = tileEntityCrafter.getStackInSlot(l);
             if (itemstack == null) continue;

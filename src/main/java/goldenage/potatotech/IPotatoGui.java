@@ -1,9 +1,9 @@
 package goldenage.potatotech;
 
-import net.minecraft.core.player.inventory.IInventory;
+import net.minecraft.core.player.inventory.container.Container;
 
 public interface IPotatoGui {
-	void diplayBlockFilterGui(IInventory tileInventory);
-	void diplayBlockCrusherGui(IInventory tileInventory);
-	void diplayBlockCrafterGui(IInventory tileInventory);
+	void diplayBlockFilterGui(Container container);
+	void diplayBlockCrusherGui(Container container);
+	void diplayBlockCrafterGui(Container container);
 }

@@ -12,19 +12,22 @@ import net.minecraft.core.data.registry.Registries;
 import net.minecraft.core.data.registry.recipe.RecipeRegistry;
 import net.minecraft.core.data.registry.recipe.entry.RecipeEntryCrafting;
 import net.minecraft.core.entity.player.EntityPlayer;
+import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.Packet140TileEntityData;
 import net.minecraft.core.player.inventory.*;
+import net.minecraft.core.player.inventory.container.Container;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class TileEntityCrafter extends TileEntity implements IInventory {
+public class TileEntityCrafter extends TileEntity implements Container {
     public InventoryCrafting craftMatrix;
-    public IInventory pattern;
-    public IInventory extraOutputs;
-    public IInventory craftResult = new InventoryCraftResult();
+    public Container pattern;
+    public Container extraOutputs;
+    public Container craftResult = new InventoryCraftResult();
     public ContainerCrafter dummyContainer;
 
     private final List<RecipeEntryCrafting<?, ?>> craftingRecipeEntries = Registries.RECIPES.getAllCraftingRecipes();
@@ -36,44 +39,6 @@ public class TileEntityCrafter extends TileEntity implements IInventory {
         extraOutputs = new InventoryBasic("extra outputs", 1);
     }
 
-    @Override
-    public int getSizeInventory() {
-        return 10;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int i) {
-        if (i == 0) {
-            return craftResult.getStackInSlot(0);
-        } else if (craftMatrix != null) {
-            return craftMatrix.getStackInSlot(i-1);
-        }
-        return null;
-    }
-
-    @Override
-    public ItemStack decrStackSize(int i, int j) {
-        if (i == 0) {
-           return craftResult.decrStackSize(i, j);
-        } else if (craftMatrix != null) {
-            return craftMatrix.decrStackSize(i, j);
-        }
-        return null;
-    }
-
-    @Override
-    public void setInventorySlotContents(int i, ItemStack itemStack) {
-        if (i == 0) {
-            craftResult.setInventorySlotContents(0, itemStack);
-        } else if (craftMatrix != null) {
-            craftMatrix.setInventorySlotContents(i - 1, itemStack);
-        }
-    }
-
-    @Override
-    public String getInvName() {
-        return "Auto Crafter";
-    }
 
 
     @Override
@@ -147,25 +112,6 @@ public class TileEntityCrafter extends TileEntity implements IInventory {
             }
             nbttagcompound.put("CraftResult", nbttaglist);
         }
-    }
-
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean canInteractWith(EntityPlayer entityPlayer) {
-        if (worldObj.getBlockTileEntity(this.x, this.y, this.z) != this) {
-            return false;
-        }
-        return entityPlayer.distanceToSqr((double) this.x + 0.5, (double) this.y + 0.5, (double) this.z + 0.5) <= 64.0;
-    }
-
-    @Override
-    public void sortInventory() {
-
     }
 
     @Override
@@ -309,4 +255,61 @@ public class TileEntityCrafter extends TileEntity implements IInventory {
             }
         }
     }
+
+	@Override
+	public int getContainerSize() {
+		return 10;
+	}
+
+	@Override
+	public @Nullable ItemStack getItem(int i) {
+		if (i == 0) {
+			return craftResult.getItem(0);
+		} else if (craftMatrix != null) {
+			return craftMatrix.getItem(i-1);
+		}
+		return null;
+	}
+
+	@Override
+	public @Nullable ItemStack removeItem(int i, int j) {
+		if (i == 0) {
+			return craftResult.removeItem(i, j);
+		} else if (craftMatrix != null) {
+			return craftMatrix.removeItem(i, j);
+		}
+		return null;
+	}
+
+	@Override
+	public void setItem(int i, @Nullable ItemStack itemStack) {
+		if (i == 0) {
+			craftResult.setItem(0, itemStack);
+		} else if (craftMatrix != null) {
+			craftMatrix.setItem(i - 1, itemStack);
+		}
+	}
+
+	@Override
+	public String getNameTranslationKey() {
+		return "auto_crafter";
+	}
+
+	@Override
+	public int getMaxStackSize() {
+		return 64;
+	}
+
+	@Override
+	public boolean stillValid(Player player) {
+		if (worldObj.getTileEntity(this.x, this.y, this.z) != this) {
+			return false;
+		}
+		return player.distanceToSqr((double) this.x + 0.5, (double) this.y + 0.5, (double) this.z + 0.5) <= 64.0;
+	}
+
+	@Override
+	public void sortContainer() {
+
+	}
 }
