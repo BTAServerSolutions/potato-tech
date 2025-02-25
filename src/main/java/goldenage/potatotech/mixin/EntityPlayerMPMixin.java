@@ -36,8 +36,9 @@ public abstract class EntityPlayerMPMixin extends PlayerServer implements IPotat
 	public void diplayBlockFilterGui(TileEntity tileEntity, String id) {
 	}
 
-
 	public void diplayBlockCrusherGui(IInventory tileInventory) {
+	}
 
+	public void diplayBlockCrafterGui(IInventory tileInventory) {
 	}
 }

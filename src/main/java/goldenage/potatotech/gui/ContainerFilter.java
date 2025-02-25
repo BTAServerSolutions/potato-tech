@@ -13,23 +13,27 @@ public class ContainerFilter extends Container {
     private final IInventory inventory;
     private final int numberOfRows;
 
-    public ContainerFilter(InventoryPlayer playerInventory, IInventory inventory) {
+    public ContainerFilter(InventoryPlayer playerInventory, IInventory inventory, IInventory inventory2) {
         this.inventory = inventory;
         numberOfRows = 1;
 
         for (int i = 0; i < 9; i++) {
-            this.addSlot(new Slot(inventory, i, 8 + i * 18, 18));
+            this.addSlot(new Slot(inventory, i, 8 + i * 18, 23));
         }
 
-        int i = (this.numberOfRows - 4) * 18;
-        for (int k = 0; k < 3; ++k) {
-            for (int j1 = 0; j1 < 9; ++j1) {
-                this.addSlot(new Slot(playerInventory, j1 + k * 9 + 9, 8 + j1 * 18, 103 + k * 18 + i));
-            }
-        }
-        for (int l = 0; l < 9; ++l) {
-            this.addSlot(new Slot(playerInventory, l, 8 + l * 18, 161 + i));
-        }
+		for (int i = 0; i < 9; i++) {
+			this.addSlot(new Slot(inventory2, i, 8 + i * 18, 52));
+		}
+
+		for (int yi = 0; yi < 3; ++yi) {
+			for (int xi = 0; xi < 9; ++xi) {
+				this.addSlot(new Slot(playerInventory, xi + yi * 9 + 9, 8 + xi * 18, 84 + yi * 18));
+			}
+		}
+
+		for (int i = 0; i < 9; ++i) {
+			this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
+		}
     }
 
     @Override

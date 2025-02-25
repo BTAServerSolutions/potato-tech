@@ -40,10 +40,7 @@
 		"afterClientStart": [
 			"goldenage.potatotech.PotatoTech"
 		],
-		"onRecipesReady": [
-			"goldenage.potatotech.PotatoTech"
-		],
-		"initNamespaces": [
+		"recipesReady": [
 			"goldenage.potatotech.PotatoTech"
 		]
 	},

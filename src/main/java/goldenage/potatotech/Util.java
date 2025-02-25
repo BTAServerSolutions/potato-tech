@@ -1,7 +1,6 @@
 package goldenage.potatotech;
 
-import goldenage.potatotech.blocks.entities.TileEntityFilter;
-import goldenage.potatotech.blocks.entities.TileEntityPipe;
+import goldenage.potatotech.blocks.entities.*;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.BlockChest;
 import net.minecraft.core.block.entity.TileEntity;
@@ -243,11 +242,18 @@ public class Util {
 					}
 
 					if (stack != null && j > 0) {
-						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
+						short color = 0;
+						if (Objects.equals(inventoryName, "Filter")) {
+							TileEntityFilter filter = (TileEntityFilter) inventory;
+							color = filter.getColorInSlot(j - 1);
+						}
+
+						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer, color);
 						if (stack.stackSize <= 0) stack = null;
 						inventory.setInventorySlotContents(j - 1, stack);
 						return returnStack;
 					}
+
 				} else if (Objects.equals(inventoryName, "Trommel")) {
 					int inventorySize = 4;
 					ItemStack stack = null;
@@ -261,8 +267,7 @@ public class Util {
 						return returnStack;
 					}
 				} else if (Objects.equals(inventoryName, "Auto Crafter")) {
-					/*
-					TileEntityAutoCrafter ac = (TileEntityAutoCrafter) te;
+					TileEntityCrafter ac = (TileEntityCrafter) te;
 					ItemStack stack = ac.removeOneResult();
 					if (stack != null) {
 						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
@@ -276,7 +281,6 @@ public class Util {
 							returnStack = new PipeStack(r, dir, stackTimer);
 						}
 					}
-					 */
 				} else if (te instanceof TileEntityFlag){
 					ItemStack stack = inventory.getStackInSlot(36);
 					if (stack != null) {
@@ -375,31 +379,36 @@ public class Util {
 				}
 			}
 		} else {
-		    // May be a chest or other mass-storage device
-			int j = 0;
-			ItemStack chestStack;
-			while (j < inventorySize) {
-				chestStack = inventory.getStackInSlot(j);
+		    if (Objects.equals(inventoryName, "Auto Crafter") && inventory instanceof TileEntityCrafter) {
+                TileEntityCrafter ac = (TileEntityCrafter) inventory;
+                hasInserted = ac.insertItem(stack);
+                } else {
+    		    // May be a chest or other mass-storage device
+    			int j = 0;
+    			ItemStack chestStack;
+    			while (j < inventorySize) {
+    				chestStack = inventory.getStackInSlot(j);
 
-				if (chestStack == null) {
-					if (!inventoryName.equals("Filter") && !inventoryName.equals("Auto Crafter")) {
-						inventory.setInventorySlotContents(j, stack);
-						hasInserted = true;
-					}
-					break;
-				}
+    				if (chestStack == null) {
+    					if (!inventoryName.equals("Filter") && !inventoryName.equals("Auto Crafter")) {
+    						inventory.setInventorySlotContents(j, stack);
+    						hasInserted = true;
+    					}
+    					break;
+    				}
 
-				int maxStackSize = inventory.getInventoryStackLimit() != 64 ? inventory.getInventoryStackLimit() : chestStack.getMaxStackSize();
-				if (chestStack.canStackWith(stack) && chestStack.stackSize < maxStackSize) {
-					chestStack.stackSize++;
-					inventory.setInventorySlotContents(j, chestStack);
+    				int maxStackSize = inventory.getInventoryStackLimit() != 64 ? inventory.getInventoryStackLimit() : chestStack.getMaxStackSize();
+    				if (chestStack.canStackWith(stack) && chestStack.stackSize < maxStackSize) {
+    					chestStack.stackSize++;
+    					inventory.setInventorySlotContents(j, chestStack);
 
-					hasInserted = true;
-					break;
-				}
+    					hasInserted = true;
+    					break;
+    				}
 
-				j++;
-			}
+    				j++;
+    			}
+    		}
 		}
 
 		return hasInserted;
@@ -431,8 +440,9 @@ public class Util {
 			|| Objects.equals(inventoryName, "BlockCrusher")
 			|| Objects.equals(inventoryName, "BlockPlacer")
 			|| Objects.equals(inventoryName, "Filter")
+			|| Objects.equals(inventoryName, "Auto Crafter")
 		) {
-			int j = 0;
+ 			int j = 0;
 			ItemStack chestStack;
 			while (j < inventorySize) {
 				chestStack = inventory.getStackInSlot(j);
@@ -559,7 +569,7 @@ public class Util {
 					return returnStack;
 				}
 			} else if (inventoryName.equals("Auto Crafter")) {
-				/*TileEntityAutoCrafter ac = (TileEntityAutoCrafter) te;
+				TileEntityCrafter ac = (TileEntityCrafter) te;
 				ItemStack stack = ac.craftResult.getStackInSlot(0).copy();
 				if (stack != null) {
 					returnStack = new PipeStack(stack, dir, stackTimer);
@@ -568,7 +578,7 @@ public class Util {
 					if (extra != null) {
 						returnStack = new PipeStack(extra, dir, stackTimer);
 					}
-				}*/
+				}
 			} else if (inventory.getSizeInventory() > 2){
 				ItemStack stack = inventory.getStackInSlot(2).copy();
 				if (stack != null) {
