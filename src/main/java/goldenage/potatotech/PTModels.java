@@ -6,10 +6,12 @@ import net.minecraft.client.render.EntityRenderDispatcher;
 import net.minecraft.client.render.TileEntityRenderDispatcher;
 import net.minecraft.client.render.block.color.BlockColorDispatcher;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
+import net.minecraft.client.render.block.model.BlockModelStandard;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
 import net.minecraft.client.render.item.model.ItemModelStandard;
 import net.minecraft.client.render.texture.stitcher.TextureRegistry;
 import net.minecraft.core.util.collection.NamespaceID;
+import net.minecraft.core.util.helper.Side;
 import turniplabs.halplibe.helper.ModelHelper;
 import turniplabs.halplibe.util.ModelEntrypoint;
 
@@ -32,6 +34,10 @@ public class PTModels implements ModelEntrypoint {
 				return model;
 			});
 		});
+
+		ModelHelper.setBlockModel(PTBlocks.testAreaMaker, () -> new BlockModelStandard<>(PTBlocks.testAreaMaker)
+			.setTex(0, "potatotech:block/potato", Side.sides)
+		);
 	}
 
 	@Override

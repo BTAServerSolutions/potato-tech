@@ -7,24 +7,21 @@ import turniplabs.halplibe.util.ItemInitEntrypoint;
 
 import java.util.HashMap;
 
-import static goldenage.potatotech.PotatoTech.LOGGER;
-import static goldenage.potatotech.PotatoTech.MOD_ID;
+import static goldenage.potatotech.PotatoTech.*;
 
 public class PTItems implements ItemInitEntrypoint {
 
 	public static HashMap<Item, String> itemTextures = new HashMap<>();
 
-	boolean isInitialized = false;
-
-	public void init() {
-		if (isInitialized) return;
-		LOGGER.info("Initializing items...");
-		isInitialized = true;
-	}
+	public static Item potato;
 
 	@Override
 	public void afterItemInit() {
-		init();
+		LOGGER.info("Initializing items...");
+
+		int id = config.getInt("starting_item_id");
+
+		potato = simpleItem("potato", "potato", "potato", id++);
 	}
 
 
