@@ -1,5 +1,6 @@
 package goldenage.potatotech;
 
+import goldenage.potatotech.blocks.BlockModelPipe;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.EntityRenderDispatcher;
@@ -37,6 +38,10 @@ public class PTModels implements ModelEntrypoint {
 
 		ModelHelper.setBlockModel(PTBlocks.testAreaMaker, () -> new BlockModelStandard<>(PTBlocks.testAreaMaker)
 			.setTex(0, "potatotech:block/potato", Side.sides)
+		);
+
+		ModelHelper.setBlockModel(PTBlocks.pipe, () -> new BlockModelPipe<>(PTBlocks.pipe)
+			.setAllTextures(0, "potatotech:block/pipe")
 		);
 	}
 
