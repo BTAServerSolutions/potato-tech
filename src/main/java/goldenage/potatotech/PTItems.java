@@ -14,6 +14,7 @@ public class PTItems implements ItemInitEntrypoint {
 	public static HashMap<Item, String> itemTextures = new HashMap<>();
 
 	public static Item potato;
+	public static Item wrench;
 
 	@Override
 	public void afterItemInit() {
@@ -22,6 +23,7 @@ public class PTItems implements ItemInitEntrypoint {
 		int id = config.getInt("starting_item_id");
 
 		potato = simpleItem("potato", "potato", "potato", id++);
+		wrench = simpleItem("wrench", "wrench", "wrench", id++);
 	}
 
 

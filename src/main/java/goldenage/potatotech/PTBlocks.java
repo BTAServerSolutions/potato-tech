@@ -2,6 +2,7 @@ package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.BlockLogicTestAreaMaker;
 import goldenage.potatotech.blocks.BlockPipe;
+import goldenage.potatotech.blocks.TileEntityPipe;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.material.Material;
 import turniplabs.halplibe.helper.BlockBuilder;
@@ -23,6 +24,7 @@ public class PTBlocks implements BlockInitEntrypoint {
 			.build("test_area_maker", "test_area_maker", id++, block -> new BlockLogicTestAreaMaker(block, Material.stone));
 
 		pipe = new BlockBuilder(MOD_ID)
+			.setTileEntity(TileEntityPipe::new)
 			.build("pipe", "pipe", id++, block -> new BlockPipe(block, Material.metal));
 	}
 }

@@ -2,8 +2,7 @@ package goldenage.potatotech;
 
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.BlockLogicChest;
-import net.minecraft.core.block.entity.TileEntity;
-import net.minecraft.core.block.entity.TileEntityFlag;
+import net.minecraft.core.block.entity.*;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Direction;
@@ -192,12 +191,6 @@ public class Util {
 			Container inventory = (Container) te;
 			String inventoryName = inventory.getNameTranslationKey();
 
-			boolean isFromIronChests = Objects.equals(inventoryName, "Iron Chest")
-				|| Objects.equals(inventoryName, "Gold Chest")
-				|| Objects.equals(inventoryName, "Diamond Chest")
-				|| Objects.equals(inventoryName, "Steel Chest")
-				|| Objects.equals(inventoryName, "Big Chest");
-
 			/*if (te instanceof IItemIO && !isFromIronChests) {
 				sunsetsatellite.catalyst.core.util.Direction sdir = sunsetsatellite.catalyst.core.util.Direction.getDirectionFromSide(dir.getId()).getOpposite();
 				IItemIO itemIo = (IItemIO) te;
@@ -213,25 +206,22 @@ public class Util {
 						inventory.setInventorySlotContents(index, stack);
 					}
 				}
-			} else */{
-				if (Objects.equals(inventoryName, "Chest")) {
+			} else */
+			{
+				if (Objects.equals(inventoryName, "container.chest.name")) {
 					inventory = BlockLogicChest.getInventory(world, x, y ,z);
 				}
 
-				if (Objects.equals(inventoryName, "Chest")
-					|| Objects.equals(inventoryName, "Trap")
-					|| Objects.equals(inventoryName, "Filter")
-					|| Objects.equals(inventoryName, "BlockCrusher")
-					|| Objects.equals(inventoryName, "BlockPlacer")
-					|| Objects.equals(inventoryName, "Large Chest")
-					|| isFromIronChests
+				if (Objects.equals(inventoryName, "container.chest.name")
+					|| Objects.equals(inventoryName, "container.dispenser.name")
+					|| Objects.equals(inventoryName, "container.filter.name")
 				) {
 					int inventorySize = inventory.getContainerSize();
 					ItemStack stack = null;
 					int j = 0;
 
-					if (!inventoryName.equals("Filter")) {
-					for (; stack == null && j < inventorySize; j++) stack = inventory.getItem(j);
+					if (!inventoryName.equals("container.filter.name")) {
+						for (; stack == null && j < inventorySize; j++) stack = inventory.getItem(j);
 					} else {
 						for (; stack == null && j < inventorySize; j++) {
 							stack = inventory.getItem(j);
@@ -241,7 +231,7 @@ public class Util {
 
 					if (stack != null && j > 0) {
 						short color = 0;
-						if (Objects.equals(inventoryName, "Filter")) {
+						if (Objects.equals(inventoryName, "container.filter.name")) {
 							/*
 							TileEntityFilter filter = (TileEntityFilter) inventory;
 							color = filter.getColorInSlot(j - 1);
@@ -254,7 +244,7 @@ public class Util {
 						return returnStack;
 					}
 
-				} else if (Objects.equals(inventoryName, "Trommel")) {
+				} else if (Objects.equals(inventoryName, "container.trommel.name")) {
 					int inventorySize = 4;
 					ItemStack stack = null;
 					int j = 0;
@@ -266,7 +256,7 @@ public class Util {
 						inventory.setItem(j - 1, stack);
 						return returnStack;
 					}
-				} else if (Objects.equals(inventoryName, "Auto Crafter")) {
+				} else if (Objects.equals(inventoryName, "container.crafter.name")) {
 					/*
 					TileEntityCrafter ac = (TileEntityCrafter) te;
 					ItemStack stack = ac.removeOneResult();
@@ -283,7 +273,7 @@ public class Util {
 						}
 					}
 					 */
-				} else if (te instanceof TileEntityFlag){
+				} else if (te instanceof TileEntityFlag) {
 					ItemStack stack = inventory.getItem(36);
 					if (stack != null) {
 						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
@@ -337,11 +327,14 @@ public class Util {
 		int inventorySize = inventory.getContainerSize();
 		String inventoryName = inventory.getNameTranslationKey();
 
-		if (Objects.equals(inventoryName, "Furnace") || Objects.equals(inventoryName, "Blast Furnace") || Objects.equals(inventoryName, "Trommel")) {
+		if (Objects.equals(inventoryName, "container.furnace.name")
+			|| Objects.equals(inventoryName, "container.furnace_blast.name")
+			|| Objects.equals(inventoryName, "container.trommel.name"))
+		{
 			int fuelSlot = 1;
 			int inputSlot = 0;
 
-			if (Objects.equals(inventoryName, "Trommel")) {
+			if (Objects.equals(inventoryName, "container.trommel.name")) {
 				fuelSlot = 4;
 				for (; inputSlot < 3; inputSlot++) {
 					ItemStack s = inventory.getItem(inputSlot);
@@ -381,7 +374,7 @@ public class Util {
 				}
 			}
 		} else {
-			if (Objects.equals(inventoryName, "Auto Crafter")) {
+			if (Objects.equals(inventoryName, "container.crafter.name")) {
 				/*
 				TileEntityCrafter ac = (TileEntityCrafter) inventory;
 				hasInserted = ac.insertItem(stack);
@@ -395,7 +388,7 @@ public class Util {
 					chestStack = inventory.getItem(j);
 
 					if (chestStack == null) {
-						if (!inventoryName.equals("Filter") && !inventoryName.equals("Auto Crafter")) {
+						if (!inventoryName.equals("conatiner.filter.name") && !inventoryName.equals("container.crafter.name")) {
 							inventory.setItem(j, stack);
 							hasInserted = true;
 						}
@@ -441,13 +434,10 @@ public class Util {
 		int inventorySize = inventory.getContainerSize();
 		String inventoryName = inventory.getNameTranslationKey();
 
-		if (Objects.equals(inventoryName, "Chest")
-			|| Objects.equals(inventoryName, "Large Chest")
-			|| Objects.equals(inventoryName, "Trap")
-			|| Objects.equals(inventoryName, "BlockCrusher")
-			|| Objects.equals(inventoryName, "BlockPlacer")
-			|| Objects.equals(inventoryName, "Filter")
-			|| Objects.equals(inventoryName, "Auto Crafter")
+		if (Objects.equals(inventoryName, "container.chest.name")
+			|| Objects.equals(inventoryName, "container.dispenser.name")
+			|| Objects.equals(inventoryName, "container.filter.name")
+			|| Objects.equals(inventoryName, "container.crafter.name")
 		) {
 			int j = 0;
 			ItemStack chestStack;
@@ -475,7 +465,7 @@ public class Util {
 			int fuelSlot = 1;
 			int inputSlot = 0;
 
-			if (Objects.equals(inventoryName, "Trommel")) {
+			if (Objects.equals(inventoryName, "container.trommel.name")) {
 				fuelSlot = 4;
 				for (; inputSlot < 3; inputSlot++) {
 					ItemStack s = inventory.getItem(inputSlot);
@@ -525,29 +515,19 @@ public class Util {
 			Container inventory = (Container) te;
 			String inventoryName = inventory.getNameTranslationKey();
 
-			boolean isFromIronChests = inventoryName.equals("Iron Chest")
-				|| inventoryName.equals("Gold Chest")
-				|| inventoryName.equals("Diamond Chest")
-				|| inventoryName.equals("Steel Chest")
-				|| inventoryName.equals("Big Chest");
-
-			if (inventoryName.equals("Chest")) {
+			if (Objects.equals(inventoryName, "container.chest.name")) {
 				inventory = BlockLogicChest.getInventory(world, x, y ,z);
 			}
 
-			if (inventoryName.equals("Chest")
-				|| inventoryName.equals("Trap")
-				|| inventoryName.equals("Filter")
-				|| inventoryName.equals("BlockCrusher")
-				|| inventoryName.equals("BlockPlacer")
-				|| inventoryName.equals("Large Chest")
-				|| isFromIronChests
+			if (Objects.equals(inventoryName, "container.chest.name")
+				|| Objects.equals(inventoryName, "container.dispenser.name")
+				|| Objects.equals(inventoryName, "container.filter.name")
 			) {
 				int inventorySize = inventory.getContainerSize();
 				ItemStack stack = null;
 				int j = 0;
 
-				if (!inventoryName.equals("Filter")) {
+				if (!inventoryName.equals("container.filter.name")) {
 					while (stack == null && j < inventorySize) stack = inventory.getItem(j++);
 					if (stack != null && stack.stackSize <= 1) {
 						returnStack = null;
@@ -565,7 +545,7 @@ public class Util {
 					returnStack = new PipeStack(stack.copy(), dir, stackTimer);
 					return returnStack;
 				}
-			} else if (inventoryName.equals("Trommel")) {
+			} else if (inventoryName.equals("container.trommel.name")) {
 				int inventorySize = 4;
 				ItemStack stack = null;
 				int j = 0;
@@ -575,7 +555,7 @@ public class Util {
 					returnStack = new PipeStack(stack, dir, stackTimer);
 					return returnStack;
 				}
-			} else if (inventoryName.equals("Auto Crafter")) {
+			} else if (inventoryName.equals("container.crafter.name")) {
 				/*
 				TileEntityCrafter ac = (TileEntityCrafter) te;
 				ItemStack stack = ac.craftResult.getStackInSlot(0).copy();

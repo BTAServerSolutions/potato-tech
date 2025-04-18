@@ -5,6 +5,8 @@ import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.entity.TileEntity;
+import net.minecraft.core.player.inventory.container.Container;
+import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.phys.AABB;
 
 public class BlockModelPipe<T extends BlockLogic> extends BlockModelStandard<T> {
@@ -95,33 +97,30 @@ public class BlockModelPipe<T extends BlockLogic> extends BlockModelStandard<T> 
 		AABB bounds = AABB.getTemporaryBB(0.25f, 0.25f, 0.25f, 0.75f, 0.75f, 0.75f);
 
 		this.renderStandardBlock(tessellator, bounds, x, y, z, 1, 1, 1);
-		/*
 		for (int i = 0; i < offsets.length; i++) {
 			float[] coord = coords[i];
 			float[] coordI = coordsInsert[i];
 			float[] coordE = coordsExtract[i];
 
-			TileEntity te = renderBlocks.blockAccess.getBlockTileEntity(x + offsets[i][0], y + offsets[i][1], z +offsets[i][2]);
+			TileEntity te = renderBlocks.blockAccess.getTileEntity(x + offsets[i][0], y + offsets[i][1], z +offsets[i][2]);
 			if (((te instanceof TileEntityPipe
 				&& ((TileEntityPipe)te).modeBySide[Direction.getDirectionById(i).getOpposite().getId()] != 3)
-				|| te instanceof IInventory) && pipe.modeBySide[i] != 3)
+				|| te instanceof Container) && pipe.modeBySide[i] != 3)
 			{
 				float[] color = colors[pipe.colorBySide[i]];
 
 				if (pipe.modeBySide[i] == 1) {
-					this.block.setBlockBounds(coordI[0], coordI[1], coordI[2], coordI[3], coordI[4], coordI[5]);
+					bounds.set(coordI[0], coordI[1], coordI[2], coordI[3], coordI[4], coordI[5]);
 				} else if (pipe.modeBySide[i] == 2) {
-					this.block.setBlockBounds(coordE[0], coordE[1], coordE[2], coordE[3], coordE[4], coordE[5]);
+					bounds.set(coordE[0], coordE[1], coordE[2], coordE[3], coordE[4], coordE[5]);
 				} else {
-					this.block.setBlockBounds(coord[0], coord[1], coord[2], coord[3], coord[4], coord[5]);
+					bounds.set(coord[0], coord[1], coord[2], coord[3], coord[4], coord[5]);
 				}
 
-				this.renderStandardBlock(tessellator, block, x, y, z, color[0], color[1], color[2]);
+				this.renderStandardBlock(tessellator, bounds, x, y, z, color[0], color[1], color[2]);
 			}
 		}
 
-		this.block.setBlockBounds(0.25f, 0.25f, 0.25f, 0.75f, 0.75f, 0.75f);
-		 */
 		return true;
 	}
 
