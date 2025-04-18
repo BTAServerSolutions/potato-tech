@@ -9,6 +9,7 @@ import net.minecraft.core.block.material.Material;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.item.Items;
 import net.minecraft.core.sound.SoundCategory;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
@@ -54,7 +55,7 @@ public class BlockPipe extends BlockLogic {
 			world.markBlockNeedsUpdate(x, y, z);
 			world.playSoundEffect(player, SoundCategory.WORLD_SOUNDS, (double) x + 0.5, (double) y + 0.5, (double) z + 0.5, "random.click", 0.3f, mode % 2 == 0 ? 0.5f : 0.6f);
 			return true;
-		} else if (heldItem.getItemKey() == "item.dye") {
+		} else if (heldItem.itemID == Items.DYE.id) {
 			te.colorBySide[side.getId()] = (short) (heldItem.getMetadata() + 1);
 			world.markBlockNeedsUpdate(x, y, z);
 			return true;
@@ -63,7 +64,7 @@ public class BlockPipe extends BlockLogic {
 			te.colorBySide[side.getId()] = (short) (heldItem.getMetadata() + 17);
 			world.markBlockNeedsUpdate(x, y, z);
 			return true;
-		} else if (heldItem.getItemKey() == "item.paper") {
+		} else if (heldItem.itemID == Items.DYE.id) {
 			te.colorBySide[side.getId()] = 0;
 			world.markBlockNeedsUpdate(x, y, z);
 			return true;

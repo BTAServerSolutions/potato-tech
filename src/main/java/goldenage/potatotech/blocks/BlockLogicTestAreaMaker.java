@@ -2,8 +2,10 @@ package goldenage.potatotech.blocks;
 
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
+import net.minecraft.core.block.Blocks;
 import net.minecraft.core.block.material.Material;
 import net.minecraft.core.entity.Mob;
+import net.minecraft.core.item.Items;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +35,11 @@ public class BlockLogicTestAreaMaker extends BlockLogic {
 		for (int yi = 0; yi <= y; yi++) {
 			for (int zi = startZ; zi <= endZ; zi++) {
 				for (int xi = startX; xi <= endX; xi++) {
-					world.setBlockWithNotify(xi, yi, zi, (zi & 1) == (xi & 1) ? 1 : 2);
+					int id = (zi & 1) == (xi & 1) ? Blocks.BASALT_POLISHED.id() : Blocks.STONE_POLISHED.id();
+					if (xi == 0 || yi == 0 || xi == endX || zi == endZ) {
+						id = (zi & 1) == (xi & 1) ? Blocks.GRANITE_POLISHED.id() : Blocks.LIMESTONE_POLISHED.id();
+					}
+					world.setBlockWithNotify(xi, yi, zi, id);
 				}
 			}
 		}

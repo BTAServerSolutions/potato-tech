@@ -90,17 +90,17 @@ public class TileEntityRendererPipe extends TileEntityRenderer<TileEntityPipe> {
 			itemEntity.item = stack;
 
 			double yOffset = stack.itemID < Blocks.blocksList.length ? 0.0 : 0.1;
-			/*
-			if (stack.itemID == Blocks.blockMap.saplingOak.id
-				|| stack.itemID == Block.saplingPine.id
-				|| stack.itemID == Block.saplingBirch.id
-				|| stack.itemID == Block.saplingCherry.id
-				|| stack.itemID == Block.saplingOakRetro.id
-				|| stack.itemID == Block.saplingEucalyptus.id
+			if (stack.itemID == Blocks.SAPLING_OAK.id()
+				|| stack.itemID == Blocks.SAPLING_PINE.id()
+				|| stack.itemID == Blocks.SAPLING_BIRCH.id()
+				|| stack.itemID == Blocks.SAPLING_CHERRY.id()
+				|| stack.itemID == Blocks.SAPLING_OAK_RETRO.id()
+				|| stack.itemID == Blocks.SAPLING_EUCALYPTUS.id()
+				|| stack.itemID == Blocks.SAPLING_SHRUB.id()
+				|| stack.itemID == Blocks.SAPLING_THORN.id()
 			) {
 				yOffset = 0.1;
 			}
-			 */
 
 
 			float brightness = 1.0F;
