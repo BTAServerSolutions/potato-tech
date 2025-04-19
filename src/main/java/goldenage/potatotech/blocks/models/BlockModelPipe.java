@@ -1,5 +1,7 @@
-package goldenage.potatotech.blocks;
+package goldenage.potatotech.blocks.models;
 
+import goldenage.potatotech.blocks.entities.TileEntityChute;
+import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.client.render.block.model.BlockModelStandard;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
@@ -105,7 +107,7 @@ public class BlockModelPipe<T extends BlockLogic> extends BlockModelStandard<T> 
 			TileEntity te = renderBlocks.blockAccess.getTileEntity(x + offsets[i][0], y + offsets[i][1], z +offsets[i][2]);
 			if (((te instanceof TileEntityPipe
 				&& ((TileEntityPipe)te).modeBySide[Direction.getDirectionById(i).getOpposite().getId()] != 3)
-				|| te instanceof Container) && pipe.modeBySide[i] != 3)
+				|| te instanceof Container || te instanceof TileEntityChute && i == 1) && pipe.modeBySide[i] != 3)
 			{
 				float[] color = colors[pipe.colorBySide[i]];
 

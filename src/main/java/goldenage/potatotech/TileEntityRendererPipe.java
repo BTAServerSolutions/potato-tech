@@ -1,23 +1,19 @@
 package goldenage.potatotech;
 
 
-import goldenage.potatotech.blocks.TileEntityPipe;
+import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.EntityRenderDispatcher;
 import net.minecraft.client.render.ItemRenderer;
-import net.minecraft.client.render.MapItemRenderer;
 import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.client.render.texture.stitcher.TextureRegistry;
 import net.minecraft.client.render.tileentity.TileEntityRenderer;
-import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.EntityItem;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
-import net.minecraft.core.world.World;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;

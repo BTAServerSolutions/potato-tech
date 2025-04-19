@@ -49,6 +49,18 @@ item.potatotech.iron_gear.desc=It turns.
 item.potatotech.steel_gear.name=Steel Gear
 item.potatotech.steel_gear.desc=It turns better.
 
+item.potatotech.crushed_iron_ore.name=Crushed Iron Ore
+item.potatotech.crushed_iron_ore.desc=Try Smelting
+
+tile.potatotech.clay_iron.name=Clay Iron
+tile.potatotech.clay_iron.desc=Crush it
+
+item.potatotech.crushed_gold_ore.name=Crushed Gold Ore
+item.potatotech.crushed_gold_ore.desc=Try Smelting
+
+tile.potatotech.clay_gold.name=Clay Gold
+tile.potatotech.clay_gold.desc=Crush it
+
 tile.potatotech.pipe.name=Pipe
 tile.potatotech.pipe.desc=Doesn't contain a warp zone.
 

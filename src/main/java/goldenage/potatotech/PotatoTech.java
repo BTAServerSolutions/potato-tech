@@ -1,6 +1,7 @@
 package goldenage.potatotech;
 
-import goldenage.potatotech.blocks.TileEntityPipe;
+import goldenage.potatotech.blocks.entities.TileEntityChute;
+import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.util.collection.NamespaceID;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint {
 		LOGGER.info("Potato Tech initialized");
 
 		EntityHelper.createTileEntity(TileEntityPipe.class, id("tile.pipe"));
+		EntityHelper.createTileEntity(TileEntityChute.class, id("tile.chute"));
 	}
 
 	@Override

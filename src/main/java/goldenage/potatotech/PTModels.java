@@ -1,7 +1,8 @@
 package goldenage.potatotech;
 
-import goldenage.potatotech.blocks.BlockModelPipe;
-import goldenage.potatotech.blocks.TileEntityPipe;
+import goldenage.potatotech.blocks.models.BlockModelChute;
+import goldenage.potatotech.blocks.models.BlockModelPipe;
+import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.EntityRenderDispatcher;
@@ -40,9 +41,20 @@ public class PTModels implements ModelEntrypoint {
 		ModelHelper.setBlockModel(PTBlocks.testAreaMaker, () -> new BlockModelStandard<>(PTBlocks.testAreaMaker)
 			.setTex(0, "potatotech:block/potato", Side.sides)
 		);
+		ModelHelper.setBlockModel(PTBlocks.clayIron, () ->
+			new BlockModelStandard<>(PTBlocks.clayIron).setAllTextures(0, "potatotech:block/clay_iron_block")
+		);
+		ModelHelper.setBlockModel(PTBlocks.clayGold, () ->
+			new BlockModelStandard<>(PTBlocks.clayGold).setAllTextures(0, "potatotech:block/clay_gold_block")
+		);
 
 		ModelHelper.setBlockModel(PTBlocks.pipe, () -> new BlockModelPipe<>(PTBlocks.pipe)
 			.setAllTextures(0, "potatotech:block/pipe")
+		);
+
+		ModelHelper.setBlockModel(PTBlocks.chute, () -> new BlockModelChute<>(PTBlocks.chute)
+			.setTex(0, "potatotech:block/chute_sides", Side.NORTH, Side.SOUTH, Side.EAST, Side.WEST)
+			.setTex(0, "potatotech:block/chute_bottom", Side.TOP, Side.BOTTOM)
 		);
 	}
 

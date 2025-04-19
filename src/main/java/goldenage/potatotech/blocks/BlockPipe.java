@@ -2,12 +2,11 @@ package goldenage.potatotech.blocks;
 
 import goldenage.potatotech.PTItems;
 import goldenage.potatotech.PotatoTech;
+import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.block.material.Material;
 import net.minecraft.core.entity.player.Player;
-import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
 import net.minecraft.core.sound.SoundCategory;

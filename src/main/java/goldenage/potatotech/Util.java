@@ -1,5 +1,6 @@
 package goldenage.potatotech;
 
+import goldenage.potatotech.blocks.entities.TileEntityChute;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.BlockLogicChest;
 import net.minecraft.core.block.entity.*;
@@ -11,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 
 public class Util {
@@ -289,13 +291,12 @@ public class Util {
 					}
 				}
 			}
-		} /*else if (te instanceof TileEntityChute && dir == Direction.UP) {
+		} else if (te instanceof TileEntityChute && dir == Direction.UP) {
 			ItemStack stack = ((TileEntityChute)te).removeOneItem();
 			if (stack != null) {
 				returnStack = new PipeStack(stack, dir, stackTimer);
 			}
 		}
-		*/
 
 		return returnStack;
 	}
@@ -575,7 +576,7 @@ public class Util {
 					returnStack = new PipeStack(stack, dir, stackTimer);
 				}
 			}
-		}/* else if (te instanceof TileEntityChute && dir == Direction.UP) {
+		} else if (te instanceof TileEntityChute && dir == Direction.UP) {
 			TileEntityChute.ChuteEntry firstKey = null;
 			for (Map.Entry<TileEntityChute.ChuteEntry, Integer> entry : ((TileEntityChute) te).contents.entrySet()) {
 				firstKey = entry.getKey();
@@ -585,7 +586,7 @@ public class Util {
 
 			ItemStack stack = new ItemStack(firstKey.getItem(), 1, firstKey.metadata);
 			returnStack = new PipeStack(stack, dir, stackTimer);
-		}*/
+		}
 
 		return returnStack;
 	}

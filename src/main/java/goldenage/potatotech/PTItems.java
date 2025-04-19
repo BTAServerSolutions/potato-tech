@@ -15,6 +15,8 @@ public class PTItems implements ItemInitEntrypoint {
 
 	public static Item potato;
 	public static Item wrench;
+	public static Item crushedIronOre;
+	public static Item crushedGoldOre;
 
 	@Override
 	public void afterItemInit() {
@@ -24,6 +26,8 @@ public class PTItems implements ItemInitEntrypoint {
 
 		potato = simpleItem("potato", "potato", "potato", id++);
 		wrench = simpleItem("wrench", "wrench", "wrench", id++);
+		crushedIronOre = simpleItem("crushed iron ore", "crushed_iron_ore", "crushed_iron_ore", id++);
+		crushedGoldOre = simpleItem("crushed gold ore", "crushed_gold_ore", "crushed_gold_ore", id++);
 	}
 
 

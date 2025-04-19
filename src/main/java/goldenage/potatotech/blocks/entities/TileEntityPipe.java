@@ -1,14 +1,11 @@
-package goldenage.potatotech.blocks;
+package goldenage.potatotech.blocks.entities;
 
 import com.mojang.nbt.tags.CompoundTag;
 import com.mojang.nbt.tags.ListTag;
 import goldenage.potatotech.PipeStack;
 import goldenage.potatotech.Util;
 import net.minecraft.core.block.BlockLogicChest;
-import net.minecraft.core.block.BlockLogicDispenser;
 import net.minecraft.core.block.entity.TileEntity;
-import net.minecraft.core.block.entity.TileEntityChest;
-import net.minecraft.core.block.entity.TileEntityDispenser;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
