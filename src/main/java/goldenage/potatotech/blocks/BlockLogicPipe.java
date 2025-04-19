@@ -14,8 +14,8 @@ import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 
-public class BlockPipe extends BlockLogic {
-	public BlockPipe(Block<?> block, Material material) {
+public class BlockLogicPipe extends BlockLogic {
+	public BlockLogicPipe(Block<?> block, Material material) {
 		super(block, material);
 		this.setBlockBounds(0.25f, 0.25f, 0.25f, 0.75f, 0.75f, 0.75f);
 	}
@@ -43,7 +43,6 @@ public class BlockPipe extends BlockLogic {
 	public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
 		TileEntityPipe te = (TileEntityPipe)world.getTileEntity(x, y, z);
 		ItemStack heldItem = player.getHeldItem();
-		PotatoTech.LOGGER.info("Item Key:" + heldItem.getItemKey());
 		if (heldItem == null) {
 			te.dropItems();
 		} else if (heldItem.itemID == PTItems.wrench.id) {

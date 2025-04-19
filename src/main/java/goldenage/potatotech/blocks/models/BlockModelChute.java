@@ -1,7 +1,6 @@
 package goldenage.potatotech.blocks.models;
 
-import goldenage.potatotech.blocks.BlockChute;
-import net.minecraft.client.render.block.model.BlockModelBasket;
+import goldenage.potatotech.blocks.BlockLogicChute;
 import net.minecraft.client.render.block.model.BlockModelStandard;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.client.render.texture.stitcher.IconCoordinate;
@@ -40,7 +39,7 @@ public class BlockModelChute<T extends BlockLogic> extends BlockModelStandard<T>
 		this.renderStandardBlock(tessellator, bounds, x, y, z);
 
 
-		BlockChute block = renderBlocks.blockAccess.getBlockLogic(x, y, z, BlockChute.class);
+		BlockLogicChute block = renderBlocks.blockAccess.getBlockLogic(x, y, z, BlockLogicChute.class);
 
 		int height = block.getFillLevel(renderBlocks.blockAccess, x, y, z);
 		if (height > 0) {

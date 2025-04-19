@@ -15,6 +15,8 @@ public class PotatoTechClient implements ClientModInitializer, ClientStartEntryp
 	@Override
 	public void onInitializeClient() {
 		LOGGER.info("Potato tech client init");
+
+
 	}
 
 	@Override

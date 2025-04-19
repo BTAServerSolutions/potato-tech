@@ -1,10 +1,8 @@
 package goldenage.potatotech;
 
-import goldenage.potatotech.blocks.BlockChute;
-import goldenage.potatotech.blocks.BlockLogicCrushable;
-import goldenage.potatotech.blocks.BlockLogicTestAreaMaker;
-import goldenage.potatotech.blocks.BlockPipe;
+import goldenage.potatotech.blocks.*;
 import goldenage.potatotech.blocks.entities.TileEntityChute;
+import goldenage.potatotech.blocks.entities.TileEntityFilter;
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
@@ -23,6 +21,8 @@ public class PTBlocks implements BlockInitEntrypoint {
 	public static Block<? extends BlockLogic> clayIron;
 	public static Block<? extends BlockLogic> clayGold;
 	public static Block<? extends BlockLogic> chute;
+	public static Block<? extends BlockLogic> filter;
+	public static Block<? extends BlockLogic> pipeStack;
 
 
 	@Override
@@ -34,7 +34,7 @@ public class PTBlocks implements BlockInitEntrypoint {
 
 		pipe = new BlockBuilder(MOD_ID)
 			.setTileEntity(TileEntityPipe::new)
-			.build("pipe", "pipe", id++, block -> new BlockPipe(block, Material.metal));
+			.build("pipe", "pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
 		clayIron = new BlockBuilder(MOD_ID)
 			.setHardness(3.0f)
 			.setBlockSound(BlockSounds.SAND)
@@ -52,7 +52,16 @@ public class PTBlocks implements BlockInitEntrypoint {
 			.setHardness(3.0f)
 			.setBlockSound(BlockSounds.STONE)
 			.build("chute", "chute", id++, block ->
-				new BlockChute(block, Material.stone)
+				new BlockLogicChute(block, Material.stone)
 			);
+		filter = new BlockBuilder(MOD_ID)
+			.setTileEntity(TileEntityFilter::new)
+			.setHardness(3.0f)
+			.setBlockSound(BlockSounds.WOOD)
+			.build("filter", "filter", id++, block ->
+				new BlockLogicFilter(block, Material.wood)
+			);
+		pipeStack = new BlockBuilder(MOD_ID)
+			.build("pipe_stack", "pipe_stack", id++, block -> new BlockLogic(block, Material.metal));
 	}
 }

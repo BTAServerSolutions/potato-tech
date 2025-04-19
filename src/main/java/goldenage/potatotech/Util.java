@@ -1,6 +1,7 @@
 package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.entities.TileEntityChute;
+import goldenage.potatotech.blocks.entities.TileEntityFilter;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.BlockLogicChest;
 import net.minecraft.core.block.entity.*;
@@ -234,10 +235,8 @@ public class Util {
 					if (stack != null && j > 0) {
 						short color = 0;
 						if (Objects.equals(inventoryName, "container.filter.name")) {
-							/*
 							TileEntityFilter filter = (TileEntityFilter) inventory;
 							color = filter.getColorInSlot(j - 1);
-							 */
 						}
 
 						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer, color);
@@ -282,6 +281,13 @@ public class Util {
 						if (stack.stackSize <= 0) stack = null;
 						inventory.setItem(36, stack);
 					}
+				} else if (te instanceof TileEntityFurnace) {
+					ItemStack stack = inventory.getItem(2);
+					if (stack != null) {
+						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
+						if (stack.stackSize <= 0) stack = null;
+						inventory.setItem(2, stack);
+					}
 				} else if (inventory.getContainerSize() > 0) {
 					ItemStack stack = inventory.getItem(0);
 					if (stack != null) {
@@ -313,9 +319,6 @@ public class Util {
 		return result;
 	}
 
-
-
-
 	public static boolean insertOnInventoryNoCatch(Container inventory, ItemStack stack, Direction direction) {
 		boolean hasInserted = false;
 		if (inventory == null) {
@@ -328,10 +331,7 @@ public class Util {
 		int inventorySize = inventory.getContainerSize();
 		String inventoryName = inventory.getNameTranslationKey();
 
-		if (Objects.equals(inventoryName, "container.furnace.name")
-			|| Objects.equals(inventoryName, "container.furnace_blast.name")
-			|| Objects.equals(inventoryName, "container.trommel.name"))
-		{
+		if (inventory instanceof TileEntityFurnace || Objects.equals(inventoryName, "container.trommel.name")) {
 			int fuelSlot = 1;
 			int inputSlot = 0;
 
@@ -345,14 +345,14 @@ public class Util {
 			}
 
 			int targetSlot = direction == Direction.UP ? fuelSlot : inputSlot;
-
 			ItemStack furnaceStack = inventory.getItem(targetSlot);
 
 			if (furnaceStack == null) {
 				inventory.setItem(targetSlot, stack);
 				hasInserted = true;
 			} else {
-				int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : furnaceStack.getMaxStackSize();
+				//int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : furnaceStack.getMaxStackSize();
+				int maxStackSize = 8;
 				if (furnaceStack.canStackWith(stack) && furnaceStack.stackSize < maxStackSize) {
 					furnaceStack.stackSize++;
 					inventory.setItem(targetSlot, furnaceStack);
@@ -374,40 +374,37 @@ public class Util {
 					hasInserted = true;
 				}
 			}
+		} else if (Objects.equals(inventoryName, "container.crafter.name")) {
+			 /*
+			 TileEntityCrafter ac = (TileEntityCrafter) inventory;
+			 hasInserted = ac.insertItem(stack);
+
+			  */
 		} else {
-			if (Objects.equals(inventoryName, "container.crafter.name")) {
-				/*
-				TileEntityCrafter ac = (TileEntityCrafter) inventory;
-				hasInserted = ac.insertItem(stack);
+			 int j = 0;
+			 ItemStack chestStack;
+			 while (j < inventorySize) {
+				  chestStack = inventory.getItem(j);
 
-				 */
-			} else {
-				// May be a chest or other mass-storage device
-				int j = 0;
-				ItemStack chestStack;
-				while (j < inventorySize) {
-					chestStack = inventory.getItem(j);
+				  if (chestStack == null) {
+					  if (!inventoryName.equals("container.filter.name") && !inventoryName.equals("container.crafter.name")) {
+						   inventory.setItem(j, stack);
+						   hasInserted = true;
+					  }
+					  break;
+				  }
 
-					if (chestStack == null) {
-						if (!inventoryName.equals("conatiner.filter.name") && !inventoryName.equals("container.crafter.name")) {
-							inventory.setItem(j, stack);
-							hasInserted = true;
-						}
-						break;
-					}
+				  int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : chestStack.getMaxStackSize();
+				  if (chestStack.canStackWith(stack) && chestStack.stackSize < maxStackSize) {
+					  chestStack.stackSize++;
+					  inventory.setItem(j, chestStack);
 
-					int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : chestStack.getMaxStackSize();
-					if (chestStack.canStackWith(stack) && chestStack.stackSize < maxStackSize) {
-						chestStack.stackSize++;
-						inventory.setItem(j, chestStack);
+					  hasInserted = true;
+					  break;
+				  }
 
-						hasInserted = true;
-						break;
-					}
-
-					j++;
-				}
-			}
+				  j++;
+			 }
 		}
 
 		return hasInserted;
@@ -425,11 +422,9 @@ public class Util {
 			return false;
 		}
 
-		/*
 		if (te instanceof TileEntityFilter) {
 			return ((TileEntityFilter) te).canInsertItem(item);
 		}
-		 */
 
 		Container inventory = (Container)te;
 		int inventorySize = inventory.getContainerSize();
@@ -445,7 +440,7 @@ public class Util {
 			while (j < inventorySize) {
 				chestStack = inventory.getItem(j);
 				if (chestStack == null) {
-					return true;
+					return !inventoryName.equals("container.filter.name");
 				}
 				int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : chestStack.getMaxStackSize();
 				if (chestStack.canStackWith(item) && chestStack.stackSize < maxStackSize) {
@@ -482,7 +477,7 @@ public class Util {
 			if (furnaceStack == null) {
 				return true;
 			} else {
-				return furnaceStack.canStackWith(item);
+				return furnaceStack.canStackWith(item) && furnaceStack.stackSize < 8;
 			}
 		}
 
@@ -569,8 +564,15 @@ public class Util {
 					}
 				}
 				 */
-			} else if (inventory.getContainerSize() > 2){
+			} else if (te instanceof TileEntityFurnace) {
 				ItemStack stack = inventory.getItem(2);
+				if (stack != null) {
+					returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
+					if (stack.stackSize <= 0) stack = null;
+					inventory.setItem(2, stack);
+				}
+			} else if (inventory.getContainerSize() > 0){
+				ItemStack stack = inventory.getItem(0);
 				if (stack != null) {
 					stack = stack.copy();
 					returnStack = new PipeStack(stack, dir, stackTimer);

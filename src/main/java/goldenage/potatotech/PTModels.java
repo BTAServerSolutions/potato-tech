@@ -10,6 +10,7 @@ import net.minecraft.client.render.TileEntityRenderDispatcher;
 import net.minecraft.client.render.block.color.BlockColorDispatcher;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.block.model.BlockModelStandard;
+import net.minecraft.client.render.block.model.BlockModelTransparent;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
 import net.minecraft.client.render.item.model.ItemModelStandard;
 import net.minecraft.client.render.texture.stitcher.TextureRegistry;
@@ -47,6 +48,9 @@ public class PTModels implements ModelEntrypoint {
 		ModelHelper.setBlockModel(PTBlocks.clayGold, () ->
 			new BlockModelStandard<>(PTBlocks.clayGold).setAllTextures(0, "potatotech:block/clay_gold_block")
 		);
+		ModelHelper.setBlockModel(PTBlocks.filter, () ->
+			new BlockModelStandard<>(PTBlocks.filter).setAllTextures(0, "potatotech:block/block_filter")
+		);
 
 		ModelHelper.setBlockModel(PTBlocks.pipe, () -> new BlockModelPipe<>(PTBlocks.pipe)
 			.setAllTextures(0, "potatotech:block/pipe")
@@ -55,6 +59,9 @@ public class PTModels implements ModelEntrypoint {
 		ModelHelper.setBlockModel(PTBlocks.chute, () -> new BlockModelChute<>(PTBlocks.chute)
 			.setTex(0, "potatotech:block/chute_sides", Side.NORTH, Side.SOUTH, Side.EAST, Side.WEST)
 			.setTex(0, "potatotech:block/chute_bottom", Side.TOP, Side.BOTTOM)
+		);
+		ModelHelper.setBlockModel(PTBlocks.pipeStack, () ->
+			new BlockModelTransparent<>(PTBlocks.pipeStack, true).setAllTextures(0, "potatotech:block/pipe_stack")
 		);
 	}
 

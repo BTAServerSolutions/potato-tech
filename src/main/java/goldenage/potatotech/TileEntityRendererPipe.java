@@ -4,16 +4,21 @@ package goldenage.potatotech;
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.ItemRenderer;
+import net.minecraft.client.render.block.color.BlockColor;
+import net.minecraft.client.render.block.color.BlockColorDispatcher;
 import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
+import net.minecraft.client.render.block.model.BlockModelStandard;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.client.render.texture.stitcher.TextureRegistry;
 import net.minecraft.client.render.tileentity.TileEntityRenderer;
+import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.EntityItem;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.util.phys.AABB;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
@@ -155,8 +160,25 @@ public class TileEntityRendererPipe extends TileEntityRenderer<TileEntityPipe> {
 					float itemSize = 0.35f;
 					GL11.glTranslatef((float) (x + pos[0]) , (float) (y + pos[1]) , (float) (z + pos[2]));
 					GL11.glScalef(itemSize, itemSize, itemSize);
-					//BlockModel blockModel = BlockModelDispatcher.getInstance().getDispatch(PTBlocks.pipeStack);
-					//blockModel.renderBlockOnInventory(tessellator, color, brightness, null);
+					BlockModelStandard blockModel = (BlockModelStandard) BlockModelDispatcher.getInstance().getDispatch(PTBlocks.pipeStack);
+					blockModel.renderBlockOnInventory(tessellator, color, brightness, null);
+					{
+						if (blockModel.renderBlocks.useInventoryTint) {
+							float cr = (float)(color >> 16 & 255) / 255.0F;
+							float cg = (float)(color >> 8 & 255) / 255.0F;
+							float cb = (float)(color & 255) / 255.0F;
+							GL11.glColor4f(cr, cg, cb, 1.0f);
+						} else {
+							GL11.glColor4f(brightness, brightness, brightness, 1.0f);
+						}
+
+						float yOffset2 = 0.5F;
+						AABB bounds = blockModel.getBlockBoundsForItemRender();
+						GL11.glTranslatef(-0.5F, 0.0F - yOffset2, -0.5F);
+						blockModel.renderBlockWithBounds(tessellator, bounds, 0, brightness, 1.0f, null);
+						GL11.glTranslatef(0.5F, yOffset2, 0.5F);
+					}
+
 					GL11.glPopMatrix();
 					GL11.glDisable(GL11.GL_BLEND);
 				}

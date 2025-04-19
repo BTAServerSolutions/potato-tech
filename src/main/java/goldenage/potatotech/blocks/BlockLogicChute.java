@@ -9,8 +9,8 @@ import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 
-public class BlockChute extends BlockLogic {
-	public BlockChute(Block<?> block, Material material) {
+public class BlockLogicChute extends BlockLogic {
+	public BlockLogicChute(Block<?> block, Material material) {
 		super(block, material);
 	}
 

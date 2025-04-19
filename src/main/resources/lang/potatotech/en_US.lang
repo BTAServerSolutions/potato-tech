@@ -126,3 +126,6 @@ tile.potatotech.heater.desc=Heats furnaces with Eu.
 
 tile.potatotech.dust.name=Dust
 tile.potatotech.dust.desc=Not angel, do not consume.
+
+container.filter.name=Filter
+tile.potatotech.pipe_stack.name=Pipe Stack
