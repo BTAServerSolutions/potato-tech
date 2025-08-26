@@ -55,6 +55,12 @@ public class PTModels implements ModelEntrypoint {
 		ModelHelper.setBlockModel(PTBlocks.pipe, () -> new BlockModelPipe<>(PTBlocks.pipe)
 			.setAllTextures(0, "potatotech:block/pipe")
 		);
+		ModelHelper.setBlockModel(PTBlocks.pipeGold, () -> new BlockModelPipe<>(PTBlocks.pipeGold)
+				.setAllTextures(0, "potatotech:block/gold_pipe")
+		);
+		ModelHelper.setBlockModel(PTBlocks.pipeDiamond, () -> new BlockModelPipe<>(PTBlocks.pipeDiamond)
+				.setAllTextures(0, "potatotech:block/diamond_pipe")
+		);
 
 		ModelHelper.setBlockModel(PTBlocks.chute, () -> new BlockModelChute<>(PTBlocks.chute)
 			.setTex(0, "potatotech:block/chute_sides", Side.NORTH, Side.SOUTH, Side.EAST, Side.WEST)
@@ -62,6 +68,14 @@ public class PTModels implements ModelEntrypoint {
 		);
 		ModelHelper.setBlockModel(PTBlocks.pipeStack, () ->
 			new BlockModelTransparent<>(PTBlocks.pipeStack, true).setAllTextures(0, "potatotech:block/pipe_stack")
+		);
+
+		ModelHelper.setBlockModel(PTBlocks.crafter, () ->
+				new BlockModelStandard<>(PTBlocks.crafter)
+						.setTex(0, "potatotech:block/block_auto_crafter_front", Side.NORTH)
+						.setTex(0, "potatotech:block/iron_chasing_details0", Side.SOUTH, Side.EAST, Side.WEST)
+						.setTex(0, "potatotech:block/block_auto_crafter_top", Side.TOP)
+						.setTex(0, "potatotech:block/iron_chasing_plain", Side.BOTTOM)
 		);
 	}
 

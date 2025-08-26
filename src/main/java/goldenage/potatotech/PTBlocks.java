@@ -1,9 +1,7 @@
 package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.*;
-import goldenage.potatotech.blocks.entities.TileEntityChute;
-import goldenage.potatotech.blocks.entities.TileEntityFilter;
-import goldenage.potatotech.blocks.entities.TileEntityPipe;
+import goldenage.potatotech.blocks.entities.*;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.material.Material;
@@ -23,6 +21,9 @@ public class PTBlocks implements BlockInitEntrypoint {
 	public static Block<? extends BlockLogic> chute;
 	public static Block<? extends BlockLogic> filter;
 	public static Block<? extends BlockLogic> pipeStack;
+	public static Block<? extends BlockLogic> crafter;
+	public static Block<? extends BlockLogic> pipeGold;
+	public static Block<? extends BlockLogic> pipeDiamond;
 
 
 	@Override
@@ -63,5 +64,19 @@ public class PTBlocks implements BlockInitEntrypoint {
 			);
 		pipeStack = new BlockBuilder(MOD_ID)
 			.build("pipe_stack", "pipe_stack", id++, block -> new BlockLogic(block, Material.metal));
+		crafter = new BlockBuilder(MOD_ID)
+				.setTileEntity(TileEntityCrafter::new)
+				.setHardness(3.0f)
+				.setBlockSound(BlockSounds.METAL)
+				.build("crafter", "crafter", id++, block ->
+						new BlockLogicCrafter(block, Material.metal)
+				);
+
+		pipeGold = new BlockBuilder(MOD_ID)
+				.setTileEntity(TileEntityGoldPipe::new)
+				.build("gold_pipe", "gold_pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
+		pipeDiamond = new BlockBuilder(MOD_ID)
+				.setTileEntity(TileEntityDiamondPipe::new)
+				.build("diamond_pipe", "diamond_pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
 	}
 }

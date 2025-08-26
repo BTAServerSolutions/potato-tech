@@ -42,6 +42,27 @@ public class PTRecipes implements RecipeEntrypoint {
 			.addInput('C',"minecraft:chests")
 			.create("Chute", PTBlocks.chute);
 
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+				.setShape("  I", " II", "I  ")
+				.addInput('I', Items.INGOT_IRON)
+				.create("Wrench", PTItems.wrench);
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+				.setShape("IGI")
+				.addInput('I', Items.INGOT_IRON)
+				.addInput('G', Blocks.GLASS)
+				.create("Pipe", new ItemStack(PTBlocks.pipe, 16));
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+				.setShape("IGI")
+				.addInput('I', Items.INGOT_GOLD)
+				.addInput('G', Blocks.GLASS)
+				.create("Gold Pipe", new ItemStack(PTBlocks.pipeGold, 16));
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+				.setShape("DGD")
+				.addInput('D', Items.DIAMOND)
+				.addInput('G', Blocks.GLASS)
+				.create("Diamond Pipe", new ItemStack(PTBlocks.pipeDiamond, 8));
+
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
 			.setInput(PTItems.crushedIronOre)
 			.create("Ingot Iron", new ItemStack(Items.INGOT_IRON));
@@ -49,6 +70,7 @@ public class PTRecipes implements RecipeEntrypoint {
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
 			.setInput(PTItems.crushedGoldOre)
 			.create("Ingot Gold", new ItemStack(Items.INGOT_GOLD));
+
 	}
 
 	@Override

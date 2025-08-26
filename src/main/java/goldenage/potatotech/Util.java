@@ -1,6 +1,7 @@
 package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.entities.TileEntityChute;
+import goldenage.potatotech.blocks.entities.TileEntityCrafter;
 import goldenage.potatotech.blocks.entities.TileEntityFilter;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.BlockLogicChest;
@@ -258,22 +259,20 @@ public class Util {
 						return returnStack;
 					}
 				} else if (Objects.equals(inventoryName, "container.crafter.name")) {
-					/*
 					TileEntityCrafter ac = (TileEntityCrafter) te;
 					ItemStack stack = ac.removeOneResult();
 					if (stack != null) {
 						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
 					} else {
-						ItemStack extra = ac.extraOutputs.getStackInSlot(0);
+						ItemStack extra = ac.extraOutputs.getItem(0);
 						if (extra != null) {
 							ItemStack r = removeItemFromStack(extra);
 							if (extra.stackSize <= 0) {
-								ac.extraOutputs.setInventorySlotContents(0, null);
+								ac.extraOutputs.setItem(0, null);
 							}
 							returnStack = new PipeStack(r, dir, stackTimer);
 						}
 					}
-					 */
 				} else if (te instanceof TileEntityFlag) {
 					ItemStack stack = inventory.getItem(36);
 					if (stack != null) {
@@ -375,11 +374,8 @@ public class Util {
 				}
 			}
 		} else if (Objects.equals(inventoryName, "container.crafter.name")) {
-			 /*
 			 TileEntityCrafter ac = (TileEntityCrafter) inventory;
 			 hasInserted = ac.insertItem(stack);
-
-			  */
 		} else {
 			 int j = 0;
 			 ItemStack chestStack;
@@ -552,18 +548,16 @@ public class Util {
 					return returnStack;
 				}
 			} else if (inventoryName.equals("container.crafter.name")) {
-				/*
 				TileEntityCrafter ac = (TileEntityCrafter) te;
-				ItemStack stack = ac.craftResult.getStackInSlot(0).copy();
+				ItemStack stack = ac.craftResult.getItem(0).copy();
 				if (stack != null) {
 					returnStack = new PipeStack(stack, dir, stackTimer);
 				} else {
-					ItemStack extra = ac.extraOutputs.getStackInSlot(0).copy();
+					ItemStack extra = ac.extraOutputs.getItem(0).copy();
 					if (extra != null) {
 						returnStack = new PipeStack(extra, dir, stackTimer);
 					}
 				}
-				 */
 			} else if (te instanceof TileEntityFurnace) {
 				ItemStack stack = inventory.getItem(2);
 				if (stack != null) {

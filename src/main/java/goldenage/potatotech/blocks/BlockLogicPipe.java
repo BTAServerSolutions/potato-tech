@@ -62,7 +62,7 @@ public class BlockLogicPipe extends BlockLogic {
 			te.colorBySide[side.getId()] = (short) (heldItem.getMetadata() + 17);
 			world.markBlockNeedsUpdate(x, y, z);
 			return true;
-		} else if (heldItem.itemID == Items.DYE.id) {
+		} else if (heldItem.itemID == Items.PAPER.id) {
 			te.colorBySide[side.getId()] = 0;
 			world.markBlockNeedsUpdate(x, y, z);
 			return true;
