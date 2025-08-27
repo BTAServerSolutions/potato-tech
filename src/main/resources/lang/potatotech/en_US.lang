@@ -112,6 +112,9 @@ tile.potatotech.stirling_engine_mv.desc=Party harder!
 tile.potatotech.coil.name=LV Coil
 tile.potatotech.coil.desc=Transforms kinetic energy bellow into electric energy.
 
+tile.potatotech.crafter.name=Auto Crafter
+tile.potatotech.crafter.desc=The name is self explanatory
+
 tile.potatotech.test_area_maker.name=Test Area Maker
 tile.potatotech.test_area_maker.desc=Makes your chunk a perfect testing area, removes all blocks above.
 
