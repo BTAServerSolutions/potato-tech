@@ -44,6 +44,7 @@ public class TileEntityPipe extends TileEntity {
 			if (stack != null) {
 				worldObj.dropItem(x, y, z, stack.stack);
 				stacks[i] = null;
+				worldObj.markBlockNeedsUpdate(x, y, z);
 			}
 		}
 	}
@@ -166,6 +167,7 @@ public class TileEntityPipe extends TileEntity {
 						}
 					}
 					stacks[dir.getId() + 1] = stack;
+					worldObj.markBlockNeedsUpdate(x, y, z);
 				}
 			}
 		}
@@ -185,7 +187,10 @@ public class TileEntityPipe extends TileEntity {
 						}
 
 						boolean inserted = Util.insertOnInventory(inventory, stack.stack, dir);
-						if (inserted) stacks[dir.getId() + 1] = null;
+						if (inserted) {
+							stacks[dir.getId() + 1] = null;
+							worldObj.markBlockNeedsUpdate(x, y, z);
+						}
 					}
 				}
 			}
