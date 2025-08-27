@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "goldenage.potatotech.mixin",
+  "package": "goldenage.potatotech.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
   ],
@@ -9,5 +9,8 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "server": [
+    "PlayerServerAccessor"
+  ]
 }

@@ -1,6 +1,7 @@
 package goldenage.potatotech.blocks;
 
 import goldenage.potatotech.blocks.entities.TileEntityFilter;
+import goldenage.potatotech.networks.client.OpenGuiFilterClientMessage;
 import goldenage.potatotech.screens.ScreenFilter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.block.Block;
@@ -11,6 +12,7 @@ import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import turniplabs.halplibe.helper.EnvironmentHelper;
 
 public class BlockLogicFilter extends BlockLogic {
 	public BlockLogicFilter(Block<?> block, Material material) {
@@ -42,9 +44,9 @@ public class BlockLogicFilter extends BlockLogic {
 
 	@Override
 	public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
-		if (!world.isClientSide) {
+		if (!EnvironmentHelper.isClientWorld()) {
 			TileEntityFilter filter = (TileEntityFilter) world.getTileEntity(x, y, z);
-			Minecraft.getMinecraft().displayScreen(new ScreenFilter(player.inventory, filter));
+			new OpenGuiFilterClientMessage(filter).sendToPlayer(player);
 		}
 		return true;
 	}

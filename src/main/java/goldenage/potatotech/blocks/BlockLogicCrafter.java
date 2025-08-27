@@ -56,7 +56,7 @@ public class BlockLogicCrafter extends BlockLogicRotatable {
     public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
         if (!world.isClientSide) {
             TileEntityCrafter crafter = (TileEntityCrafter) world.getTileEntity(x, y, z);
-            Minecraft.getMinecraft().displayScreen(new ScreenCrafter(player, crafter));
+            //TODO: Minecraft.getMinecraft().displayScreen(new ScreenCrafter(player, crafter));
         }
         return true;
     }
