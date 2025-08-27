@@ -63,6 +63,20 @@ public class PTRecipes implements RecipeEntrypoint {
 				.addInput('G', Blocks.GLASS)
 				.create("Diamond Pipe", new ItemStack(PTBlocks.pipeDiamond, 8));
 
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape("WRW", "RMR", "WRW")
+			.addInput('W', "minecraft:planks")
+			.addInput('R', Items.DUST_REDSTONE)
+			.addInput('M', Blocks.MESH_GOLD)
+			.create("Filter", new ItemStack(PTBlocks.filter, 1));
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape("WRW", "RMR", "WRW")
+			.addInput('W', Items.INGOT_IRON)
+			.addInput('R', Items.DUST_REDSTONE)
+			.addInput('M', Blocks.WORKBENCH)
+			.create("Crafter", new ItemStack(PTBlocks.crafter, 1));
+
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
 			.setInput(PTItems.crushedIronOre)
 			.create("Ingot Iron", new ItemStack(Items.INGOT_IRON));
@@ -70,7 +84,6 @@ public class PTRecipes implements RecipeEntrypoint {
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
 			.setInput(PTItems.crushedGoldOre)
 			.create("Ingot Gold", new ItemStack(Items.INGOT_GOLD));
-
 	}
 
 	@Override
