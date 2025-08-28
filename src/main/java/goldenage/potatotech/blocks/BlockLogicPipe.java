@@ -13,6 +13,7 @@ import net.minecraft.core.sound.SoundCategory;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
+import turniplabs.halplibe.helper.EnvironmentHelper;
 
 public class BlockLogicPipe extends BlockLogic {
 	public BlockLogicPipe(Block<?> block, Material material) {
@@ -41,6 +42,10 @@ public class BlockLogicPipe extends BlockLogic {
 
 	@Override
 	public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
+		if (EnvironmentHelper.isClientWorld()) {
+			return false;
+		}
+
 		TileEntityPipe te = (TileEntityPipe)world.getTileEntity(x, y, z);
 		ItemStack heldItem = player.getHeldItem();
 		if (heldItem == null) {
@@ -75,6 +80,9 @@ public class BlockLogicPipe extends BlockLogic {
 		boolean flag = world.hasDirectSignal(x, y, z) || world.hasNeighborSignal(x, y, z);
 		if (flag) {
 			 world.scheduleBlockUpdate(x, y, z, this.id(), 0);
+		}
+		if (EnvironmentHelper.isServerEnvironment()) {
+			world.markBlockNeedsUpdate(x, y, z);
 		}
 	}
 }
