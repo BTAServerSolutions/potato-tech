@@ -1,10 +1,7 @@
 package goldenage.potatotech.blocks;
 
 import goldenage.potatotech.blocks.entities.TileEntityCrafter;
-import goldenage.potatotech.blocks.entities.TileEntityFilter;
-import goldenage.potatotech.screens.ScreenCrafter;
-import goldenage.potatotech.screens.ScreenFilter;
-import net.minecraft.client.Minecraft;
+import goldenage.potatotech.networks.client.OpenGuiCrafterClientMessage;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogicRotatable;
 import net.minecraft.core.block.Blocks;
@@ -12,9 +9,9 @@ import net.minecraft.core.block.material.Material;
 import net.minecraft.core.entity.EntityItem;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
-import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import turniplabs.halplibe.helper.EnvironmentHelper;
 
 import java.util.Random;
 
@@ -54,9 +51,9 @@ public class BlockLogicCrafter extends BlockLogicRotatable {
 
     @Override
     public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
-        if (!world.isClientSide) {
+        if (!EnvironmentHelper.isClientWorld()) {
             TileEntityCrafter crafter = (TileEntityCrafter) world.getTileEntity(x, y, z);
-            //TODO: Minecraft.getMinecraft().displayScreen(new ScreenCrafter(player, crafter));
+			new OpenGuiCrafterClientMessage(crafter).sendToPlayer(player);
         }
         return true;
     }

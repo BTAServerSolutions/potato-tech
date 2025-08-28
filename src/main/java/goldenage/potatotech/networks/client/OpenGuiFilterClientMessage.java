@@ -6,7 +6,6 @@ import goldenage.potatotech.screens.ScreenFilter;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Screen;
-import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.menu.MenuAbstract;
 
@@ -26,7 +25,7 @@ public class OpenGuiFilterClientMessage extends OpenGuiContainerMessage<TileEnti
 	}
 
 	@Override
-	protected MenuAbstract getMenuInstance(Container playerInventory, TileEntityFilter container) {
+	protected MenuAbstract getMenuInstance(ContainerInventory playerInventory, TileEntityFilter container) {
 		return new MenuFilter(playerInventory, container);
 	}
 }

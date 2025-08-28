@@ -8,17 +8,14 @@ import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.data.registry.Registries;
 import net.minecraft.core.data.registry.recipe.entry.RecipeEntryCrafting;
 import net.minecraft.core.entity.player.Player;
-import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.player.inventory.container.*;
 import net.minecraft.core.player.inventory.container.Container;
-import net.minecraft.core.player.inventory.menu.MenuContainer;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.util.List;
 
 public class TileEntityCrafter extends TileEntity implements Container {
@@ -28,7 +25,11 @@ public class TileEntityCrafter extends TileEntity implements Container {
 	public Container craftResult = new ContainerResult();
 	public MenuCrafter dummyContainer;
 
-	private final List<RecipeEntryCrafting<?, ?>> craftingRecipeEntries = Registries.RECIPES.getAllCraftingRecipes();
+	private static List<RecipeEntryCrafting<?, ?>> CRAFTING_RECIPE_ENTRIES_CACHE;
+
+	static public void updateRecipeEntriesCache() {
+		CRAFTING_RECIPE_ENTRIES_CACHE = Registries.RECIPES.getAllCraftingRecipes();
+	}
 
 	public TileEntityCrafter() {
 		dummyContainer = new MenuCrafter(null, this);
@@ -270,7 +271,7 @@ public class TileEntityCrafter extends TileEntity implements Container {
 			}
 
 			RecipeEntryCrafting<?, ?> recipe = null;
-			for (RecipeEntryCrafting<?, ?> entry: craftingRecipeEntries) {
+			for (RecipeEntryCrafting<?, ?> entry: CRAFTING_RECIPE_ENTRIES_CACHE) {
 				if (entry.matches(this.craftMatrix)) {
 					recipe = entry;
 					break;

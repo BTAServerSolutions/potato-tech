@@ -1,6 +1,7 @@
 package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.entities.*;
+import goldenage.potatotech.networks.client.OpenGuiCrafterClientMessage;
 import goldenage.potatotech.networks.client.OpenGuiFilterClientMessage;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.util.collection.NamespaceID;
@@ -40,6 +41,7 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint {
 		EntityHelper.createTileEntity(TileEntityCrafter.class, id("tile.crafter"));
 
 		NetworkHandler.registerNetworkMessage(OpenGuiFilterClientMessage::new);
+		NetworkHandler.registerNetworkMessage(OpenGuiCrafterClientMessage::new);
 	}
 
 	@Override

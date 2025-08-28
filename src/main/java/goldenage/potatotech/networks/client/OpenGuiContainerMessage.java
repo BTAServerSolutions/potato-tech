@@ -6,7 +6,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Screen;
 import net.minecraft.core.entity.player.Player;
-import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.menu.MenuAbstract;
 import net.minecraft.server.entity.player.PlayerServer;
@@ -43,7 +42,7 @@ abstract class OpenGuiContainerMessage<A> implements NetworkMessage {
 		}
 	}
 
-	abstract protected MenuAbstract getMenuInstance(Container playerInventory, A container);
+	abstract protected MenuAbstract getMenuInstance(ContainerInventory playerInventory, A container);
 
 	@Environment(EnvType.SERVER)
 	protected void serverSetWindow2(Player player) {

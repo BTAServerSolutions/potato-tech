@@ -1,5 +1,6 @@
 package goldenage.potatotech;
 
+import goldenage.potatotech.blocks.entities.TileEntityCrafter;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.data.registry.Registries;
@@ -111,5 +112,7 @@ public class PTRecipes implements RecipeEntrypoint {
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
 			.setInput(PTItems.crushedGoldOre)
 			.create("Ingot Gold", new ItemStack(Items.INGOT_GOLD));
+
+		TileEntityCrafter.updateRecipeEntriesCache();
 	}
 }
