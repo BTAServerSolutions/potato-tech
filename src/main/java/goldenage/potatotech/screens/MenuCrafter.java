@@ -5,26 +5,21 @@ import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.Container;
+import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.menu.MenuAbstract;
 import net.minecraft.core.player.inventory.slot.Slot;
-import net.minecraft.core.player.inventory.slot.SlotResult;
 
 import java.util.List;
 
 public class MenuCrafter extends MenuAbstract {
-	public static class SlotCrafterOut extends SlotResult {
-		public SlotCrafterOut(Player player, Container craftSlots, Container container, int index, int x, int y) {
-			super(player, craftSlots, container, index, x, y);
+	public static class SlotCrafterOut extends Slot {
+		public SlotCrafterOut(Container inventory, int id, int x, int y) {
+			super(inventory, id, x, y);
 		}
 
 		@Override
 		public boolean mayPlace(ItemStack itemstack) {
-			return hasItem() && getItemStack().canStackWith(itemstack);
-		}
-
-		@Override
-		public void onTake(ItemStack itemstack) {
-			super.onTake(itemstack);
+			return false;
 		}
 	}
 
@@ -39,13 +34,12 @@ public class MenuCrafter extends MenuAbstract {
 		}
 	}
 
-	public MenuCrafter(Player player, TileEntityCrafter tile) {
-		if (player == null) {
+	public MenuCrafter(ContainerInventory playerInventory, TileEntityCrafter tile) {
+		if (playerInventory == null) {
 			return;
 		}
 
-		SlotCrafterOut slotCrafting = new SlotCrafterOut(player, tile.craftMatrix, tile.craftResult, 0, 124, 35);
-		this.addSlot(slotCrafting);
+		this.addSlot(new SlotCrafterOut(tile.craftResult, 0, 124, 35));
 
 		this.addSlot(new SlotNoInteract(tile.extraOutputs, 0, 151, 35));
 
@@ -61,12 +55,12 @@ public class MenuCrafter extends MenuAbstract {
 
 		for (int yi = 0; yi < 3; ++yi) {
 			for (int xi = 0; xi < 9; ++xi) {
-				this.addSlot(new Slot(player.inventory, xi + yi * 9 + 9, 8 + xi * 18, 109 + yi * 18));
+				this.addSlot(new Slot(playerInventory, xi + yi * 9 + 9, 8 + xi * 18, 109 + yi * 18));
 			}
 		}
 
 		for (int i = 0; i < 9; ++i) {
-			this.addSlot(new Slot(player.inventory, i, 8 + i * 18, 167));
+			this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 167));
 		}
 	}
 

@@ -104,8 +104,9 @@ public class BlockModelPipe<T extends BlockLogic> extends BlockModelStandard<T> 
 			float[] coordI = coordsInsert[i];
 			float[] coordE = coordsExtract[i];
 
+			int blockId = renderBlocks.blockAccess.getBlockId(x + offsets[i][0], y + offsets[i][1], z +offsets[i][2]);
 			TileEntity te = renderBlocks.blockAccess.getTileEntity(x + offsets[i][0], y + offsets[i][1], z +offsets[i][2]);
-			if (((te instanceof TileEntityPipe
+			if (blockId != 0 && ((te instanceof TileEntityPipe
 				&& ((TileEntityPipe)te).modeBySide[Direction.getDirectionById(i).getOpposite().getId()] != 3)
 				|| te instanceof Container || te instanceof TileEntityChute && i == 1) && pipe.modeBySide[i] != 3)
 			{

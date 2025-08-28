@@ -44,6 +44,7 @@ public class TileEntityPipe extends TileEntity {
 			if (stack != null) {
 				worldObj.dropItem(x, y, z, stack.stack);
 				stacks[i] = null;
+				worldObj.markBlockNeedsUpdate(x, y, z);
 			}
 		}
 	}
@@ -166,6 +167,7 @@ public class TileEntityPipe extends TileEntity {
 						}
 					}
 					stacks[dir.getId() + 1] = stack;
+					worldObj.markBlockNeedsUpdate(x, y, z);
 				}
 			}
 		}
@@ -176,8 +178,9 @@ public class TileEntityPipe extends TileEntity {
 		for (Direction dir : Direction.directions) {
 			PipeStack stack = stacks[dir.getId() + 1];
 			if (stack != null && stack.direction == dir.getOpposite() && stack.timer >= maxPipeStackTimer) {
+				int blockId = worldObj.getBlockId(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
 				TileEntity te = worldObj.getTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-				if (te instanceof Container && !(te instanceof TileEntityPipe)) {
+				if (blockId != 0 && te instanceof Container && !(te instanceof TileEntityPipe)) {
 					if (modeBySide[dir.getId()] <= 1) {
 						Container inventory = (Container) te;
 						if (Objects.equals(inventory.getNameTranslationKey(), "container.chest.name")) {
@@ -185,7 +188,10 @@ public class TileEntityPipe extends TileEntity {
 						}
 
 						boolean inserted = Util.insertOnInventory(inventory, stack.stack, dir);
-						if (inserted) stacks[dir.getId() + 1] = null;
+						if (inserted) {
+							stacks[dir.getId() + 1] = null;
+							worldObj.markBlockNeedsUpdate(x, y, z);
+						}
 					}
 				}
 			}
@@ -196,8 +202,9 @@ public class TileEntityPipe extends TileEntity {
 		for (Direction dir : Direction.directions) {
 			PipeStack stack = stacks[dir.getId() + 1];
 			if (stack != null && stack.direction == dir.getOpposite() && stack.timer >= maxPipeStackTimer) {
+				int blockId = worldObj.getBlockId(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
 				TileEntity te = worldObj.getTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-				if (te instanceof TileEntityPipe) {
+				if (blockId != 0 && te instanceof TileEntityPipe) {
 					TileEntityPipe p = (TileEntityPipe) te;
 					if (p.stacks[dir.getOpposite().getId() + 1] == null) {
 						stack.timer = 0;
@@ -213,8 +220,9 @@ public class TileEntityPipe extends TileEntity {
 			for (int i = 0; i < 6; i++) {
 				PipeStack stack2 = stacks[i + 1];
 				Direction dir = Direction.getDirectionById(i);
+				int blockId = worldObj.getBlockId(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
 				TileEntity te = worldObj.getTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-				if (stack2 == null && (te instanceof Container || te instanceof TileEntityPipe) && i != stacks[0].direction.getId() && modeBySide[i] < 2) {
+				if (stack2 == null && blockId != 0 && (te instanceof Container || te instanceof TileEntityPipe) && i != stacks[0].direction.getId() && modeBySide[i] < 2) {
 					if (te instanceof TileEntityPipe) {
 						TileEntityPipe pipe = (TileEntityPipe) te;
 						int pipeMode = pipe.modeBySide[dir.getOpposite().getId()];

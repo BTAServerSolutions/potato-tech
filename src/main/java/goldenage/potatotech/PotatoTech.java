@@ -1,11 +1,15 @@
 package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.entities.*;
+import goldenage.potatotech.networks.client.OpenGuiCrafterClientMessage;
+import goldenage.potatotech.networks.client.OpenGuiFilterClientMessage;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.util.collection.NamespaceID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import turniplabs.halplibe.helper.EntityHelper;
+import turniplabs.halplibe.helper.NetworkHelper;
+import turniplabs.halplibe.helper.network.NetworkHandler;
 import turniplabs.halplibe.util.ConfigHandler;
 import turniplabs.halplibe.util.GameStartEntrypoint;
 
@@ -35,6 +39,9 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint {
 		EntityHelper.createTileEntity(TileEntityChute.class, id("tile.chute"));
 		EntityHelper.createTileEntity(TileEntityFilter.class, id("tile.filter"));
 		EntityHelper.createTileEntity(TileEntityCrafter.class, id("tile.crafter"));
+
+		NetworkHandler.registerNetworkMessage(OpenGuiFilterClientMessage::new);
+		NetworkHandler.registerNetworkMessage(OpenGuiCrafterClientMessage::new);
 	}
 
 	@Override

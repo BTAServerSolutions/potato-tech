@@ -1,5 +1,6 @@
 package goldenage.potatotech;
 
+import goldenage.potatotech.blocks.entities.TileEntityCrafter;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.data.registry.Registries;
@@ -19,11 +20,38 @@ import static goldenage.potatotech.PotatoTech.LOGGER;
 public class PTRecipes implements RecipeEntrypoint {
 
 	public static RecipeNamespace POTATO_TECH = new RecipeNamespace();
-	public static RecipeGroup<RecipeEntryCrafting<?,?>> WORKBENCH;
+	public static RecipeGroup<RecipeEntryCrafting<?, ?>> WORKBENCH;
 	public static RecipeGroup<RecipeEntryFurnace> FURNACE;
+
 	@Override
 	public void onRecipesReady() {
 		LOGGER.info("Loading PotatoTech recipes...");
+		resetGroups();
+		registerNamespaces();
+		load();
+	}
+
+	@Override
+	public void initNamespaces() {
+		LOGGER.info("Loading PotatoTech recipe namespaces...");
+		resetGroups();
+
+		registerNamespaces();
+	}
+
+	public void registerNamespaces() {
+		POTATO_TECH.register("workbench", WORKBENCH);
+		POTATO_TECH.register("furnace", FURNACE);
+		Registries.RECIPES.register("potatotech", POTATO_TECH);
+	}
+
+	public void resetGroups() {
+		WORKBENCH = new RecipeGroup<>(new RecipeSymbol(new ItemStack(Blocks.WORKBENCH)));
+		FURNACE = new RecipeGroup<>(new RecipeSymbol(new ItemStack(Blocks.FURNACE_STONE_IDLE)));
+		Registries.RECIPES.unregister("potatotech");
+	}
+
+	public void load() {
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
 			.setShape("CI", "IC", "  ")
 			.addInput('C', Items.CLAY)
@@ -39,29 +67,29 @@ public class PTRecipes implements RecipeEntrypoint {
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
 			.setShape("S S", "SCS", " S ")
 			.addInput('S', "minecraft:stones")
-			.addInput('C',"minecraft:chests")
+			.addInput('C', "minecraft:chests")
 			.create("Chute", PTBlocks.chute);
 
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
-				.setShape("  I", " II", "I  ")
-				.addInput('I', Items.INGOT_IRON)
-				.create("Wrench", PTItems.wrench);
+			.setShape("  I", " II", "I  ")
+			.addInput('I', Items.INGOT_IRON)
+			.create("Wrench", PTItems.wrench);
 
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
-				.setShape("IGI")
-				.addInput('I', Items.INGOT_IRON)
-				.addInput('G', Blocks.GLASS)
-				.create("Pipe", new ItemStack(PTBlocks.pipe, 16));
+			.setShape("IGI")
+			.addInput('I', Items.INGOT_IRON)
+			.addInput('G', Blocks.GLASS)
+			.create("Pipe", new ItemStack(PTBlocks.pipe, 16));
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
-				.setShape("IGI")
-				.addInput('I', Items.INGOT_GOLD)
-				.addInput('G', Blocks.GLASS)
-				.create("Gold Pipe", new ItemStack(PTBlocks.pipeGold, 16));
+			.setShape("IGI")
+			.addInput('I', Items.INGOT_GOLD)
+			.addInput('G', Blocks.GLASS)
+			.create("Gold Pipe", new ItemStack(PTBlocks.pipeGold, 16));
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
-				.setShape("DGD")
-				.addInput('D', Items.DIAMOND)
-				.addInput('G', Blocks.GLASS)
-				.create("Diamond Pipe", new ItemStack(PTBlocks.pipeDiamond, 8));
+			.setShape("DGD")
+			.addInput('D', Items.DIAMOND)
+			.addInput('G', Blocks.GLASS)
+			.create("Diamond Pipe", new ItemStack(PTBlocks.pipeDiamond, 8));
 
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
 			.setShape("WRW", "RMR", "WRW")
@@ -84,18 +112,7 @@ public class PTRecipes implements RecipeEntrypoint {
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
 			.setInput(PTItems.crushedGoldOre)
 			.create("Ingot Gold", new ItemStack(Items.INGOT_GOLD));
-	}
 
-	@Override
-	public void initNamespaces() {
-		LOGGER.info("Loading PotatoTech recipe namespaces...");
-
-		Registries.RECIPES.unregister("potatotech");
-		POTATO_TECH = new RecipeNamespace();
-		WORKBENCH = new RecipeGroup<>(new RecipeSymbol(new ItemStack(Blocks.WORKBENCH)));
-		FURNACE = new RecipeGroup<>(new RecipeSymbol(new ItemStack(Blocks.FURNACE_STONE_IDLE)));
-
-		POTATO_TECH.register("workbench",WORKBENCH);
-		POTATO_TECH.register("furnace",FURNACE);
+		TileEntityCrafter.updateRecipeEntriesCache();
 	}
 }
