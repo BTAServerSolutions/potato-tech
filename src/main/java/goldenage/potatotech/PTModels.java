@@ -75,7 +75,7 @@ public class PTModels implements ModelEntrypoint {
 						.setTex(0, "potatotech:block/block_auto_crafter_front", Side.NORTH)
 						.setTex(0, "potatotech:block/iron_chasing_details0", Side.SOUTH, Side.EAST, Side.WEST)
 						.setTex(0, "potatotech:block/block_auto_crafter_top", Side.TOP)
-						.setTex(0, "potatotech:block/iron_chasing_plain", Side.BOTTOM)
+						.setTex(0, "potatotech:block/iron_casing_plain", Side.BOTTOM)
 		);
 	}
 
