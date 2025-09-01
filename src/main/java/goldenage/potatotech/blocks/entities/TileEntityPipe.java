@@ -236,7 +236,7 @@ public class TileEntityPipe extends TileEntity {
 							x + dir.getOffsetX(),
 							y + dir.getOffsetY(),
 							z + dir.getOffsetZ(),
-							dir.getOpposite(),
+							dir,
 							stacks[0].stack);
 
 						if (canInsert) {

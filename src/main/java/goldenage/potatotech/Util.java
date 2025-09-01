@@ -218,6 +218,7 @@ public class Util {
 
 				if (Objects.equals(inventoryName, "container.chest.name")
 					|| Objects.equals(inventoryName, "container.dispenser.name")
+					|| inventoryName.startsWith("container.ironchest")
 					|| Objects.equals(inventoryName, "container.filter.name")
 				) {
 					int inventorySize = inventory.getContainerSize();
@@ -428,6 +429,7 @@ public class Util {
 
 		if (Objects.equals(inventoryName, "container.chest.name")
 			|| Objects.equals(inventoryName, "container.dispenser.name")
+			|| inventoryName.startsWith("container.ironchest")
 			|| Objects.equals(inventoryName, "container.filter.name")
 			|| Objects.equals(inventoryName, "container.crafter.name")
 		) {
@@ -473,7 +475,7 @@ public class Util {
 			if (furnaceStack == null) {
 				return true;
 			} else {
-				return furnaceStack.canStackWith(item) && furnaceStack.stackSize < 8;
+				return furnaceStack.canStackWith(item) && furnaceStack.stackSize < Math.min(8, item.getMaxStackSize());
 			}
 		}
 
@@ -513,6 +515,7 @@ public class Util {
 
 			if (Objects.equals(inventoryName, "container.chest.name")
 				|| Objects.equals(inventoryName, "container.dispenser.name")
+				|| inventoryName.startsWith("container.ironchest")
 				|| Objects.equals(inventoryName, "container.filter.name")
 			) {
 				int inventorySize = inventory.getContainerSize();
