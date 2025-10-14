@@ -26,18 +26,6 @@ public class PTModels implements ModelEntrypoint {
 	@Override
 	public void initBlockModels(BlockModelDispatcher dispatcher) {
 		LOGGER.info("Initializing block models...");
-	}
-
-	@Override
-	public void initItemModels(ItemModelDispatcher dispatcher) {
-		LOGGER.info("Initializing item models...");
-		PTItems.itemTextures.forEach((item,texture)->{
-			ModelHelper.setItemModel(item,()->{
-				ItemModelStandard model = new ItemModelStandard(item, null);
-				model.icon = TextureRegistry.getTexture(NamespaceID.getTemp(PotatoTech.MOD_ID,"item/"+texture));
-				return model;
-			});
-		});
 
 		ModelHelper.setBlockModel(PTBlocks.testAreaMaker, () -> new BlockModelStandard<>(PTBlocks.testAreaMaker)
 			.setTex(0, "potatotech:block/potato", Side.sides)
@@ -56,10 +44,10 @@ public class PTModels implements ModelEntrypoint {
 			.setAllTextures(0, "potatotech:block/pipe")
 		);
 		ModelHelper.setBlockModel(PTBlocks.pipeGold, () -> new BlockModelPipe<>(PTBlocks.pipeGold)
-				.setAllTextures(0, "potatotech:block/gold_pipe")
+			.setAllTextures(0, "potatotech:block/gold_pipe")
 		);
 		ModelHelper.setBlockModel(PTBlocks.pipeDiamond, () -> new BlockModelPipe<>(PTBlocks.pipeDiamond)
-				.setAllTextures(0, "potatotech:block/diamond_pipe")
+			.setAllTextures(0, "potatotech:block/diamond_pipe")
 		);
 
 		ModelHelper.setBlockModel(PTBlocks.chute, () -> new BlockModelChute<>(PTBlocks.chute)
@@ -71,12 +59,24 @@ public class PTModels implements ModelEntrypoint {
 		);
 
 		ModelHelper.setBlockModel(PTBlocks.crafter, () ->
-				new BlockModelStandard<>(PTBlocks.crafter)
-						.setTex(0, "potatotech:block/block_auto_crafter_front", Side.NORTH)
-						.setTex(0, "potatotech:block/iron_chasing_details0", Side.SOUTH, Side.EAST, Side.WEST)
-						.setTex(0, "potatotech:block/block_auto_crafter_top", Side.TOP)
-						.setTex(0, "potatotech:block/iron_casing_plain", Side.BOTTOM)
+			new BlockModelStandard<>(PTBlocks.crafter)
+				.setTex(0, "potatotech:block/block_auto_crafter_front", Side.NORTH)
+				.setTex(0, "potatotech:block/iron_chasing_details0", Side.SOUTH, Side.EAST, Side.WEST)
+				.setTex(0, "potatotech:block/block_auto_crafter_top", Side.TOP)
+				.setTex(0, "potatotech:block/iron_casing_plain", Side.BOTTOM)
 		);
+	}
+
+	@Override
+	public void initItemModels(ItemModelDispatcher dispatcher) {
+		LOGGER.info("Initializing item models...");
+		PTItems.itemTextures.forEach((item,texture)->{
+			ModelHelper.setItemModel(item,()->{
+				ItemModelStandard model = new ItemModelStandard(item, null);
+				model.icon = TextureRegistry.getTexture(NamespaceID.getTemp(PotatoTech.MOD_ID,"item/"+texture));
+				return model;
+			});
+		});
 	}
 
 	@Override

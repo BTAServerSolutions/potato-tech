@@ -210,6 +210,7 @@ public class TileEntityPipe extends TileEntity {
 						stack.timer = 0;
 						p.stacks[dir.getOpposite().getId() + 1] = stack;
 						stacks[dir.getId() + 1] = null;
+						worldObj.markBlockNeedsUpdate(x, y, z);
 					}
 				}
 			}
@@ -270,6 +271,8 @@ public class TileEntityPipe extends TileEntity {
 				stacks[0].timer = 0;
 				stacks[dir.getId() + 1] = stacks[0];
 				stacks[0] = null;
+
+				worldObj.markBlockNeedsUpdate(x, y, z);
 			}
 		}
 
@@ -282,6 +285,7 @@ public class TileEntityPipe extends TileEntity {
 						stacks[0] = stack;
 						stacks[0].timer = 0;
 						stacks[i + 1] = null;
+						worldObj.markBlockNeedsUpdate(x, y, z);
 					}
 				}
 			}

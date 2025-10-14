@@ -35,48 +35,66 @@ public class PTBlocks implements BlockInitEntrypoint {
 
 		pipe = new BlockBuilder(MOD_ID)
 			.setTileEntity(TileEntityPipe::new)
+			.setHardness(1.0f)
+			.setResistance(1.0f)
 			.build("pipe", "pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
+
 		clayIron = new BlockBuilder(MOD_ID)
-			.setHardness(3.0f)
+			.setHardness(1.0f)
+			.setResistance(1.0f)
 			.setBlockSound(BlockSounds.SAND)
 			.build("clay_iron", "clay_iron", id++, block ->
 				new BlockLogicCrushable(block, Material.clay, "Iron")
 			);
+
 		clayGold = new BlockBuilder(MOD_ID)
-			.setHardness(3.0f)
+			.setHardness(1.0f)
+			.setResistance(1.0f)
 			.setBlockSound(BlockSounds.SAND)
 			.build("clay_gold", "clay_gold", id++, block ->
 				new BlockLogicCrushable(block, Material.clay, "Gold")
 			);
+
 		chute = new BlockBuilder(MOD_ID)
 			.setTileEntity(TileEntityChute::new)
-			.setHardness(3.0f)
+			.setHardness(1.0f)
+			.setResistance(1.0f)
 			.setBlockSound(BlockSounds.STONE)
 			.build("chute", "chute", id++, block ->
 				new BlockLogicChute(block, Material.stone)
 			);
+
 		filter = new BlockBuilder(MOD_ID)
 			.setTileEntity(TileEntityFilter::new)
-			.setHardness(3.0f)
+			.setHardness(1.0f)
+			.setResistance(1.0f)
 			.setBlockSound(BlockSounds.WOOD)
 			.build("filter", "filter", id++, block ->
 				new BlockLogicFilter(block, Material.wood)
 			);
+
 		pipeStack = new BlockBuilder(MOD_ID)
 			.build("pipe_stack", "pipe_stack", id++, block -> new BlockLogic(block, Material.metal));
+
 		crafter = new BlockBuilder(MOD_ID)
-				.setTileEntity(TileEntityCrafter::new)
-				.setHardness(3.0f)
-				.setBlockSound(BlockSounds.METAL)
-				.build("crafter", "crafter", id++, block ->
-						new BlockLogicCrafter(block, Material.metal)
-				);
+			.setTileEntity(TileEntityCrafter::new)
+			.setHardness(1.0f)
+			.setResistance(1.0f)
+			.setBlockSound(BlockSounds.METAL)
+			.build("crafter", "crafter", id++, block ->
+					new BlockLogicCrafter(block, Material.metal)
+			);
 
 		pipeGold = new BlockBuilder(MOD_ID)
-				.setTileEntity(TileEntityGoldPipe::new)
-				.build("gold_pipe", "gold_pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
+			.setTileEntity(TileEntityGoldPipe::new)
+			.setHardness(1.0f)
+			.setResistance(1.0f)
+			.build("gold_pipe", "gold_pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
+
 		pipeDiamond = new BlockBuilder(MOD_ID)
-				.setTileEntity(TileEntityDiamondPipe::new)
-				.build("diamond_pipe", "diamond_pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
+			.setTileEntity(TileEntityDiamondPipe::new)
+			.setHardness(1.0f)
+			.setResistance(1.0f)
+			.build("diamond_pipe", "diamond_pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
 	}
 }
