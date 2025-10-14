@@ -132,3 +132,7 @@ tile.potatotech.dust.desc=Not angel, do not consume.
 
 container.filter.name=Filter
 tile.potatotech.pipe_stack.name=Pipe Stack
+
+key.potatotech.wrenchMode=Wrench Mode
+gui.options.page.potatotech=Potato Logistics
+gui.options.page.controls.category.potatotech=Potato Logistics
