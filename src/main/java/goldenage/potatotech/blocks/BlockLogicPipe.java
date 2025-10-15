@@ -55,15 +55,11 @@ public class BlockLogicPipe extends BlockLogic {
 
 		KeyBinding wrenchModeKey = ((IKeybindings) mc.gameSettings).potatotech$getWrenchMode();
 
+		int sideId = wrenchModeKey.isPressed() ? side.getOpposite().getId() : side.getId();
+
 		if (heldItem == null) {
 			te.dropItems();
 		} else if (heldItem.itemID == PTItems.wrench.id) {
-			int sideId = side.getId();
-
-			if (wrenchModeKey.isPressed()) {
-				sideId = side.getOpposite().getId();
-			}
-
 			int mode = te.modeBySide[sideId];
 			mode = (mode + 1) % 4;
 			te.modeBySide[sideId] = (short)mode;
@@ -72,16 +68,16 @@ public class BlockLogicPipe extends BlockLogic {
 			world.playSoundEffect(player, SoundCategory.WORLD_SOUNDS, (double) x + 0.5, (double) y + 0.5, (double) z + 0.5, "random.click", 0.3f, mode % 2 == 0 ? 0.5f : 0.6f);
 			return true;
 		} else if (heldItem.itemID == Items.DYE.id) {
-			te.colorBySide[side.getId()] = (short) (heldItem.getMetadata() + 1);
+			te.colorBySide[sideId] = (short) (heldItem.getMetadata() + 1);
 			world.markBlockNeedsUpdate(x, y, z);
 			return true;
 		} else if (heldItem.getItem().getClass().getName().equals("goocraft4evr.nonamedyes.item.ItemModDye")) {
 			// NoNameDyes support
-			te.colorBySide[side.getId()] = (short) (heldItem.getMetadata() + 17);
+			te.colorBySide[sideId] = (short) (heldItem.getMetadata() + 17);
 			world.markBlockNeedsUpdate(x, y, z);
 			return true;
 		} else if (heldItem.itemID == Items.PAPER.id) {
-			te.colorBySide[side.getId()] = 0;
+			te.colorBySide[sideId] = 0;
 			world.markBlockNeedsUpdate(x, y, z);
 			return true;
 		}
