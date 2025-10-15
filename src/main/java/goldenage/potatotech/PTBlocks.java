@@ -5,6 +5,7 @@ import goldenage.potatotech.blocks.entities.*;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.material.Material;
+import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.sound.BlockSounds;
 import turniplabs.halplibe.helper.BlockBuilder;
 import turniplabs.halplibe.util.BlockInitEntrypoint;
@@ -36,21 +37,24 @@ public class PTBlocks implements BlockInitEntrypoint {
 		pipe = new BlockBuilder(MOD_ID)
 			.setTileEntity(TileEntityPipe::new)
 			.setHardness(1.0f)
-			.setResistance(1.0f)
+			.setResistance(3.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.build("pipe", "pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
 
 		clayIron = new BlockBuilder(MOD_ID)
 			.setHardness(1.0f)
-			.setResistance(1.0f)
+			.setResistance(3.0f)
 			.setBlockSound(BlockSounds.SAND)
+			.addTags(BlockTags.MINEABLE_BY_SHOVEL)
 			.build("clay_iron", "clay_iron", id++, block ->
 				new BlockLogicCrushable(block, Material.clay, "Iron")
 			);
 
 		clayGold = new BlockBuilder(MOD_ID)
 			.setHardness(1.0f)
-			.setResistance(1.0f)
+			.setResistance(3.0f)
 			.setBlockSound(BlockSounds.SAND)
+			.addTags(BlockTags.MINEABLE_BY_SHOVEL)
 			.build("clay_gold", "clay_gold", id++, block ->
 				new BlockLogicCrushable(block, Material.clay, "Gold")
 			);
@@ -58,8 +62,9 @@ public class PTBlocks implements BlockInitEntrypoint {
 		chute = new BlockBuilder(MOD_ID)
 			.setTileEntity(TileEntityChute::new)
 			.setHardness(1.0f)
-			.setResistance(1.0f)
+			.setResistance(3.0f)
 			.setBlockSound(BlockSounds.STONE)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.build("chute", "chute", id++, block ->
 				new BlockLogicChute(block, Material.stone)
 			);
@@ -67,8 +72,9 @@ public class PTBlocks implements BlockInitEntrypoint {
 		filter = new BlockBuilder(MOD_ID)
 			.setTileEntity(TileEntityFilter::new)
 			.setHardness(1.0f)
-			.setResistance(1.0f)
+			.setResistance(3.0f)
 			.setBlockSound(BlockSounds.WOOD)
+			.addTags(BlockTags.MINEABLE_BY_AXE)
 			.build("filter", "filter", id++, block ->
 				new BlockLogicFilter(block, Material.wood)
 			);
@@ -79,7 +85,8 @@ public class PTBlocks implements BlockInitEntrypoint {
 		crafter = new BlockBuilder(MOD_ID)
 			.setTileEntity(TileEntityCrafter::new)
 			.setHardness(1.0f)
-			.setResistance(1.0f)
+			.setResistance(3.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.setBlockSound(BlockSounds.METAL)
 			.build("crafter", "crafter", id++, block ->
 					new BlockLogicCrafter(block, Material.metal)
@@ -88,13 +95,15 @@ public class PTBlocks implements BlockInitEntrypoint {
 		pipeGold = new BlockBuilder(MOD_ID)
 			.setTileEntity(TileEntityGoldPipe::new)
 			.setHardness(1.0f)
-			.setResistance(1.0f)
+			.setResistance(3.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.build("gold_pipe", "gold_pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
 
 		pipeDiamond = new BlockBuilder(MOD_ID)
 			.setTileEntity(TileEntityDiamondPipe::new)
 			.setHardness(1.0f)
-			.setResistance(1.0f)
+			.setResistance(3.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.build("diamond_pipe", "diamond_pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
 	}
 }
