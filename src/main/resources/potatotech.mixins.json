@@ -4,6 +4,7 @@
   "package": "goldenage.potatotech.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "ItemDyeMixin"
   ],
   "client": [
     "GameSettingsMixin"

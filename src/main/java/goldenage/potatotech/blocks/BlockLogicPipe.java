@@ -16,6 +16,7 @@ import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 import turniplabs.halplibe.helper.EnvironmentHelper;
+import turniplabs.halplibe.helper.NetworkHelper;
 
 import static net.minecraft.client.render.colorizer.Colorizers.mc;
 
@@ -53,12 +54,10 @@ public class BlockLogicPipe extends BlockLogic {
 		TileEntityPipe te = (TileEntityPipe)world.getTileEntity(x, y, z);
 		ItemStack heldItem = player.getHeldItem();
 
-		KeyBinding wrenchModeKey = ((IKeybindings) mc.gameSettings).potatotech$getWrenchMode();
-
-		int sideId = wrenchModeKey.isPressed() ? side.getOpposite().getId() : side.getId();
+		int sideId = player.isSneaking() ? side.getOpposite().getId() : side.getId();
 
 		if (heldItem == null) {
-			te.dropItems();
+			if (player.isSneaking()) te.dropItems();
 		} else if (heldItem.itemID == PTItems.wrench.id) {
 			int mode = te.modeBySide[sideId];
 			mode = (mode + 1) % 4;

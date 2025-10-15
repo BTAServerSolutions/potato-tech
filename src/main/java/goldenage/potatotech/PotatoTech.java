@@ -24,7 +24,7 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint {
 	static {
 		Properties prop = new Properties();
 		prop.setProperty("starting_block_id","1999");
-		prop.setProperty("starting_item_id","17999");
+		prop.setProperty("starting_item_id","17900");
 		config = new ConfigHandler(MOD_ID, prop);
 		config.updateConfig();
 	}
