@@ -378,10 +378,16 @@ public class Util {
 			 TileEntityCrafter ac = (TileEntityCrafter) inventory;
 			 hasInserted = ac.insertItem(stack);
 		} else {
-			 int j = 0;
 			 ItemStack chestStack;
-			 while (j < inventorySize) {
-				  chestStack = inventory.getItem(j);
+			 for (int j = 0; j < inventorySize; j++) {
+				  if (inventoryName.equals("container.activator.name")) {
+					  TileEntityActivator activator = (TileEntityActivator) inventory;
+					  if (activator.locked(j)) {
+						  continue;
+					  }
+				  }
+
+				 chestStack = inventory.getItem(j);
 
 				  if (chestStack == null) {
 					  if (!inventoryName.equals("container.filter.name") && !inventoryName.equals("container.crafter.name")) {
@@ -399,8 +405,6 @@ public class Util {
 					  hasInserted = true;
 					  break;
 				  }
-
-				  j++;
 			 }
 		}
 
@@ -432,10 +436,17 @@ public class Util {
 			|| inventoryName.startsWith("container.ironchest")
 			|| Objects.equals(inventoryName, "container.filter.name")
 			|| Objects.equals(inventoryName, "container.crafter.name")
+			|| inventoryName.equals("container.activator.name")
 		) {
-			int j = 0;
 			ItemStack chestStack;
-			while (j < inventorySize) {
+			for (int j = 0; j < inventorySize; j++) {
+				if (inventoryName.equals("container.activator.name")) {
+					TileEntityActivator activator = (TileEntityActivator) inventory;
+					if (activator.locked(j)) {
+						continue;
+					}
+				}
+
 				chestStack = inventory.getItem(j);
 				if (chestStack == null) {
 					return !inventoryName.equals("container.filter.name");
@@ -444,7 +455,6 @@ public class Util {
 				if (chestStack.canStackWith(item) && chestStack.stackSize < maxStackSize) {
 					return true;
 				}
-				j++;
 			}
 		} else if (inventory instanceof TileEntityFlag) {
 			int targetSlot = 36;
