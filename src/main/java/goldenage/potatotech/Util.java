@@ -473,8 +473,9 @@ public class Util {
 				fuelSlot = 4;
 				for (; inputSlot < 3; inputSlot++) {
 					ItemStack s = inventory.getItem(inputSlot);
+					if (s == null) break;
 					int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : s.getMaxStackSize();
-					if (s == null || s.canStackWith(item) && s.stackSize < maxStackSize) break;
+					if (s.canStackWith(item) && s.stackSize < maxStackSize) break;
 				}
 			}
 
