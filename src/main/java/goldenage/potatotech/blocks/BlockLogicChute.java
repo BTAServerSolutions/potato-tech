@@ -61,7 +61,7 @@ public class BlockLogicChute extends BlockLogic {
 	public boolean getSignal(WorldSource worldSource, int x, int y, int z, Side side) {
 		TileEntityChute basketTileEntity = (TileEntityChute) worldSource.getTileEntity(x, y, z);
 		if (basketTileEntity != null) {
-			return basketTileEntity.getNumUnitsInside() == basketTileEntity.getMaxUnits();
+			return basketTileEntity.getNumUnitsInside() >= basketTileEntity.getMaxUnits();
 		}
 		return false;
 	}
@@ -70,7 +70,7 @@ public class BlockLogicChute extends BlockLogic {
 	public boolean getDirectSignal(World world, int x, int y, int z, Side side) {
 		TileEntityChute basketTileEntity = (TileEntityChute) world.getTileEntity(x, y, z);
 		if (basketTileEntity != null) {
-			return basketTileEntity.getNumUnitsInside() == basketTileEntity.getMaxUnits();
+			return basketTileEntity.getNumUnitsInside() >= basketTileEntity.getMaxUnits();
 		}
 		return false;
 	}

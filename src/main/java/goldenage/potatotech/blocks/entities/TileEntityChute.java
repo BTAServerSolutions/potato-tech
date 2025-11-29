@@ -106,6 +106,12 @@ public class TileEntityChute extends TileEntity {
 		this.worldObj.notifyBlockChange(this.x, this.y, this.z, PTBlocks.chute.id());
 	}
 	public ItemStack removeOneItem() {
+		ItemStack itemStack = this.getItemToRemove();
+		this.removeItems(itemStack);
+		return itemStack;
+	}
+
+	public ItemStack getItemToRemove() {
 		ChuteEntry firstKey = null;
 		int itemCount = 0;
 		for (Map.Entry<ChuteEntry, Integer> entry : this.contents.entrySet()) {
@@ -117,19 +123,26 @@ public class TileEntityChute extends TileEntity {
 		if (firstKey == null || itemCount == 0) return null;
 
 		ItemStack itemStack = new ItemStack(firstKey.getItem(), 1, firstKey.metadata);
-
-		itemCount--;
+		return itemStack;
+	}
+	public boolean removeItems(ItemStack stack) {
+		if (stack == null) {
+			return false;
+		}
+		ChuteEntry entry = new ChuteEntry(stack.itemID, stack.getMetadata(), stack.getData());
+		int itemCount = this.contents.getOrDefault(entry, 0);
+		if ((itemCount == 0) || (stack.stackSize > itemCount)) {
+			return false;
+		};
+		itemCount -= stack.stackSize;
 
 		if (itemCount == 0) {
-			this.contents.remove(firstKey);
+			this.contents.remove(entry);
 		} else {
-			this.contents.put(firstKey, itemCount);
+			this.contents.put(entry, itemCount);
 		}
-
-		this.worldObj.notifyBlockChange(this.x, this.y, this.z, PTBlocks.chute.id());
-		this.updateNumUnits();
-
-		return itemStack;
+		this.numUnitsInside -= this.getItemSizeUnits(stack.getItem()) * stack.stackSize;
+		return true;
 	}
 
 	@Override
@@ -156,22 +169,19 @@ public class TileEntityChute extends TileEntity {
 		boolean shouldUpdate = false;
 		if (!entities.isEmpty()) {
 			for (Entity e : entities) {
+				if (this.numUnitsInside >= this.getMaxUnits()) break;
 				EntityItem entity = (EntityItem)e;
 				if (entity.item == null || entity.item.stackSize <= 0 || entity.basketPickupDelay != 0) continue;
-				shouldUpdate = this.importItemStack(entity.item);
+				shouldUpdate = this.importItemStack(entity.item) || shouldUpdate;
 				if (entity.item.stackSize > 0) continue;
 				entity.item.stackSize = 0;
 				e.outOfWorld();
 			}
 		}
-		if (shouldUpdate) {
-			this.worldObj.notifyBlockChange(this.x, this.y, this.z, PTBlocks.chute.id());
-			this.updateNumUnits();
-		}
 
 		TileEntity outTe = worldObj.getTileEntity(x, y-1, z) ;
 		if (outTe instanceof Container) {
-			ItemStack itemToRemove = this.removeOneItem();
+			ItemStack itemToRemove = this.getItemToRemove();
 
 			if (itemToRemove != null) {
 				boolean hasInserted = false;
@@ -186,18 +196,27 @@ public class TileEntityChute extends TileEntity {
 				if (inventory != null) {
 					hasInserted = Util.insertOnInventory(inventory, itemToRemove, Direction.DOWN);
 				}
-				if (!hasInserted) {
-					importItemStack(itemToRemove);
+
+				if (hasInserted) {
+					shouldUpdate = this.removeItems(itemToRemove) || shouldUpdate;
+					this.worldObj.markBlockNeedsUpdate(x, y-1, z);
 				}
 			}
 		} else if (outTe instanceof TileEntityChute) {
-			ItemStack itemToRemove = this.removeOneItem();
+			ItemStack itemToRemove = this.getItemToRemove();
 			if (itemToRemove != null) {
-				if (!((TileEntityChute)outTe).importItemStack(itemToRemove)) {
-					this.importItemStack(itemToRemove);
+				if (((TileEntityChute)outTe).importItemStack(itemToRemove)) {
+					shouldUpdate = this.removeItems(itemToRemove) || shouldUpdate;
+					this.worldObj.markBlockNeedsUpdate(x, y-1, z);
 				}
 			}
 		}
+
+		if (shouldUpdate) {
+			this.worldObj.notifyBlockChange(this.x, this.y, this.z, PTBlocks.chute.id());
+			this.updateNumUnits();
+		}
+
 	}
 
 	public boolean importItemStack(ItemStack stack) {
@@ -209,6 +228,7 @@ public class TileEntityChute extends TileEntity {
 			return false;
 		}
 		stack.stackSize -= itemsToTake;
+		this.numUnitsInside += itemsToTake * itemsToTake;
 		int currentItemsInBE = this.contents.getOrDefault(entry, 0);
 		this.contents.put(entry, currentItemsInBE += itemsToTake);
 		return true;
