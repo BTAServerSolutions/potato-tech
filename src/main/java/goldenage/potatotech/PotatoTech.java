@@ -39,6 +39,7 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint {
 		EntityHelper.createTileEntity(TileEntityChute.class, id("tile.chute"));
 		EntityHelper.createTileEntity(TileEntityFilter.class, id("tile.filter"));
 		EntityHelper.createTileEntity(TileEntityCrafter.class, id("tile.crafter"));
+		EntityHelper.createTileEntity(TileEntityEnergyConnector.class, id("tile.energy_connector"));
 
 		NetworkHandler.registerNetworkMessage(OpenGuiFilterClientMessage::new);
 		NetworkHandler.registerNetworkMessage(OpenGuiCrafterClientMessage::new);

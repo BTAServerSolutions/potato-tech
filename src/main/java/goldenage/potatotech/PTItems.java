@@ -1,7 +1,9 @@
 package goldenage.potatotech;
 
+import goldenage.potatotech.items.ItemWireSpool;
 import goldenage.potatotech.items.ItemWrench;
 import net.minecraft.core.item.Item;
+import net.minecraft.core.item.ItemPlaceable;
 import net.minecraft.core.util.collection.NamespaceID;
 import turniplabs.halplibe.helper.ItemBuilder;
 import turniplabs.halplibe.util.ItemInitEntrypoint;
@@ -18,6 +20,9 @@ public class PTItems implements ItemInitEntrypoint {
 	public static Item wrench;
 	public static Item crushedIronOre;
 	public static Item crushedGoldOre;
+	public static Item energyConnector;
+	public static Item wireSpool;
+
 
 	@Override
 	public void afterItemInit() {
@@ -29,6 +34,8 @@ public class PTItems implements ItemInitEntrypoint {
 		wrench = customItem(new ItemWrench("wrench", NamespaceID.getPermanent(MOD_ID, "wrench"), id++), "wrench", "wrench");
 		crushedIronOre = simpleItem("crushed iron ore", "crushed_iron_ore", "crushed_iron_ore", id++);
 		crushedGoldOre = simpleItem("crushed gold ore", "crushed_gold_ore", "crushed_gold_ore", id++);
+		energyConnector = customItem(new ItemPlaceable("Energy Connector", MOD_ID+":"+"item_energy_connector", id++, PTBlocks.energyConnector), "energy_connector", "item_connector");
+		wireSpool = customItem(new ItemWireSpool("wire_spool", NamespaceID.getPermanent(MOD_ID, "wire_spool"), id++), "wire_spool", "wire_spool");
 	}
 
 

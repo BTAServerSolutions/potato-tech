@@ -1,6 +1,8 @@
 package goldenage.potatotech;
 
+import goldenage.potatotech.blocks.entities.TileEntityEnergyConnector;
 import goldenage.potatotech.blocks.models.BlockModelChute;
+import goldenage.potatotech.blocks.models.BlockModelConnector;
 import goldenage.potatotech.blocks.models.BlockModelPipe;
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.fabricmc.api.EnvType;
@@ -58,6 +60,11 @@ public class PTModels implements ModelEntrypoint {
 			new BlockModelTransparent<>(PTBlocks.pipeStack, true).setAllTextures(0, "potatotech:block/pipe_stack")
 		);
 
+		ModelHelper.setBlockModel(PTBlocks.energyConnector, () ->
+			new BlockModelConnector<>(PTBlocks.energyConnector)
+				.setAllTextures(0, "potatotech:block/energy_connector")
+		);
+
 		ModelHelper.setBlockModel(PTBlocks.crafter, () ->
 			new BlockModelStandard<>(PTBlocks.crafter)
 				.setTex(0, "potatotech:block/block_auto_crafter_front", Side.NORTH)
@@ -88,6 +95,7 @@ public class PTModels implements ModelEntrypoint {
 	public void initTileEntityModels(TileEntityRenderDispatcher dispatcher) {
 		LOGGER.info("Initializing tile entity renderers...");
 		ModelHelper.setTileEntityModel(TileEntityPipe.class, TileEntityRendererPipe::new);
+		ModelHelper.setTileEntityModel(TileEntityEnergyConnector.class, TileEntityRendererEnergyConnector::new);
 	}
 
 	@Override

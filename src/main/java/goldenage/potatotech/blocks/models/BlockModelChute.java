@@ -58,25 +58,25 @@ public class BlockModelChute<T extends BlockLogic> extends BlockModelStandard<T>
 		float basketHeight = 1.0f;
 		AABB bounds = block.getBounds();
 		bounds.set(onepix, fourPix, onepix, 0.9375f, fourPix + onepix, 0.9375f);
-		super.renderBlockOnInventory(tessellator, metadata, brightness, lightmapCoordinate);
+		super.renderBlockWithBounds(tessellator, bounds, metadata, brightness, 1.0f, lightmapCoordinate);
 
 		bounds.set(0.0f, fourPix, 0.0f, 1.0f, 1.0f, onepix);
-		super.renderBlockOnInventory(tessellator, metadata, brightness, lightmapCoordinate);
+		super.renderBlockWithBounds(tessellator, bounds, metadata, brightness, 1.0f, lightmapCoordinate);
 
 		bounds.set(0.0f, fourPix, 0.9375f, 1.0f, 1.0f, 1.0f);
-		super.renderBlockOnInventory(tessellator, metadata, brightness, lightmapCoordinate);
+		super.renderBlockWithBounds(tessellator, bounds, metadata, brightness, 1.0f, lightmapCoordinate);
 
 		bounds.set(0.0f, fourPix, onepix, onepix, 1.0f, 0.9375f);
-		super.renderBlockOnInventory(tessellator, metadata, brightness, lightmapCoordinate);
+		super.renderBlockWithBounds(tessellator, bounds, metadata, brightness, 1.0f, lightmapCoordinate);
 
 		bounds.set(0.9375f, fourPix, onepix, 1.0f, 1.0f, 0.9375f);
-		super.renderBlockOnInventory(tessellator, metadata, brightness, lightmapCoordinate);
+		super.renderBlockWithBounds(tessellator, bounds, metadata, brightness, 1.0f, lightmapCoordinate);
 
 		bounds.set(twoPix, 0, twoPix, 1.0f - twoPix, fourPix, 1.0f-twoPix);
-		super.renderBlockOnInventory(tessellator, metadata, brightness, lightmapCoordinate);
+		super.renderBlockWithBounds(tessellator, bounds, metadata, brightness, 1.0f, lightmapCoordinate);
 
 		bounds.set(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
-		super.renderBlockOnInventory(tessellator, metadata, brightness, lightmapCoordinate);
+		super.renderBlockWithBounds(tessellator, bounds, metadata, brightness, 1.0f, lightmapCoordinate);
 	}
 
 	protected IconCoordinate fillTexture = TextureRegistry.getTexture("minecraft:block/basket/fill");

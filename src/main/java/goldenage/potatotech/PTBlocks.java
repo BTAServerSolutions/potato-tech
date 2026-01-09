@@ -25,6 +25,7 @@ public class PTBlocks implements BlockInitEntrypoint {
 	public static Block<? extends BlockLogic> crafter;
 	public static Block<? extends BlockLogic> pipeGold;
 	public static Block<? extends BlockLogic> pipeDiamond;
+	public static Block<? extends BlockLogic> energyConnector;
 
 
 	@Override
@@ -105,5 +106,12 @@ public class PTBlocks implements BlockInitEntrypoint {
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.build("diamond_pipe", "diamond_pipe", id++, block -> new BlockLogicPipe(block, Material.metal));
+
+		energyConnector = new BlockBuilder(MOD_ID)
+			.setTileEntity(TileEntityEnergyConnector::new)
+			.setHardness(1.0f)
+			.setResistance(3.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
+			.build("energy_connector", "energy_connector", id++, block -> new BlockLogicEnergyConnector(block, Material.metal));
 	}
 }
