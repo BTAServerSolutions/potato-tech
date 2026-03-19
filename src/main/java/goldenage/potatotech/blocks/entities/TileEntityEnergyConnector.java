@@ -6,12 +6,20 @@ import goldenage.potatotech.PTBlocks;
 import goldenage.potatotech.PTItems;
 import goldenage.potatotech.PotatoTech;
 import net.minecraft.core.block.entity.TileEntity;
+import net.minecraft.core.block.entity.TileEntityFurnace;
+import net.minecraft.core.block.entity.TileEntityFurnaceBlast;
+import net.minecraft.core.block.entity.TileEntityTrommel;
+import net.minecraft.core.data.registry.Registries;
+import net.minecraft.core.data.registry.recipe.entry.RecipeEntryBlastFurnace;
+import net.minecraft.core.data.registry.recipe.entry.RecipeEntryFurnace;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.util.helper.Direction;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class TileEntityEnergyConnector extends TileEntity {
 	public static class Connection {
@@ -45,7 +53,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 		}
 	}
 
-	static public int energyCapacity = 32;
+	static public final int energyCapacity = 32;
 	public int energy = 0;
 
 	public TileEntityEnergyConnector() {
@@ -62,6 +70,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 			CompoundTag nbttagcompound1 = (CompoundTag)nbttaglist.tagAt(i);
 			this.connections.add(Connection.readConnectionFromNBT(nbttagcompound1));
 		}
+		energy = nbttagcompound.getInteger("energy");
 	}
 
 	@Override
@@ -75,6 +84,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 			nbttaglist.addTag(nbttagcompound1);
 		}
 		nbttagcompound.put("connections", nbttaglist);
+		nbttagcompound.putInt("energy", energy);
 	}
 
 	public boolean addConnection(int xi, int yi, int zi)  {
@@ -139,6 +149,48 @@ public class TileEntityEnergyConnector extends TileEntity {
 		return result;
 	}
 
+
+	private static boolean furnaceCanSmelt(TileEntityFurnace furnace, boolean isBlast) {
+		if (furnace.getItem(0) == null) {
+			return false;
+		}
+		List<RecipeEntryFurnace> listF = Registries.RECIPES.getAllFurnaceRecipes();
+		List<RecipeEntryBlastFurnace> listB = Registries.RECIPES.getAllBlastFurnaceRecipes();
+
+		ItemStack itemstack = null;
+		if (isBlast) {
+			Iterator iter = listB.iterator();
+			while(iter.hasNext()) {
+				RecipeEntryFurnace recipeEntryBase = (RecipeEntryFurnace)iter.next();
+				if (recipeEntryBase != null && recipeEntryBase.matches(furnace.getItem(0))) {
+					itemstack = recipeEntryBase.getOutput();
+				}
+			}
+		} else {
+			Iterator iter = listF.iterator();
+			while(iter.hasNext()) {
+				RecipeEntryFurnace recipeEntryBase = (RecipeEntryFurnace)iter.next();
+				if (recipeEntryBase != null && recipeEntryBase.matches(furnace.getItem(0))) {
+					itemstack = recipeEntryBase.getOutput();
+				}
+			}
+		}
+
+		if (itemstack == null) {
+			return false;
+		}
+		if (furnace.getItem(2) == null) {
+			return true;
+		}
+		if (!furnace.getItem(2).isItemEqual(itemstack)) {
+			return false;
+		}
+		if (furnace.getItem(2).stackSize < furnace.getMaxStackSize() && furnace.getItem(2).stackSize < furnace.getItem(2).getMaxStackSize()) {
+			return true;
+		}
+		return furnace.getItem(2).stackSize < itemstack.getMaxStackSize();
+	}
+
 	@Override
 	public void tick() {
 		int side = worldObj.getBlockMetadata(x, y, z);
@@ -157,6 +209,21 @@ public class TileEntityEnergyConnector extends TileEntity {
 					int amountToTransfer = Math.min(1 + (energy - teConn.energy) / 2, energy);
 					energy -= amountToTransfer;
 					teConn.energy += amountToTransfer;
+				}
+			}
+
+			if (te2 instanceof TileEntityFurnace && energy > 0) {
+				TileEntityFurnace furnace = (TileEntityFurnace) te2;
+				//if (furnaceCanSmelt(furnace, te2 instanceof TileEntityFurnaceBlast)) {
+					energy -= 1;
+					furnace.currentBurnTime = 50;
+				//}
+			}
+			if (te2 instanceof TileEntityTrommel && energy > 0) {
+				TileEntityTrommel trommel = (TileEntityTrommel) te2;
+				trommel.burnTime = 50;
+				if (trommel.currentItemBurnTime > 0) {
+					energy -= 1;
 				}
 			}
         }

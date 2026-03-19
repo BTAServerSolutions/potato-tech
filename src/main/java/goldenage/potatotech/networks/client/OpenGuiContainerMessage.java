@@ -14,7 +14,6 @@ import turniplabs.halplibe.helper.network.NetworkHandler;
 import turniplabs.halplibe.helper.network.NetworkMessage;
 import turniplabs.halplibe.helper.network.UniversalPacket;
 
-import javax.annotation.Nonnull;
 
 abstract class OpenGuiContainerMessage<A> implements NetworkMessage {
 	final protected A container;
@@ -55,12 +54,12 @@ abstract class OpenGuiContainerMessage<A> implements NetworkMessage {
 	}
 
 	@Override
-	public void encodeToUniversalPacket(@Nonnull UniversalPacket buf) {
+	public void encodeToUniversalPacket(UniversalPacket buf) {
 		buf.writeInt(windowId);
 	}
 
 	@Override
-	public void decodeFromUniversalPacket(@Nonnull UniversalPacket buf) {
+	public void decodeFromUniversalPacket(UniversalPacket buf) {
 		windowId = buf.readInt();
 	}
 
