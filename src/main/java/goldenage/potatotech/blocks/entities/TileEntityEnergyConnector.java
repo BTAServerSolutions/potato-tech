@@ -2,6 +2,7 @@ package goldenage.potatotech.blocks.entities;
 
 import com.mojang.nbt.tags.CompoundTag;
 import com.mojang.nbt.tags.ListTag;
+import goldenage.potatotech.PTBlocks;
 import goldenage.potatotech.PTItems;
 import goldenage.potatotech.PotatoTech;
 import net.minecraft.core.block.entity.TileEntity;
@@ -117,17 +118,20 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (i < connections.size()) connections.remove(i);
 	}
 
-	public ItemStack getBreakDrops() {
+	public ItemStack getBreakDrops(boolean removeConnection) {
 		ItemStack result = new ItemStack(PTItems.wireSpool, 0);
 
 		ArrayList<Connection> connectionsCopy = (ArrayList<Connection>) connections.clone();
 		for (Connection c: connectionsCopy) {
             TileEntity te = worldObj.getTileEntity(c.x, c.y, c.z);
-			if (te instanceof TileEntityEnergyConnector) {
+			if (te instanceof TileEntityEnergyConnector && removeConnection) {
 				((TileEntityEnergyConnector) te).removeConnection(x, y, z);
 			}
 			result.stackSize++;
 		}
+
+		PotatoTech.LOGGER.info("break results is: " + result);
+
 		if (result.stackSize < 1){
 			return null;
 		}
@@ -149,9 +153,8 @@ public class TileEntityEnergyConnector extends TileEntity {
 			TileEntity te2 = worldObj.getTileEntity(conn.x, conn.y, conn.z);
 			if (te2 instanceof TileEntityEnergyConnector) {
 				TileEntityEnergyConnector teConn = (TileEntityEnergyConnector) te2;
-
-				if (teConn.energy < energy) {
-					int amountToTransfer = Math.min(energy / 2, energyCapacity - teConn.energy);
+				if (teConn.energy < energy && teConn.energy < energyCapacity) {
+					int amountToTransfer = Math.min(1 + (energy - teConn.energy) / 2, energy);
 					energy -= amountToTransfer;
 					teConn.energy += amountToTransfer;
 				}

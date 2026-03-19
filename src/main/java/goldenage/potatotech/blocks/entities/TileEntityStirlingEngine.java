@@ -27,7 +27,6 @@ public class TileEntityStirlingEngine extends TileEntity {
 		int coldBlock = worldObj.getBlockId(x + directionCold.getOffsetX(), y + directionCold.getOffsetY(), z + directionCold.getOffsetZ());
 		int hotBlock = worldObj.getBlockId(x + directionHot.getOffsetX(), y + directionHot.getOffsetY(), z + directionHot.getOffsetZ());
 
-		PotatoTech.LOGGER.info("cold id is: " + coldBlock + " | hot id is: " + hotBlock);
 		power = 0;
 		if (hotBlock == Blocks.FLUID_LAVA_STILL.id() && coldBlock == Blocks.FLUID_WATER_STILL.id())  {
 			power = 1;

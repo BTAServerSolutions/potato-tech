@@ -1,6 +1,7 @@
 package goldenage.potatotech.blocks;
 
 import goldenage.potatotech.PTItems;
+import goldenage.potatotech.PotatoTech;
 import goldenage.potatotech.blocks.entities.TileEntityEnergyConnector;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
@@ -39,12 +40,13 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 
 	@Override
 	public void onBlockRemoved(World world, int x, int y, int z, int data) {
-		super.onBlockRemoved(world, x, y, z, data);
+		((TileEntityEnergyConnector)world.getTileEntity(x, y, z)).getBreakDrops(true);
 	}
 
 	@Override
-	public ItemStack @Nullable [] getBreakResult(World world, EnumDropCause dropCause, int meta, TileEntity tileEntity) {
-		return new ItemStack[]{new ItemStack(PTItems.energyConnector), ((TileEntityEnergyConnector)tileEntity).getBreakDrops()};
+	public ItemStack @Nullable [] getBreakResult(World world, EnumDropCause dropCause, int x, int y, int z, int meta, TileEntity tileEntity) {
+		PotatoTech.LOGGER.info("Get break result");
+		return new ItemStack[]{new ItemStack(PTItems.energyConnector), ((TileEntityEnergyConnector)tileEntity).getBreakDrops(true)};
 	}
 
 	@Override
