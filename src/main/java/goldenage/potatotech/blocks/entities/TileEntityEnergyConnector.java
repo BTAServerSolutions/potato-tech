@@ -2,6 +2,7 @@ package goldenage.potatotech.blocks.entities;
 
 import com.mojang.nbt.tags.CompoundTag;
 import com.mojang.nbt.tags.ListTag;
+import goldenage.potatotech.PTItems;
 import goldenage.potatotech.PotatoTech;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.item.ItemStack;
@@ -42,6 +43,9 @@ public class TileEntityEnergyConnector extends TileEntity {
 			return con;
 		}
 	}
+
+	static public int energyCapacity = 32;
+	public int energy = 0;
 
 	public TileEntityEnergyConnector() {
 
@@ -114,12 +118,11 @@ public class TileEntityEnergyConnector extends TileEntity {
 	}
 
 	public ItemStack getBreakDrops() {
-		/*
-		ItemStack result = new ItemStack(PotatoLogisticsMod.itemWireSpool, 0);
+		ItemStack result = new ItemStack(PTItems.wireSpool, 0);
 
 		ArrayList<Connection> connectionsCopy = (ArrayList<Connection>) connections.clone();
 		for (Connection c: connectionsCopy) {
-			TileEntity te = Util.getBlockTileEntity(worldObj, c.x, c.y, c.z);
+            TileEntity te = worldObj.getTileEntity(c.x, c.y, c.z);
 			if (te instanceof TileEntityEnergyConnector) {
 				((TileEntityEnergyConnector) te).removeConnection(x, y, z);
 			}
@@ -130,19 +133,30 @@ public class TileEntityEnergyConnector extends TileEntity {
 		}
 
 		return result;
-		 */
-		return null;
-	}
-
-	public void updateMachineConnections(Direction dir) {
 	}
 
 	@Override
 	public void tick() {
-		Direction[] directions = Direction.directions;
-
 		int side = worldObj.getBlockMetadata(x, y, z);
-		updateMachineConnections(Direction.getDirectionById(side).getOpposite());
+		Direction connectionDir = Direction.getDirectionById(side).getOpposite();
+		TileEntity te = worldObj.getTileEntity(x + connectionDir.getOffsetX(), y + connectionDir.getOffsetY(), z + connectionDir.getOffsetZ());
+		if (te instanceof TileEntityStirlingEngine) {
+			TileEntityStirlingEngine engine = (TileEntityStirlingEngine) te;
+			energy = Math.min(energy + engine.power, energyCapacity);
+		}
+
+        for (Connection conn : connections) {
+			TileEntity te2 = worldObj.getTileEntity(conn.x, conn.y, conn.z);
+			if (te2 instanceof TileEntityEnergyConnector) {
+				TileEntityEnergyConnector teConn = (TileEntityEnergyConnector) te2;
+
+				if (teConn.energy < energy) {
+					int amountToTransfer = Math.min(energy / 2, energyCapacity - teConn.energy);
+					energy -= amountToTransfer;
+					teConn.energy += amountToTransfer;
+				}
+			}
+        }
 	}
 	@Override
 	public Packet getDescriptionPacket() {

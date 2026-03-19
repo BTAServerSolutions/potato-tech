@@ -23,33 +23,6 @@ public class BlockLogicCrafter extends BlockLogicRotatable {
     }
 
     @Override
-    public void onBlockPlacedByWorld(World world, int x, int y, int z) {
-        super.onBlockPlacedByWorld(world, x, y, z);
-
-        if (!world.isClientSide) {
-            int l = world.getBlockId(x, y, z - 1);
-            int i1 = world.getBlockId(x, y, z + 1);
-            int j1 = world.getBlockId(x - 1, y, z);
-            int k1 = world.getBlockId(x + 1, y, z);
-            byte byte0 = 3;
-
-            if (Blocks.solid[i1] && !Blocks.solid[l]) {
-                byte0 = 2;
-            }
-
-            if (Blocks.solid[j1] && !Blocks.solid[k1]) {
-                byte0 = 5;
-            }
-
-            if (Blocks.solid[k1] && !Blocks.solid[j1]) {
-                byte0 = 4;
-            }
-
-            world.setBlockMetadataWithNotify(x, y, z, byte0);
-        }
-    }
-
-    @Override
     public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
         if (!EnvironmentHelper.isClientWorld()) {
             TileEntityCrafter crafter = (TileEntityCrafter) world.getTileEntity(x, y, z);

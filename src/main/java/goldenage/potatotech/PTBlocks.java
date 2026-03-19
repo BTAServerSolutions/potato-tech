@@ -116,6 +116,7 @@ public class PTBlocks implements BlockInitEntrypoint {
 			.build("energy_connector", "energy_connector", id++, block -> new BlockLogicEnergyConnector(block, Material.metal));
 
 		stirlingEngine = new BlockBuilder(MOD_ID)
+			.setTileEntity(TileEntityStirlingEngine::new)
 			.setHardness(1.0f)
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)

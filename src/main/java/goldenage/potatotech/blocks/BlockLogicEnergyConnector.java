@@ -32,7 +32,7 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 		world.setBlockMetadataWithNotify(x, y, z, side.getId());
 		TileEntity te = world.getTileEntity(x, y, z);
 		if (te instanceof TileEntityEnergyConnector) {
-			((TileEntityEnergyConnector) te).updateMachineConnections(side.getOpposite().getDirection());
+			//((TileEntityEnergyConnector) te).updateMachineConnections(side.getOpposite().getDirection());
 		}
 		super.onBlockPlacedOnSide(world, x, y, z, side, xPlaced, yPlaced);
 	}
@@ -44,7 +44,7 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 
 	@Override
 	public ItemStack @Nullable [] getBreakResult(World world, EnumDropCause dropCause, int meta, TileEntity tileEntity) {
-		return new ItemStack[]{new ItemStack(PTItems.energyConnector)};
+		return new ItemStack[]{new ItemStack(PTItems.energyConnector), ((TileEntityEnergyConnector)tileEntity).getBreakDrops()};
 	}
 
 	@Override

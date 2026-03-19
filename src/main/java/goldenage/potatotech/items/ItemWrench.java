@@ -3,7 +3,11 @@ package goldenage.potatotech.items;
 import goldenage.potatotech.PTBlocks;
 import goldenage.potatotech.PotatoTech;
 import goldenage.potatotech.blocks.BlockLogicPipe;
+import goldenage.potatotech.blocks.entities.TileEntityEnergyConnector;
+import goldenage.potatotech.blocks.entities.TileEntityStirlingEngine;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.block.BlockLogic;
+import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemDye;
@@ -28,6 +32,16 @@ public class ItemWrench extends Item {
 				pipeBlock.onBlockRightClicked(world, blockX, blockY, blockZ, entityplayer, side, xPlaced, yPlaced);
 				return true;
 			}
+		}
+
+		if (blockId == PTBlocks.energyConnector.id()) {
+			TileEntityEnergyConnector conn = (TileEntityEnergyConnector) world.getTileEntity(blockX, blockY, blockZ);
+			entityplayer.sendMessage("energy amount = " + conn.energy);
+		}
+
+		if (blockId == PTBlocks.stirlingEngine.id()) {
+			TileEntityStirlingEngine engine = (TileEntityStirlingEngine) world.getTileEntity(blockX, blockY, blockZ);
+			entityplayer.sendMessage("power = " + engine.power);
 		}
 		return false;
 	}
