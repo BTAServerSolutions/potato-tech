@@ -11,6 +11,7 @@ import net.minecraft.client.render.EntityRenderDispatcher;
 import net.minecraft.client.render.TileEntityRenderDispatcher;
 import net.minecraft.client.render.block.color.BlockColorDispatcher;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
+import net.minecraft.client.render.block.model.BlockModelRotatable;
 import net.minecraft.client.render.block.model.BlockModelStandard;
 import net.minecraft.client.render.block.model.BlockModelTransparent;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
@@ -39,7 +40,7 @@ public class PTModels implements ModelEntrypoint {
 			new BlockModelStandard<>(PTBlocks.clayGold).setAllTextures(0, "potatotech:block/clay_gold_block")
 		);
 		ModelHelper.setBlockModel(PTBlocks.filter, () ->
-			new BlockModelStandard<>(PTBlocks.filter).setAllTextures(0, "potatotech:block/block_filter")
+			new BlockModelStandard<>(PTBlocks.filter).setAllTextures(0, "potatotech:block/filter")
 		);
 
 		ModelHelper.setBlockModel(PTBlocks.pipe, () -> new BlockModelPipe<>(PTBlocks.pipe)
@@ -66,11 +67,20 @@ public class PTModels implements ModelEntrypoint {
 		);
 
 		ModelHelper.setBlockModel(PTBlocks.crafter, () ->
-			new BlockModelStandard<>(PTBlocks.crafter)
-				.setTex(0, "potatotech:block/block_auto_crafter_front", Side.NORTH)
+			new BlockModelRotatable<>(PTBlocks.crafter)
+				.setTex(0, "potatotech:block/auto_crafter_front", Side.NORTH)
 				.setTex(0, "potatotech:block/iron_chasing_details0", Side.SOUTH, Side.EAST, Side.WEST)
-				.setTex(0, "potatotech:block/block_auto_crafter_top", Side.TOP)
+				.setTex(0, "potatotech:block/auto_crafter_top", Side.TOP)
 				.setTex(0, "potatotech:block/iron_casing_plain", Side.BOTTOM)
+		);
+		ModelHelper.setBlockModel(PTBlocks.stirlingEngine, () ->
+			new BlockModelRotatable<>(PTBlocks.stirlingEngine)
+				.setTex(0, "potatotech:block/stirling_engine_front", Side.TOP)
+				.setTex(0, "potatotech:block/stirling_engine_back", Side.BOTTOM)
+				.setTex(0, "potatotech:block/stirling_engine_hot_side", Side.WEST)
+				.setTex(0, "potatotech:block/stirling_engine_cold_side", Side.EAST)
+				.setTex(0, "potatotech:block/stirling_engine_top", Side.NORTH)
+				.setTex(0, "potatotech:block/iron_chasing_details1", Side.SOUTH)
 		);
 	}
 
