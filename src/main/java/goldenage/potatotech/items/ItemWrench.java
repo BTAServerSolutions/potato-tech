@@ -35,18 +35,19 @@ public class ItemWrench extends Item {
 			}
 		}
 
-		if (blockId == PTBlocks.energyConnector.id()) {
-			TileEntityEnergyConnector conn = (TileEntityEnergyConnector) world.getTileEntity(blockX, blockY, blockZ);
-			entityplayer.sendMessage("energy amount = " + conn.energy);
-		}
-
-		if (blockId == PTBlocks.stirlingEngine.id()) {
-			TileEntityStirlingEngine engine = (TileEntityStirlingEngine) world.getTileEntity(blockX, blockY, blockZ);
-			entityplayer.sendMessage("power = " + engine.power);
-		}
-		if (blockId == Blocks.FURNACE_STONE_IDLE.id() || blockId == Blocks.FURNACE_STONE_ACTIVE.id()) {
-			TileEntityFurnace engine = (TileEntityFurnace) world.getTileEntity(blockX, blockY, blockZ);
-			entityplayer.sendMessage("burn time = " + engine.currentBurnTime);
+		if (!world.isClientSide) {
+			if (blockId == PTBlocks.energyConnector.id()) {
+				TileEntityEnergyConnector conn = (TileEntityEnergyConnector) world.getTileEntity(blockX, blockY, blockZ);
+				entityplayer.sendMessage("energy amount = " + conn.energy);
+			}
+			if (blockId == PTBlocks.stirlingEngine.id()) {
+				TileEntityStirlingEngine engine = (TileEntityStirlingEngine) world.getTileEntity(blockX, blockY, blockZ);
+				entityplayer.sendMessage("power = " + engine.power);
+			}
+			if (blockId == Blocks.FURNACE_STONE_IDLE.id() || blockId == Blocks.FURNACE_STONE_ACTIVE.id()) {
+				TileEntityFurnace engine = (TileEntityFurnace) world.getTileEntity(blockX, blockY, blockZ);
+				entityplayer.sendMessage("burn time = " + engine.currentBurnTime);
+			}
 		}
 		return false;
 	}

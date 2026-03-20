@@ -90,6 +90,9 @@ public class TileEntityEnergyConnector extends TileEntity {
 	}
 
 	public boolean addConnection(int xi, int yi, int zi)  {
+		if (worldObj == null || worldObj.isClientSide) {
+			return false;
+		}
 		TileEntity te = worldObj.getTileEntity(xi, yi, zi);
 
 		if (!(te instanceof TileEntityEnergyConnector)) return false;
@@ -114,12 +117,19 @@ public class TileEntityEnergyConnector extends TileEntity {
 
 		connections.add(new Connection(xi, yi, zi));
 		((TileEntityEnergyConnector) te).connections.add(new Connection(this.x, this.y, this.z));
+		this.setChanged();
+		((TileEntityEnergyConnector) te).setChanged();
+		worldObj.markBlockNeedsUpdate(this.x, this.y, this.z);
+		worldObj.markBlockNeedsUpdate(xi, yi, zi);
 		PotatoTech.LOGGER.info("Added connection on: " + xi + " " + yi + " " + zi);
 
 		return true;
 	}
 
 	public void removeConnection(int xi, int yi, int zi) {
+		if (worldObj == null || worldObj.isClientSide) {
+			return;
+		}
 		int i = 0;
 		for (Connection c: connections) {
 			if (c.x == xi && c.y == yi && c.z == zi) {
@@ -127,7 +137,11 @@ public class TileEntityEnergyConnector extends TileEntity {
 			}
 			i++;
 		}
-		if (i < connections.size()) connections.remove(i);
+		if (i < connections.size()) {
+			connections.remove(i);
+			this.setChanged();
+			worldObj.markBlockNeedsUpdate(this.x, this.y, this.z);
+		}
 	}
 
 	public ItemStack getBreakDrops(boolean removeConnection) {
@@ -195,7 +209,12 @@ public class TileEntityEnergyConnector extends TileEntity {
 
 	@Override
 	public void tick() {
-		int side = worldObj.getBlockMetadata(x, y, z);
+		if (worldObj == null || worldObj.isClientSide) {
+			return;
+		}
+
+		int previousEnergy = energy;
+		int side = worldObj.getBlockMetadata(x, y, z) & 7;
 		Direction connectionDir = Direction.getDirectionById(side).getOpposite();
 		TileEntity te = worldObj.getTileEntity(x + connectionDir.getOffsetX(), y + connectionDir.getOffsetY(), z + connectionDir.getOffsetZ());
 		if (te instanceof TileEntityStirlingEngine) {
@@ -226,6 +245,15 @@ public class TileEntityEnergyConnector extends TileEntity {
 					energy -= 2;
 				}
 			}
+		} else if (te instanceof TileEntityCrafter) {
+			TileEntityCrafter crafter = (TileEntityCrafter) te;
+			if (energy > 0) {
+				int sent = crafter.addEnergy(1);
+				if (sent > 0) {
+					energy -= sent;
+					worldObj.markBlockNeedsUpdate(crafter.x, crafter.y, crafter.z);
+				}
+			}
 		}
 
         for (Connection conn : connections) {
@@ -236,10 +264,17 @@ public class TileEntityEnergyConnector extends TileEntity {
 					int amountToTransfer = Math.min(1 + (energy - teConn.energy) / 2, energy);
 					energy -= amountToTransfer;
 					teConn.energy += amountToTransfer;
+					teConn.setChanged();
+					worldObj.markBlockNeedsUpdate(teConn.x, teConn.y, teConn.z);
 				}
 			}
 
         }
+
+		if (energy != previousEnergy) {
+			this.setChanged();
+			worldObj.markBlockNeedsUpdate(this.x, this.y, this.z);
+		}
 	}
 	@Override
 	public Packet getDescriptionPacket() {

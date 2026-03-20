@@ -34,10 +34,17 @@ public class BlockLogicCrafter extends BlockLogicRotatable {
 
     @Override
     public void onBlockRemoved(World world, int x, int y, int z, int data) {
-        int blockId = world.getBlockId(x,y,z);
-        // TODO
-        //if (blockId == PotatoLogisticsMod.blockFurnaceBurner.id || blockId == PotatoLogisticsMod.blockFurnaceBurnerOn.id) {return;}
+        if (world.isClientSide) {
+            super.onBlockRemoved(world, x, y, z, data);
+            return;
+        }
+
         TileEntityCrafter tileEntityCrafter = (TileEntityCrafter) world.getTileEntity(x, y, z);
+        if (tileEntityCrafter == null) {
+            super.onBlockRemoved(world, x, y, z, data);
+            return;
+        }
+
         for (int l = 0; l < tileEntityCrafter.getContainerSize(); ++l) {
             ItemStack itemstack = tileEntityCrafter.getItem(l);
             if (itemstack == null) continue;

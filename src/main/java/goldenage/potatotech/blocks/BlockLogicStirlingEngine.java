@@ -1,6 +1,5 @@
 package goldenage.potatotech.blocks;
 
-import goldenage.potatotech.PotatoTech;
 import net.minecraft.core.block.*;
 import net.minecraft.core.block.material.Material;
 import net.minecraft.core.entity.Mob;

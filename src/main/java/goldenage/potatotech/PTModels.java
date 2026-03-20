@@ -73,10 +73,10 @@ public class PTModels implements ModelEntrypoint {
 
 		ModelHelper.setBlockModel(PTBlocks.crafter, () ->
 			new BlockModelRotatable<>(PTBlocks.crafter)
-				.setTex(0, "potatotech:block/auto_crafter_front", Side.NORTH)
-				.setTex(0, "potatotech:block/iron_chasing_details0", Side.SOUTH, Side.EAST, Side.WEST)
-				.setTex(0, "potatotech:block/auto_crafter_top", Side.TOP)
-				.setTex(0, "potatotech:block/iron_casing_plain", Side.BOTTOM)
+				.setTex(0, "potatotech:block/auto_crafter_front", Side.TOP)
+				.setTex(0, "potatotech:block/iron_chasing_details0", Side.BOTTOM, Side.EAST, Side.WEST)
+				.setTex(0, "potatotech:block/auto_crafter_top", Side.NORTH)
+				.setTex(0, "potatotech:block/iron_casing_plain", Side.SOUTH)
 		);
 		ModelHelper.setBlockModel(PTBlocks.stirlingEngine, () ->
 			new BlockModelRotatable<>(PTBlocks.stirlingEngine)

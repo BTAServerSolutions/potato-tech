@@ -22,6 +22,10 @@ public class ItemWireSpool extends Item {
 
 	@Override
 	public boolean onUseItemOnBlock(ItemStack itemstack, Player entityplayer, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced) {
+		if (world.isClientSide) {
+			return true;
+		}
+
 		this.displayName = getStatName();
 
 		Block block = world.getBlock(blockX, blockY, blockZ);

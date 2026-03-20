@@ -8,7 +8,6 @@ import net.minecraft.core.util.collection.NamespaceID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import turniplabs.halplibe.helper.EntityHelper;
-import turniplabs.halplibe.helper.NetworkHelper;
 import turniplabs.halplibe.helper.network.NetworkHandler;
 import turniplabs.halplibe.util.ConfigHandler;
 import turniplabs.halplibe.util.GameStartEntrypoint;

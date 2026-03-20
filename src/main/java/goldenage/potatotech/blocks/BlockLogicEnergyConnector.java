@@ -40,7 +40,13 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 
 	@Override
 	public void onBlockRemoved(World world, int x, int y, int z, int data) {
-		((TileEntityEnergyConnector)world.getTileEntity(x, y, z)).getBreakDrops(true);
+		if (!world.isClientSide) {
+			TileEntity te = world.getTileEntity(x, y, z);
+			if (te instanceof TileEntityEnergyConnector) {
+				((TileEntityEnergyConnector) te).getBreakDrops(true);
+			}
+		}
+		super.onBlockRemoved(world, x, y, z, data);
 	}
 
 	@Override

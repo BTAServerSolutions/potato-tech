@@ -21,7 +21,9 @@ public class BlockLogicFilter extends BlockLogic {
 
 	@Override
 	public void onBlockRemoved(World world, int x, int y, int z, int data) {
-		dropFilterContent(world, x, y, z);
+		if (!world.isClientSide) {
+			dropFilterContent(world, x, y, z);
+		}
 		super.onBlockRemoved(world, x, y, z, data);
 	}
 

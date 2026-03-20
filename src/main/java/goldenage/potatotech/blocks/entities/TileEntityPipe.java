@@ -294,7 +294,15 @@ public class TileEntityPipe extends TileEntity {
 
 	@Override
 	public void tick() {
+		if (worldObj == null) {
+			return;
+		}
+
 		for (PipeStack pipeStack : stacks) if (pipeStack != null) pipeStack.timer++;
+
+		if (worldObj.isClientSide) {
+			return;
+		}
 
 		outputItems();
 

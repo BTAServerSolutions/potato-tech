@@ -19,11 +19,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class TileEntityCrafter extends TileEntity implements Container {
+	public static final int energyCapacity = 1;
+	public static final int energyPerCraft = 1;
+
 	public ContainerCrafting craftMatrix;
 	public Container pattern;
 	public Container extraOutputs;
 	public Container craftResult = new ContainerResult();
 	public MenuCrafter dummyContainer;
+	public int energy = 0;
 
 	private static List<RecipeEntryCrafting<?, ?>> CRAFTING_RECIPE_ENTRIES_CACHE;
 
@@ -81,6 +85,7 @@ public class TileEntityCrafter extends TileEntity implements Container {
 	@Override
 	public void readFromNBT(CompoundTag nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
+		energy = nbttagcompound.getInteger("energy");
 		{
 			ListTag nbttaglist = nbttagcompound.getList("CraftGrid");
 			for (int i = 0; i < nbttaglist.tagCount(); ++i) {
@@ -113,6 +118,7 @@ public class TileEntityCrafter extends TileEntity implements Container {
 	@Override
 	public void writeToNBT(CompoundTag nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
+		nbttagcompound.putInt("energy", energy);
 		{
 			ListTag nbttaglist = new ListTag();
 			for (int i = 0; i < this.craftMatrix.getContainerSize(); ++i) {
@@ -238,6 +244,18 @@ public class TileEntityCrafter extends TileEntity implements Container {
 		return inserted;
 	}
 
+	public int addEnergy(int amount) {
+		if (amount <= 0) {
+			return 0;
+		}
+		int accepted = Math.min(amount, energyCapacity - energy);
+		if (accepted > 0) {
+			energy += accepted;
+			setChanged();
+		}
+		return accepted;
+	}
+
 	@Override
 	public void setChanged() {
 		super.setChanged();
@@ -260,7 +278,7 @@ public class TileEntityCrafter extends TileEntity implements Container {
 					break;
 				}
 
-				if (i0 != null && i1 != null && i0.itemID != i1.itemID) {
+				if (i0 != null && i0.itemID != i1.itemID) {
 					canCraft = false;
 					break;
 				}
@@ -283,10 +301,11 @@ public class TileEntityCrafter extends TileEntity implements Container {
 				craftingResult = recipe.getCraftingResult(craftMatrix);
 			}
 
-			if (craftResult.getItem(0) == null && craftingResult != null && canCraft) {
+			if (craftResult.getItem(0) == null && craftingResult != null && canCraft && energy >= energyPerCraft) {
 				if (timer > 10) {
 					recipe.onCraftResult(this.craftMatrix);
 					craftResult.setItem(0, craftingResult);
+					energy -= energyPerCraft;
 					this.setChanged();
 
 					int bucketCount = 0;
@@ -305,6 +324,8 @@ public class TileEntityCrafter extends TileEntity implements Container {
 					timer = 0;
 				}
 				timer += 1;
+			} else {
+				timer = 0;
 
 				//CraftingManager.getInstance().onCraftResult(this.craftMatrix);
 				//for (int i = 0; i < 9; i++) this.craftMatrix.decrStackSize(i, 1);

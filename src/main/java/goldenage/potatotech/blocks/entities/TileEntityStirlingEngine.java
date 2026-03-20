@@ -1,7 +1,5 @@
 package goldenage.potatotech.blocks.entities;
 
-import goldenage.potatotech.PotatoTech;
-import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogicRotatable;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.block.entity.TileEntity;
@@ -15,15 +13,24 @@ public class TileEntityStirlingEngine extends TileEntity {
 
 	@Override
 	public void tick() {
+		if (worldObj == null || worldObj.isClientSide) {
+			return;
+		}
+
+		int previousPower = power;
+
 		Direction direction = BlockLogicRotatable.getDirectionFromMeta(worldObj.getBlockMetadata(x, y, z));
-		Direction directionCold = Direction.EAST;
-		Direction directionHot = Direction.WEST;
+		Direction directionCold = Direction.WEST;
+		Direction directionHot = Direction.EAST;
 		if (direction == Direction.WEST) {
 			directionCold = Direction.SOUTH;
 			directionHot = Direction.NORTH;
 		} else if (direction == Direction.EAST) {
-			directionHot = Direction.SOUTH;
 			directionCold = Direction.NORTH;
+			directionHot = Direction.SOUTH;
+		} else if (direction == Direction.SOUTH) {
+			directionCold = Direction.EAST;
+			directionHot = Direction.WEST;
 		}
 
 		int coldBlock = worldObj.getBlockId(x + directionCold.getOffsetX(), y + directionCold.getOffsetY(), z + directionCold.getOffsetZ());
@@ -52,7 +59,11 @@ public class TileEntityStirlingEngine extends TileEntity {
 			hotTemperature = 2;
 		}
 
-		power = hotTemperature - coldTemperature;
+		power = Math.max(0, hotTemperature - coldTemperature);
+		if (power != previousPower) {
+			setChanged();
+			worldObj.markBlockNeedsUpdate(x, y, z);
+		}
 
 		super.tick();
 	}

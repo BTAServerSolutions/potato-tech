@@ -38,9 +38,11 @@ public class BlockLogicPipe extends BlockLogic {
 
 	@Override
 	public void onBlockRemoved(World world, int x, int y, int z, int data) {
-		TileEntityPipe te = (TileEntityPipe)world.getTileEntity(x, y, z);
-		if (te != null) {
-			te.dropItems();
+		if (!world.isClientSide) {
+			TileEntityPipe te = (TileEntityPipe)world.getTileEntity(x, y, z);
+			if (te != null) {
+				te.dropItems();
+			}
 		}
 		super.onBlockRemoved(world, x, y, z, data);
 	}
