@@ -105,6 +105,31 @@ public class PTRecipes implements RecipeEntrypoint {
 			.addInput('M', Blocks.WORKBENCH)
 			.create("Crafter", new ItemStack(PTBlocks.crafter, 1));
 
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape(" R ", "RSR", " R ")
+			.addInput('R', PTItems.redstoneAlloy)
+			.addInput('S', Items.STICK)
+			.create("Crafter", new ItemStack(PTItems.wireSpool, 8));
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape(" R ", "RSR", " R ")
+			.addInput('R', Items.INGOT_IRON)
+			.addInput('S', PTBlocks.coil)
+			.create("Crafter", new ItemStack(PTItems.electricHeatingUnit, 1));
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape("CCC", "CSC", "CCC")
+			.addInput('C', PTItems.wireSpool)
+			.addInput('S', Items.INGOT_IRON)
+			.create("Crafter", new ItemStack(PTBlocks.coil, 1));
+
+		RecipeBuilder.Shapeless(PotatoTech.MOD_ID)
+			.addInput(Items.INGOT_IRON)
+			.addInput(new ItemStack(Items.DUST_REDSTONE))
+			.addInput(new ItemStack(Items.DUST_REDSTONE))
+			.addInput(new ItemStack(Items.DUST_REDSTONE))
+			.create("Redstone Iron Mix", new ItemStack(PTItems.redstoneIronMix, 1));
+
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
 			.setInput(PTItems.crushedIronOre)
 			.create("Ingot Iron", new ItemStack(Items.INGOT_IRON));
@@ -112,6 +137,10 @@ public class PTRecipes implements RecipeEntrypoint {
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
 			.setInput(PTItems.crushedGoldOre)
 			.create("Ingot Gold", new ItemStack(Items.INGOT_GOLD));
+
+		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
+			.setInput(PTItems.redstoneIronMix)
+			.create("Ingot Iron", new ItemStack(PTItems.redstoneAlloy));
 
 		TileEntityCrafter.updateRecipeEntriesCache();
 	}

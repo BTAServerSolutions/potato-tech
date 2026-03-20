@@ -5,6 +5,8 @@ import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogicRotatable;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.block.entity.TileEntity;
+import net.minecraft.core.net.packet.Packet;
+import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.util.helper.Direction;
 
 public class TileEntityStirlingEngine extends TileEntity {
@@ -27,11 +29,36 @@ public class TileEntityStirlingEngine extends TileEntity {
 		int coldBlock = worldObj.getBlockId(x + directionCold.getOffsetX(), y + directionCold.getOffsetY(), z + directionCold.getOffsetZ());
 		int hotBlock = worldObj.getBlockId(x + directionHot.getOffsetX(), y + directionHot.getOffsetY(), z + directionHot.getOffsetZ());
 
-		power = 0;
-		if (hotBlock == Blocks.FLUID_LAVA_STILL.id() && coldBlock == Blocks.FLUID_WATER_STILL.id())  {
-			power = 1;
+		int coldTemperature = 0;
+		int hotTemperature = 0;
+
+		if (coldBlock == Blocks.FLUID_WATER_STILL.id() || coldBlock == Blocks.FLUID_WATER_FLOWING.id()) {
+			coldTemperature = -1;
 		}
 
+		if (coldBlock == Blocks.PERMAICE.id()) {
+			coldTemperature = -2;
+		}
+
+		if (coldBlock == Blocks.ICE.id()) {
+			coldTemperature = -3;
+		}
+
+		if (hotBlock == Blocks.FLUID_LAVA_STILL.id() || hotBlock == Blocks.FLUID_LAVA_FLOWING.id()) {
+			hotTemperature = 3;
+		}
+
+		if (hotBlock == Blocks.FIRE.id()) {
+			hotTemperature = 2;
+		}
+
+		power = hotTemperature - coldTemperature;
+
 		super.tick();
+	}
+
+	@Override
+	public Packet getDescriptionPacket() {
+		return new PacketTileEntityData(this);
 	}
 }

@@ -27,6 +27,7 @@ public class PTBlocks implements BlockInitEntrypoint {
 	public static Block<? extends BlockLogic> pipeDiamond;
 	public static Block<? extends BlockLogic> energyConnector;
 	public static Block<? extends BlockLogic> stirlingEngine;
+	public static Block<? extends BlockLogic> coil;
 
 
 	@Override
@@ -121,5 +122,11 @@ public class PTBlocks implements BlockInitEntrypoint {
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.build("stirling_engine", "stirling_engine", id++, block -> new BlockLogicStirlingEngine(block, Material.metal));
+
+		coil = new BlockBuilder(MOD_ID)
+			.setHardness(1.0f)
+			.setResistance(3.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
+			.build("coil", "coil", id++, block -> new BlockLogic(block, Material.metal));
 	}
 }

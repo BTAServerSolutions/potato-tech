@@ -8,6 +8,7 @@ import goldenage.potatotech.blocks.entities.TileEntityStirlingEngine;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.Blocks;
+import net.minecraft.core.block.entity.TileEntityFurnace;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemDye;
@@ -42,6 +43,10 @@ public class ItemWrench extends Item {
 		if (blockId == PTBlocks.stirlingEngine.id()) {
 			TileEntityStirlingEngine engine = (TileEntityStirlingEngine) world.getTileEntity(blockX, blockY, blockZ);
 			entityplayer.sendMessage("power = " + engine.power);
+		}
+		if (blockId == Blocks.FURNACE_STONE_IDLE.id() || blockId == Blocks.FURNACE_STONE_ACTIVE.id()) {
+			TileEntityFurnace engine = (TileEntityFurnace) world.getTileEntity(blockX, blockY, blockZ);
+			entityplayer.sendMessage("burn time = " + engine.currentBurnTime);
 		}
 		return false;
 	}

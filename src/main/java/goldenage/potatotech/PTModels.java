@@ -53,6 +53,11 @@ public class PTModels implements ModelEntrypoint {
 			.setAllTextures(0, "potatotech:block/diamond_pipe")
 		);
 
+		ModelHelper.setBlockModel(PTBlocks.coil, () -> new BlockModelStandard<>(PTBlocks.chute)
+			.setTex(0, "potatotech:block/coil_sides", Side.NORTH, Side.SOUTH, Side.EAST, Side.WEST)
+			.setTex(0, "potatotech:block/coil_top", Side.TOP, Side.BOTTOM)
+		);
+
 		ModelHelper.setBlockModel(PTBlocks.chute, () -> new BlockModelChute<>(PTBlocks.chute)
 			.setTex(0, "potatotech:block/chute_sides", Side.NORTH, Side.SOUTH, Side.EAST, Side.WEST)
 			.setTex(0, "potatotech:block/chute_bottom", Side.TOP, Side.BOTTOM)

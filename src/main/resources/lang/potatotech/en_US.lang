@@ -52,6 +52,9 @@ item.potatotech.steel_gear.desc=It turns better.
 item.potatotech.crushed_iron_ore.name=Crushed Iron Ore
 item.potatotech.crushed_iron_ore.desc=Try Smelting
 
+item.potatotech.electric_heating_unit.name=Electric Heating Unit
+item.potatotech.electric_heating_unit.desc=Use to upgrade your furnaces to use electricity
+
 tile.potatotech.clay_iron.name=Clay Iron
 tile.potatotech.clay_iron.desc=Crush it
 
@@ -103,14 +106,11 @@ tile.potatotech.furnace_burner.desc=Getting hot in here!
 tile.potatotech.furnace_burner_on.name=Furnace Burner
 tile.potatotech.furnace_burner_on.desc=Getting hot in here!
 
-tile.potatotech.stirling_engine_lv.name=LV Stirling Engine
-tile.potatotech.stirling_engine_lv.desc=From hot to kinetic, party hard!
+tile.potatotech.stirling_engine.name=Stirling Engine
+tile.potatotech.stirling_engine.desc=From hot to kinetic, party hard!
 
-tile.potatotech.stirling_engine_mv.name=MV Stirling Engine
-tile.potatotech.stirling_engine_mv.desc=Party harder!
-
-tile.potatotech.coil.name=LV Coil
-tile.potatotech.coil.desc=Transforms kinetic energy bellow into electric energy.
+tile.potatotech.coil.name=Coil
+tile.potatotech.coil.desc=Just a coil, it does nothing by itself
 
 tile.potatotech.crafter.name=Auto Crafter
 tile.potatotech.crafter.desc=The name is self explanatory
@@ -120,12 +120,6 @@ tile.potatotech.test_area_maker.desc=Makes your chunk a perfect testing area, re
 
 tile.potatotech.block_crafter.name=Auto Crafter
 tile.potatotech.block_crafter.desc=No, it does not have a face, you're delusional.
-
-tile.potatotech.capacitor.name=LV Capacitor
-tile.potatotech.capacitor.desc=Stores 100000 Eu.
-
-tile.potatotech.heater.name=Heater
-tile.potatotech.heater.desc=Heats furnaces with Eu.
 
 tile.potatotech.dust.name=Dust
 tile.potatotech.dust.desc=Not angel, do not consume.

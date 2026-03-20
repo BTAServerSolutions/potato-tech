@@ -5,6 +5,8 @@ import com.mojang.nbt.tags.ListTag;
 import goldenage.potatotech.PTBlocks;
 import goldenage.potatotech.PTItems;
 import goldenage.potatotech.PotatoTech;
+import net.minecraft.core.block.BlockLogicFurnace;
+import net.minecraft.core.block.BlockLogicFurnaceBlast;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.block.entity.TileEntityFurnace;
 import net.minecraft.core.block.entity.TileEntityFurnaceBlast;
@@ -161,7 +163,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (isBlast) {
 			Iterator iter = listB.iterator();
 			while(iter.hasNext()) {
-				RecipeEntryFurnace recipeEntryBase = (RecipeEntryFurnace)iter.next();
+				RecipeEntryBlastFurnace recipeEntryBase = (RecipeEntryBlastFurnace)iter.next();
 				if (recipeEntryBase != null && recipeEntryBase.matches(furnace.getItem(0))) {
 					itemstack = recipeEntryBase.getOutput();
 				}
@@ -199,6 +201,31 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (te instanceof TileEntityStirlingEngine) {
 			TileEntityStirlingEngine engine = (TileEntityStirlingEngine) te;
 			energy = Math.min(energy + engine.power, energyCapacity);
+		} else if (te instanceof TileEntityFurnace) {
+			TileEntityFurnace furnace = (TileEntityFurnace) te;
+			boolean isBlast = te instanceof TileEntityFurnaceBlast;
+			ItemStack fuel = furnace.getItem(1);
+			if (furnaceCanSmelt(furnace, isBlast) && energy > 1 && fuel != null && fuel.itemID == PTItems.electricHeatingUnit.id) {
+				if (furnace.currentBurnTime == 0) {
+					if (isBlast) {
+						BlockLogicFurnaceBlast.updateFurnaceBlockState(true, worldObj, x + connectionDir.getOffsetX(), y + connectionDir.getOffsetY(), z + connectionDir.getOffsetZ());
+					} else {
+						BlockLogicFurnace.updateFurnaceBlockState(true, worldObj, x + connectionDir.getOffsetX(), y + connectionDir.getOffsetY(), z + connectionDir.getOffsetZ());
+					}
+				}
+				energy -= isBlast ? 3 : 2;
+				furnace.currentBurnTime = 10;
+				furnace.maxBurnTime = 10;
+			}
+		} else if (te instanceof TileEntityTrommel) {
+			TileEntityTrommel trommel = (TileEntityTrommel) te;
+			ItemStack fuel = trommel.getItem(4);
+			if (energy > 0 && fuel != null && fuel.itemID == PTItems.electricHeatingUnit.id) {
+				trommel.burnTime = 10;
+				if (trommel.currentItemBurnTime > 0) {
+					energy -= 2;
+				}
+			}
 		}
 
         for (Connection conn : connections) {
@@ -212,20 +239,6 @@ public class TileEntityEnergyConnector extends TileEntity {
 				}
 			}
 
-			if (te2 instanceof TileEntityFurnace && energy > 0) {
-				TileEntityFurnace furnace = (TileEntityFurnace) te2;
-				//if (furnaceCanSmelt(furnace, te2 instanceof TileEntityFurnaceBlast)) {
-					energy -= 1;
-					furnace.currentBurnTime = 50;
-				//}
-			}
-			if (te2 instanceof TileEntityTrommel && energy > 0) {
-				TileEntityTrommel trommel = (TileEntityTrommel) te2;
-				trommel.burnTime = 50;
-				if (trommel.currentItemBurnTime > 0) {
-					energy -= 1;
-				}
-			}
         }
 	}
 	@Override

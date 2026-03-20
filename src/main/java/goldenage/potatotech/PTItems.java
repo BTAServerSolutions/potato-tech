@@ -22,6 +22,9 @@ public class PTItems implements ItemInitEntrypoint {
 	public static Item crushedGoldOre;
 	public static Item energyConnector;
 	public static Item wireSpool;
+	public static Item electricHeatingUnit;
+	public static Item redstoneIronMix;
+	public static Item redstoneAlloy;
 
 
 	@Override
@@ -36,6 +39,9 @@ public class PTItems implements ItemInitEntrypoint {
 		crushedGoldOre = simpleItem("crushed gold ore", "crushed_gold_ore", "crushed_gold_ore", id++);
 		energyConnector = customItem(new ItemPlaceable("Energy Connector", MOD_ID+":"+"item_energy_connector", id++, PTBlocks.energyConnector), "energy_connector", "item_connector");
 		wireSpool = customItem(new ItemWireSpool("wire_spool", NamespaceID.getPermanent(MOD_ID, "wire_spool"), id++), "wire_spool", "wire_spool");
+		electricHeatingUnit = simpleItem("Electric Heating Unit", "electric_heating_unit", "electric_heating_unit", id++);
+		redstoneIronMix = simpleItem("Redstone IronMix", "redstone_iron_mix", "redstone_iron_mix", id++);
+		redstoneAlloy = simpleItem("Redstone Allow", "redstone_alloy", "redstone_alloy", id++);
 	}
 
 
