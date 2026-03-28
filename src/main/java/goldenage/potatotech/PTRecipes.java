@@ -106,10 +106,24 @@ public class PTRecipes implements RecipeEntrypoint {
 			.create("Crafter", new ItemStack(PTBlocks.crafter, 1));
 
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape("IRI", "ACA", "III")
+			.addInput('I', Items.INGOT_IRON)
+			.addInput('R', Items.DUST_REDSTONE)
+			.addInput('C', PTBlocks.coil)
+			.addInput('A', PTItems.redstoneAlloy)
+			.create("Stirling Engine", new ItemStack(PTBlocks.stirlingEngine, 1));
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
 			.setShape(" R ", "RSR", " R ")
 			.addInput('R', PTItems.redstoneAlloy)
 			.addInput('S', Items.STICK)
-			.create("Crafter", new ItemStack(PTItems.wireSpool, 8));
+			.create("Wire Spool", new ItemStack(PTItems.wireSpool, 8));
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape(" I ", "BIB", "BIB")
+			.addInput('I', Items.INGOT_IRON)
+			.addInput('B', Items.BRICK_CLAY)
+			.create("Energy Connector", new ItemStack(PTItems.energyConnector, 4));
 
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
 			.setShape(" R ", "RSR", " R ")

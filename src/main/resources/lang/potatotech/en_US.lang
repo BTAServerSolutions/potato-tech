@@ -109,6 +109,9 @@ tile.potatotech.furnace_burner_on.desc=Getting hot in here!
 tile.potatotech.stirling_engine.name=Stirling Engine
 tile.potatotech.stirling_engine.desc=From hot to kinetic, party hard!
 
+tile.potatotech.sequencer.name=Sequencer
+tile.potatotech.sequencer.desc=A timing/control block with its own interface.
+
 tile.potatotech.coil.name=Coil
 tile.potatotech.coil.desc=Just a coil, it does nothing by itself
 
@@ -125,6 +128,7 @@ tile.potatotech.dust.name=Dust
 tile.potatotech.dust.desc=Not angel, do not consume.
 
 container.filter.name=Filter
+container.sequencer.name=Sequencer
 tile.potatotech.pipe_stack.name=Pipe Stack
 
 key.potatotech.wrenchMode=Wrench Mode

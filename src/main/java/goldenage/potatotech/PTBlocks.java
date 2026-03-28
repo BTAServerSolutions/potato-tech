@@ -27,6 +27,7 @@ public class PTBlocks implements BlockInitEntrypoint {
 	public static Block<? extends BlockLogic> pipeDiamond;
 	public static Block<? extends BlockLogic> energyConnector;
 	public static Block<? extends BlockLogic> stirlingEngine;
+	public static Block<? extends BlockLogic> sequencer;
 	public static Block<? extends BlockLogic> coil;
 
 
@@ -128,5 +129,12 @@ public class PTBlocks implements BlockInitEntrypoint {
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.build("coil", "coil", id++, block -> new BlockLogic(block, Material.metal));
+
+		sequencer = new BlockBuilder(MOD_ID)
+			.setTileEntity(TileEntitySequencer::new)
+			.setHardness(0.0f)
+			.setResistance(2.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
+			.build("sequencer", "sequencer", id++, block -> new BlockLogicSequencer(block, Material.metal));
 	}
 }

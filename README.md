@@ -5,9 +5,22 @@ Template for making Babric mods for BTA!
 **Note: *DO NOT fork this repository unless you want to contribute!***
 
 ## Prerequisites
-- JDK for Java 17 ([Eclipse Temurin](https://adoptium.net/temurin/releases/) recommended)
-- [Intellij IDEA](https://www.jetbrains.com/idea/download/) (Scroll down for the free community edition, if using linux **DO NOT** use the flatpak distribution)
-- Minecraft Development plugin (Optional, but highly recommended)
+- JDK 21 for Gradle ([Eclipse Temurin](https://adoptium.net/temurin/releases/) recommended)
+- VS Code with the Java Extension Pack and Gradle extension, or [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) if you prefer the existing workflow
+- Minecraft Development plugin is still useful in IntelliJ, but it is optional for VS Code
+
+## VS Code setup
+
+1. Open the repository root in VS Code and let the Java and Gradle extensions import the project.
+
+2. Make sure a JDK 21 installation is available to VS Code for Gradle. The project toolchain will take care of Java 8 compilation.
+
+3. Use the tasks in the VS Code terminal or Command Palette:
+   `build` compiles the mod, `runClient` starts the dev client, and `runServer` starts the dedicated server.
+
+4. For debugging, launch `Attach to BTA Client` or `Attach to BTA Server` from the Run and Debug panel. Those configs start the matching Gradle task with `--debug-jvm` and attach on port `5005`.
+
+5. If VS Code asks for a Gradle import refresh, accept it. The workspace is meant to stay Gradle-first.
 
 ## Setup instructions
    

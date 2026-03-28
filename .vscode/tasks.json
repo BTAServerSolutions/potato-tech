@@ -1,0 +1,66 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "${workspaceFolder}\\gradlew.bat",
+      "args": ["build"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "runClient",
+      "type": "shell",
+      "command": "${workspaceFolder}\\gradlew.bat",
+      "args": ["runClient"],
+      "group": "none",
+      "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "runServer",
+      "type": "shell",
+      "command": "${workspaceFolder}\\gradlew.bat",
+      "args": ["runServer"],
+      "group": "none",
+      "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "runClient (debug)",
+      "type": "shell",
+      "command": "${workspaceFolder}\\gradlew.bat",
+      "args": ["runClient", "--debug-jvm"],
+      "group": "none",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "gradle",
+        "pattern": [],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "Listening for transport dt_socket at address: 5005"
+        }
+      }
+    },
+    {
+      "label": "runServer (debug)",
+      "type": "shell",
+      "command": "${workspaceFolder}\\gradlew.bat",
+      "args": ["runServer", "--debug-jvm"],
+      "group": "none",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "gradle",
+        "pattern": [],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "Listening for transport dt_socket at address: 5005"
+        }
+      }
+    }
+  ]
+}

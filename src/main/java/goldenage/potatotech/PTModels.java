@@ -87,6 +87,12 @@ public class PTModels implements ModelEntrypoint {
 				.setTex(0, "potatotech:block/stirling_engine_top", Side.NORTH)
 				.setTex(0, "potatotech:block/iron_chasing_details1", Side.SOUTH)
 		);
+		ModelHelper.setBlockModel(PTBlocks.sequencer, () ->
+			new BlockModelRotatable<>(PTBlocks.sequencer)
+				.setTex(0, "potatotech:block/sequencer_front", Side.TOP)
+				.setTex(0, "potatotech:block/iron_machine_out", Side.NORTH)
+				.setTex(0, "potatotech:block/iron_machine_side", Side.SOUTH, Side.EAST, Side.WEST, Side.BOTTOM)
+		);
 	}
 
 	@Override

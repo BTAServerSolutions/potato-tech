@@ -3,6 +3,7 @@ package goldenage.potatotech;
 import goldenage.potatotech.blocks.entities.*;
 import goldenage.potatotech.networks.client.OpenGuiCrafterClientMessage;
 import goldenage.potatotech.networks.client.OpenGuiFilterClientMessage;
+import goldenage.potatotech.networks.client.OpenGuiSequencerClientMessage;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.util.collection.NamespaceID;
 import org.slf4j.Logger;
@@ -40,9 +41,11 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint {
 		EntityHelper.createTileEntity(TileEntityCrafter.class, id("tile.crafter"));
 		EntityHelper.createTileEntity(TileEntityEnergyConnector.class, id("tile.energy_connector"));
 		EntityHelper.createTileEntity(TileEntityStirlingEngine.class, id("tile.stirling_engine"));
+		EntityHelper.createTileEntity(TileEntitySequencer.class, id("tile.sequencer"));
 
 		NetworkHandler.registerNetworkMessage(OpenGuiFilterClientMessage::new);
 		NetworkHandler.registerNetworkMessage(OpenGuiCrafterClientMessage::new);
+		NetworkHandler.registerNetworkMessage(OpenGuiSequencerClientMessage::new);
 	}
 
 	@Override

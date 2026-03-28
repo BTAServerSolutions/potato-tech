@@ -1,0 +1,10 @@
+{
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "java.import.gradle.enabled": true,
+  "java.import.gradle.wrapper.enabled": true,
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.jdt.ls.vmargs": "-Xmx2G -Dfile.encoding=UTF-8",
+  "gradle.nestedProjects": true,
+  "java.compile.nullAnalysis.mode": "automatic"
+}
