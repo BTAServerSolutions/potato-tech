@@ -17,7 +17,9 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.pos.TilePosc;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemWrench extends Item {
 	public ItemWrench(String translationKey, @NotNull NamespaceID namespaceId, int id) {
@@ -25,12 +27,16 @@ public class ItemWrench extends Item {
 	}
 
 	@Override
-	public boolean onUseItemOnBlock(ItemStack itemstack, Player entityplayer, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced) {
+	public boolean onUseOnBlock(@NotNull ItemStack selfStack, @NotNull World world, @Nullable Player player, @NotNull TilePosc blockPos, @NotNull Side side, double xHit, double yHit) {
+		int blockX = blockPos.x();
+		int blockY = blockPos.y();
+		int blockZ = blockPos.z();
+
 		int blockId = world.getBlockId(blockX, blockY, blockZ);
 		if (blockId == PTBlocks.pipe.id() || blockId == PTBlocks.pipeDiamond.id() || blockId == PTBlocks.pipeGold.id()) {
 			BlockLogic pipeBlock = world.getBlockLogic(blockX, blockY, blockZ, BlockLogicPipe.class);
 			if (pipeBlock != null) {
-				pipeBlock.onBlockRightClicked(world, blockX, blockY, blockZ, entityplayer, side, xPlaced, yPlaced);
+				pipeBlock.onBlockRightClicked(world, blockX, blockY, blockZ, player, side, xHit, yHit);
 				return true;
 			}
 		}
@@ -38,15 +44,15 @@ public class ItemWrench extends Item {
 		if (!world.isClientSide) {
 			if (blockId == PTBlocks.energyConnector.id()) {
 				TileEntityEnergyConnector conn = (TileEntityEnergyConnector) world.getTileEntity(blockX, blockY, blockZ);
-				entityplayer.sendMessage("energy amount = " + conn.energy);
+				player.sendMessage("energy amount = " + conn.energy);
 			}
 			if (blockId == PTBlocks.stirlingEngine.id()) {
 				TileEntityStirlingEngine engine = (TileEntityStirlingEngine) world.getTileEntity(blockX, blockY, blockZ);
-				entityplayer.sendMessage("power = " + engine.power);
+				player.sendMessage("power = " + engine.power);
 			}
 			if (blockId == Blocks.FURNACE_STONE_IDLE.id() || blockId == Blocks.FURNACE_STONE_ACTIVE.id()) {
 				TileEntityFurnace engine = (TileEntityFurnace) world.getTileEntity(blockX, blockY, blockZ);
-				entityplayer.sendMessage("burn time = " + engine.currentBurnTime);
+				player.sendMessage("burn time = " + engine.currentBurnTime);
 			}
 		}
 		return false;

@@ -95,6 +95,7 @@ public class BlockModelPipe<T extends BlockLogic> extends BlockModelStandard<T> 
 	}
 
 
+	/*
 	public boolean renderNormal(TileEntityPipe pipe, Tessellator tessellator, int x, int y, int z) {
 		AABB bounds = AABB.getTemporaryBB(0.25f, 0.25f, 0.25f, 0.75f, 0.75f, 0.75f);
 
@@ -132,4 +133,5 @@ public class BlockModelPipe<T extends BlockLogic> extends BlockModelStandard<T> 
 		TileEntity pipe = renderBlocks.blockAccess.getTileEntity(x, y, z);
 		return renderNormal((TileEntityPipe) pipe, tessellator, x, y, z);
 	}
+	 */
 }

@@ -31,6 +31,7 @@ public class BlockModelConnector <T extends BlockLogic> extends BlockModelStanda
 		return new float[]{r, g, b};
 	}
 
+	/*
 	@Override
 	public boolean render(Tessellator tessellator, int x, int y, int z) {
 		int meta = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
@@ -92,4 +93,5 @@ public class BlockModelConnector <T extends BlockLogic> extends BlockModelStanda
 		//block.setBlockBounds(pixelSize * 5, 0, pixelSize * 5, 1 - pixelSize * 5, pixelSize * 9, 1 - pixelSize * 5);
 		return true;
 	}
+	 */
 }
