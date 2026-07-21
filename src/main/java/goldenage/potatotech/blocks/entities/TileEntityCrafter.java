@@ -14,6 +14,7 @@ import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.player.inventory.container.*;
 import net.minecraft.core.player.inventory.container.Container;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -81,9 +82,8 @@ public class TileEntityCrafter extends TileEntity implements Container {
 		return "container.crafter.name";
 	}
 
-
 	@Override
-	public void readFromNBT(CompoundTag nbttagcompound) {
+	public void readAdditionalData(CompoundTag nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		energy = nbttagcompound.getInteger("energy");
 		{
@@ -116,7 +116,7 @@ public class TileEntityCrafter extends TileEntity implements Container {
 	}
 
 	@Override
-	public void writeToNBT(CompoundTag nbttagcompound) {
+	public void writeAdditionalData(CompoundTag nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		nbttagcompound.putInt("energy", energy);
 		{
@@ -164,14 +164,14 @@ public class TileEntityCrafter extends TileEntity implements Container {
 
 	@Override
 	public boolean stillValid(Player player) {
-		if (worldObj.getTileEntity(this.x, this.y, this.z) != this) {
+		if (worldObj.getTileEntity(tilePos.x, tilePos.y, tilePos.z) != this) {
 			return false;
 		}
-		return player.distanceToSqr((double) this.x + 0.5, (double) this.y + 0.5, (double) this.z + 0.5) <= 64.0;
+		return player.distanceToSqr((double) tilePos.x + 0.5, (double) tilePos.y + 0.5, (double) tilePos.z + 0.5) <= 64.0;
 	}
 
 	@Override
-	public void sortContainer() {
+	public void sort() {
 
 	}
 
@@ -311,14 +311,14 @@ public class TileEntityCrafter extends TileEntity implements Container {
 					int bucketCount = 0;
 					for (int i = 0; i < 9; i++) {
 						ItemStack s = craftMatrix.getItem(i);
-						if (s != null && s.itemID == Items.BUCKET.id) {
+						if (s != null && s.itemID == Items.BUCKET_IRON.id) {
 							craftMatrix.setItem(i, null);
 							bucketCount += 1;
 						}
 					}
 
 					if (bucketCount > 0) {
-						extraOutputs.setItem(0, new ItemStack(Items.BUCKET, bucketCount));
+						extraOutputs.setItem(0, new ItemStack(Items.BUCKET_IRON, bucketCount));
 					}
 
 					timer = 0;

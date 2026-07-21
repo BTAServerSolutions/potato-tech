@@ -56,7 +56,7 @@ public class BlockLogicPipe extends BlockLogic {
 		TileEntityPipe te = (TileEntityPipe)world.getTileEntity(x, y, z);
 		ItemStack heldItem = player.getHeldItem();
 
-		int sideId = player.isSneaking() ? side.getOpposite().getId() : side.getId();
+		int sideId = player.isSneaking() ? side.opposite().id : side.id;
 
 		if (heldItem == null) {
 			if (player.isSneaking()) te.dropItems();

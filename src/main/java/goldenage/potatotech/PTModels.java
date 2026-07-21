@@ -7,7 +7,6 @@ import goldenage.potatotech.blocks.models.BlockModelPipe;
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.EntityRenderDispatcher;
 import net.minecraft.client.render.TileEntityRenderDispatcher;
 import net.minecraft.client.render.block.color.BlockColorDispatcher;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
@@ -105,11 +104,6 @@ public class PTModels implements ModelEntrypoint {
 				return model;
 			});
 		});
-	}
-
-	@Override
-	public void initEntityModels(EntityRenderDispatcher dispatcher) {
-		LOGGER.info("Initializing entity models...");
 	}
 
 	@Override

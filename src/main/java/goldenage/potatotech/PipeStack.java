@@ -28,14 +28,14 @@ public class PipeStack {
     }
 
     public void writeToNBT(CompoundTag nbttagcompound) {
-        nbttagcompound.putShort("direction", (short) this.direction.getId());
+        nbttagcompound.putShort("direction", (short) this.direction.id);
         nbttagcompound.putShort("timer", (short) this.timer);
 		nbttagcompound.putShort("color", (short) this.color);
 		if (stack != null) stack.writeToNBT(nbttagcompound);
     }
 
     public void readFromNBT(CompoundTag nbttagcompound) {
-        this.direction = Direction.getDirectionById(nbttagcompound.getShort("direction"));
+        this.direction = Direction.fromId(nbttagcompound.getShort("direction"));
         this.timer = nbttagcompound.getShort("timer");
 		this.color = nbttagcompound.getShort("color");
         this.stack = ItemStack.readItemStackFromNbt(nbttagcompound);

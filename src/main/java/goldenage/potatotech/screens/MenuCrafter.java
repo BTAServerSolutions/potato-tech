@@ -1,6 +1,7 @@
 package goldenage.potatotech.screens;
 
 import goldenage.potatotech.blocks.entities.TileEntityCrafter;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
@@ -8,6 +9,7 @@ import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 import net.minecraft.core.player.inventory.menu.MenuAbstract;
 import net.minecraft.core.player.inventory.slot.Slot;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -70,7 +72,12 @@ public class MenuCrafter extends MenuAbstract {
 	}
 
 	@Override
-	public List<Integer> getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
+	public void handleItemMove(InventoryAction action, Slot slot, int target, Player player) {
+		super.handleItemMove(action, slot, target, player);
+	}
+
+	@Override
+	public IntList getMoveSlots(@NotNull InventoryAction action, @NotNull Slot slot, int i, Player player) {
 		if (slot.index == 0) {
 			return this.getSlots(0, 1, false);
 		}
@@ -93,20 +100,20 @@ public class MenuCrafter extends MenuAbstract {
 	}
 
 	@Override
-	public List<Integer> getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
+	public IntList getTargetSlots(@NotNull InventoryAction action, @NotNull Slot slot, int i, Player player) {
 		if (slot.index >= 10 && slot.index <= 45) {
-			if (target == 1) {
+			if (i == 1) {
 				return this.getSlots(1, 9, false);
 			}
 			if (slot.index <= 36) {
 				return this.getSlots(37, 9, false);
 			}
 			return this.getSlots(10, 27, false);
-		} else {
-			if (slot.index == 0) {
-				return this.getSlots(10, 36, true);
-			}
-			return this.getSlots(10, 36, false);
 		}
+
+		if (slot.index == 0) {
+			return this.getSlots(10, 36, true);
+		}
+		return this.getSlots(10, 36, false);
 	}
 }

@@ -9,6 +9,7 @@ import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.util.phys.AABB;
 import org.jetbrains.annotations.Nullable;
+import org.joml.primitives.AABBdc;
 
 public class BlockModelChute<T extends BlockLogic> extends BlockModelStandard<T> {
 	public BlockModelChute(Block<T> block) {
@@ -22,9 +23,9 @@ public class BlockModelChute<T extends BlockLogic> extends BlockModelStandard<T>
 		float twoPix = onepix * 2;
 
 		float basketHeight = 1.0f;
-		AABB bounds = block.getBounds();
+		AABBdc bounds = block.getBounds();
 		bounds.set(onepix, fourPix, onepix, 0.9375f, fourPix + onepix, 0.9375f);
-		this.renderStandardBlock(tessellator, bounds, x, y, z);
+		this.renderBlockWithBounds(tessellator, bounds, x, y, z);
 
 		bounds.set(0.0f, fourPix, 0.0f, 1.0f, 1.0f, onepix);
 		this.renderStandardBlock(tessellator, bounds, x, y, z);

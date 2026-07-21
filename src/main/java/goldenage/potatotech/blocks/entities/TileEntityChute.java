@@ -18,6 +18,9 @@ import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
+import org.jetbrains.annotations.NotNull;
+import org.joml.primitives.AABBd;
+import org.joml.primitives.AABBdc;
 
 import java.util.*;
 
@@ -42,7 +45,7 @@ public class TileEntityChute extends TileEntity {
 			}
 		}
 		this.contents.clear();
-		this.worldObj.notifyBlockChange(this.x, this.y, this.z, PTBlocks.chute.id());
+		this.worldObj.notifyBlockChange(this.tilePos.x, this.tilePos.y, this.tilePos.z, PTBlocks.chute.id());
 		this.updateNumUnits();
 	}
 
@@ -64,7 +67,7 @@ public class TileEntityChute extends TileEntity {
 		float f = rand.nextFloat() * 0.8f + 0.1f;
 		float f1 = rand.nextFloat() * 0.8f + 0.1f;
 		float f2 = rand.nextFloat() * 0.8f + 0.1f;
-		EntityItem entityitem = new EntityItem(this.worldObj, (float)this.x + f, (float)this.y + f1, (float)this.z + f2, itemstack);
+		EntityItem entityitem = new EntityItem(this.worldObj, (float)this.tilePos.x + f, (float)this.tilePos.y + f1, (float)this.tilePos.z + f2, itemstack);
 		float f3 = 0.05f;
 		entityitem.xd = (float)rand.nextGaussian() * 0.05f;
 		entityitem.yd = (float)rand.nextGaussian() * 0.05f + 0.25f;
@@ -103,7 +106,7 @@ public class TileEntityChute extends TileEntity {
 		}
 
 		this.updateNumUnits();
-		this.worldObj.notifyBlockChange(this.x, this.y, this.z, PTBlocks.chute.id());
+		this.worldObj.notifyBlockChange(this.tilePos.x, this.tilePos.y, this.tilePos.z, PTBlocks.chute.id());
 	}
 	public ItemStack removeOneItem() {
 		ChuteEntry firstKey = null;
@@ -126,14 +129,14 @@ public class TileEntityChute extends TileEntity {
 			this.contents.put(firstKey, itemCount);
 		}
 
-		this.worldObj.notifyBlockChange(this.x, this.y, this.z, PTBlocks.chute.id());
+		this.worldObj.notifyBlockChange(this.tilePos.x, this.tilePos.y, this.tilePos.z, PTBlocks.chute.id());
 		this.updateNumUnits();
 
 		return itemStack;
 	}
 
 	@Override
-	public void readFromNBT(CompoundTag tag) {
+	public void readAdditionalData(@NotNull CompoundTag tag) {
 		super.readFromNBT(tag);
 		ListTag itemsTag = tag.getList("Items");
 		this.contents.clear();
@@ -151,7 +154,7 @@ public class TileEntityChute extends TileEntity {
 		if (this.worldObj == null || this.worldObj.isClientSide) {
 			return;
 		}
-		AABB aabb = AABB.getTemporaryBB(this.x, this.y, this.z, this.x + 1, this.y + 2, this.z + 1);
+		AABBd aabb = new AABBd(this.tilePos.x, this.tilePos.y, this.tilePos.z, this.tilePos.x + 1, this.tilePos.y + 2, this.tilePos.z + 1);
 		List<EntityItem> entities = this.worldObj.getEntitiesWithinAABB(EntityItem.class, aabb);
 		boolean shouldUpdate = false;
 		if (!entities.isEmpty()) {
@@ -165,11 +168,11 @@ public class TileEntityChute extends TileEntity {
 			}
 		}
 		if (shouldUpdate) {
-			this.worldObj.notifyBlockChange(this.x, this.y, this.z, PTBlocks.chute.id());
+			this.worldObj.notifyBlockChange(this.tilePos.x, this.tilePos.y, this.tilePos.z, PTBlocks.chute.id());
 			this.updateNumUnits();
 		}
 
-		TileEntity outTe = worldObj.getTileEntity(x, y-1, z) ;
+		TileEntity outTe = worldObj.getTileEntity(tilePos.x, tilePos.y-1, tilePos.z) ;
 		if (outTe instanceof Container) {
 			ItemStack itemToRemove = this.removeOneItem();
 
@@ -178,7 +181,7 @@ public class TileEntityChute extends TileEntity {
 
 				Container inventory;
 				if (outTe instanceof TileEntityChest) {
-					inventory = BlockLogicChest.getInventory(worldObj, x, y - 1, z);
+					inventory = BlockLogicChest.getInventory(worldObj, tilePos.add(0, -1, 0));
 				} else {
 					inventory = (Container) outTe;
 				}
@@ -215,7 +218,7 @@ public class TileEntityChute extends TileEntity {
 	}
 
 	@Override
-	public void writeToNBT(CompoundTag tag) {
+	public void writeAdditionalData(@NotNull CompoundTag tag) {
 		super.writeToNBT(tag);
 		ListTag itemsTag = new ListTag();
 		for (Map.Entry<ChuteEntry, Integer> entry : this.contents.entrySet()) {

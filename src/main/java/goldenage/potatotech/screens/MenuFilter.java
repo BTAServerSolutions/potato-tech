@@ -1,6 +1,7 @@
 package goldenage.potatotech.screens;
 
 import goldenage.potatotech.blocks.entities.TileEntityFilter;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.player.inventory.container.Container;
@@ -39,7 +40,7 @@ public class MenuFilter extends MenuAbstract {
 	}
 
 	@Override
-	public List<Integer> getMoveSlots(InventoryAction inventoryAction, Slot slot, int i, Player player) {
+	public IntList getMoveSlots(InventoryAction inventoryAction, Slot slot, int i, Player player) {
 		if (slot.index < 9){
 			return getSlots(0, 9, false);
 		}
@@ -50,10 +51,10 @@ public class MenuFilter extends MenuAbstract {
 	}
 
 	@Override
-	public List<Integer> getTargetSlots(InventoryAction inventoryAction, Slot slot, int i, Player player) {
+	public IntList getTargetSlots(InventoryAction inventoryAction, Slot slot, int i, Player player) {
 		int filterSize = this.numberOfRows * 9;
 		if (slot.index < filterSize) { // Filter -> Inventory
-			List<Integer> listOut = getSlots(filterSize + 27,9, false); // Hotbar first
+			IntList listOut = getSlots(filterSize + 27,9, false); // Hotbar first
 			listOut.addAll(getSlots(filterSize,27, false)); // Then Inventory
 			return listOut;
 		}

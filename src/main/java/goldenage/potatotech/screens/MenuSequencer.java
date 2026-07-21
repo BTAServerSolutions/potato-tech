@@ -1,6 +1,7 @@
 package goldenage.potatotech.screens;
 
 import goldenage.potatotech.blocks.entities.TileEntitySequencer;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
@@ -28,7 +29,7 @@ public class MenuSequencer extends MenuAbstract {
 	}
 
 	@Override
-	public List<Integer> getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
+	public IntList getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
 		if (action == InventoryAction.MOVE_SIMILAR) {
 			return this.getSlots(0, 36, false);
 		}
@@ -38,18 +39,18 @@ public class MenuSequencer extends MenuAbstract {
 		if (slot.index < 36) {
 			return this.getSlots(27, 9, false);
 		}
-		return Collections.emptyList();
+		return null;
 	}
 
 	@Override
-	public List<Integer> getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
+	public IntList getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
 		if (slot.index < 27) {
 			return this.getSlots(27, 9, false);
 		}
 		if (slot.index < 36) {
 			return this.getSlots(0, 27, false);
 		}
-		return Collections.emptyList();
+		return null;
 	}
 
 	@Override
