@@ -15,6 +15,7 @@ import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.primitives.AABBdc;
 
 import java.util.ArrayList;
 
@@ -30,7 +31,7 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 
 	@Override
 	public void onBlockPlacedOnSide(World world, int x, int y, int z, @NotNull Side side, double xPlaced, double yPlaced) {
-		world.setBlockMetadataWithNotify(x, y, z, side.getId());
+		world.setBlockMetadataWithNotify(x, y, z, side.direction.id);
 		TileEntity te = world.getTileEntity(x, y, z);
 		if (te instanceof TileEntityEnergyConnector) {
 			//((TileEntityEnergyConnector) te).updateMachineConnections(side.getOpposite().getDirection());
@@ -56,27 +57,27 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 	}
 
 	@Override
-	public AABB getBlockBoundsFromState(WorldSource world, int x, int y, int z) {
-		Side side = Side.getSideById(world.getBlockMetadata(x, y, z) & 7);
+	public AABBdc getBlockBoundsFromState(WorldSource world, int x, int y, int z) {
+		Side side = Side.fromId(world.getBlockMetadata(x, y, z) & 7);
 		float pixelSize = 1.0f / 16.0f;
 		float min = pixelSize * 5;
 		float max = 1.0f - pixelSize * 5;
 		float len = pixelSize*9;
 
-		AABB aabb = this.getBounds();
+		AABB aabbdc = (AABB) this.getBounds();
 		if (side == Side.TOP) {
-			aabb.set(min, 0, min, max, len, max);
+			aabbdc.set(min, 0, min, max, len, max);
 		} else if (side == Side.BOTTOM) {
-			aabb.set(min, 1 - len, min, max, 1, max);
+			aabbdc.set(min, 1 - len, min, max, 1, max);
 		} else if (side == Side.NORTH) {
-			aabb.set(min, min, 1 - len, max, max, 1);
+			aabbdc.set(min, min, 1 - len, max, max, 1);
 		} else if (side == Side.SOUTH) {
-			aabb.set(min, min, 0, max, max, len);
+			aabbdc.set(min, min, 0, max, max, len);
 		} else if (side == Side.EAST) {
-			aabb.set(0, min, min, len, max, max);
+			aabbdc.set(0, min, min, len, max, max);
 		} else {
-			aabb.set(1 - len, min, min, 1, max, max);
+			aabbdc.set(1 - len, min, min, 1, max, max);
 		}
-        return aabb;
+        return aabbdc.asJomlAABB();
     }
 }

@@ -2,7 +2,6 @@ package goldenage.potatotech.blocks.entities;
 
 import com.mojang.nbt.tags.CompoundTag;
 import com.mojang.nbt.tags.ListTag;
-import goldenage.potatotech.PTBlocks;
 import goldenage.potatotech.PTItems;
 import goldenage.potatotech.PotatoTech;
 import net.minecraft.core.block.BlockLogicFurnace;
@@ -18,6 +17,7 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.util.helper.Direction;
+import net.minecraft.core.world.pos.TilePos;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -58,13 +58,15 @@ public class TileEntityEnergyConnector extends TileEntity {
 	static public final int energyCapacity = 32;
 	public int energy = 0;
 
+	TilePos globalConnectPos = new TilePos(this.tilePos.x, this.tilePos.y, this.tilePos.z);
+
 	public TileEntityEnergyConnector() {
 
 	}
 
 	public ArrayList<Connection> connections = new ArrayList<>();
 	@Override
-	public void readFromNBT(CompoundTag nbttagcompound) {
+	public void readAdditionalData(CompoundTag nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		ListTag nbttaglist = nbttagcompound.getList("connections");
 		this.connections = new ArrayList<>();
@@ -76,7 +78,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 	}
 
 	@Override
-	public void writeToNBT(CompoundTag nbttagcompound) {
+	public void writeAdditionalData(CompoundTag nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		ListTag nbttaglist = new ListTag();
 		for (Connection connection : this.connections) {
@@ -93,6 +95,8 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (worldObj == null || worldObj.isClientSide) {
 			return false;
 		}
+		TilePos connectPos = new TilePos(xi, yi, zi);
+
 		TileEntity te = worldObj.getTileEntity(xi, yi, zi);
 
 		if (!(te instanceof TileEntityEnergyConnector)) return false;
@@ -107,7 +111,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (hasConnection) return false;
 
 		for (Connection c: ((TileEntityEnergyConnector) te).connections) {
-			if (c.x == this.x && c.y == this.y && c.z == this.z) {
+			if (c.x == this.tilePos.x && c.y == this.tilePos.y && c.z == this.tilePos.z) {
 				hasConnection = true;
 				break;
 			}
@@ -116,11 +120,11 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (hasConnection) return false;
 
 		connections.add(new Connection(xi, yi, zi));
-		((TileEntityEnergyConnector) te).connections.add(new Connection(this.x, this.y, this.z));
+		((TileEntityEnergyConnector) te).connections.add(new Connection(this.tilePos.x, this.tilePos.y, this.tilePos.z));
 		this.setChanged();
 		((TileEntityEnergyConnector) te).setChanged();
-		worldObj.markBlockNeedsUpdate(this.x, this.y, this.z);
-		worldObj.markBlockNeedsUpdate(xi, yi, zi);
+		worldObj.markBlockNeedsUpdate(globalConnectPos);
+		worldObj.markBlockNeedsUpdate(connectPos);
 		PotatoTech.LOGGER.info("Added connection on: " + xi + " " + yi + " " + zi);
 
 		return true;
@@ -140,7 +144,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (i < connections.size()) {
 			connections.remove(i);
 			this.setChanged();
-			worldObj.markBlockNeedsUpdate(this.x, this.y, this.z);
+			worldObj.markBlockNeedsUpdate(globalConnectPos);
 		}
 	}
 
@@ -151,7 +155,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 		for (Connection c: connectionsCopy) {
             TileEntity te = worldObj.getTileEntity(c.x, c.y, c.z);
 			if (te instanceof TileEntityEnergyConnector && removeConnection) {
-				((TileEntityEnergyConnector) te).removeConnection(x, y, z);
+				((TileEntityEnergyConnector) te).removeConnection(tilePos.x, tilePos.y, tilePos.z);
 			}
 			result.stackSize++;
 		}
@@ -178,7 +182,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 			Iterator iter = listB.iterator();
 			while(iter.hasNext()) {
 				RecipeEntryBlastFurnace recipeEntryBase = (RecipeEntryBlastFurnace)iter.next();
-				if (recipeEntryBase != null && recipeEntryBase.matches(furnace.getItem(0))) {
+				if (recipeEntryBase != null && recipeEntryBase.matches(furnace.getItem(0), furnace.getItem(1))) {
 					itemstack = recipeEntryBase.getOutput();
 				}
 			}
@@ -214,9 +218,9 @@ public class TileEntityEnergyConnector extends TileEntity {
 		}
 
 		int previousEnergy = energy;
-		int side = worldObj.getBlockMetadata(x, y, z) & 7;
-		Direction connectionDir = Direction.getDirectionById(side).getOpposite();
-		TileEntity te = worldObj.getTileEntity(x + connectionDir.getOffsetX(), y + connectionDir.getOffsetY(), z + connectionDir.getOffsetZ());
+		int side = worldObj.getBlockMetadata(tilePos.x, tilePos.y, tilePos.z) & 7;
+		Direction connectionDir = Direction.fromId(side).opposite();
+		TileEntity te = worldObj.getTileEntity(tilePos.x + connectionDir.offsetX(), tilePos.y + connectionDir.offsetY(), tilePos.z + connectionDir.offsetZ());
 		if (te instanceof TileEntityStirlingEngine) {
 			TileEntityStirlingEngine engine = (TileEntityStirlingEngine) te;
 			energy = Math.min(energy + engine.power, energyCapacity);
@@ -227,9 +231,11 @@ public class TileEntityEnergyConnector extends TileEntity {
 			if (furnaceCanSmelt(furnace, isBlast) && energy > 1 && fuel != null && fuel.itemID == PTItems.electricHeatingUnit.id) {
 				if (furnace.currentBurnTime == 0) {
 					if (isBlast) {
-						BlockLogicFurnaceBlast.updateFurnaceBlockState(true, worldObj, x + connectionDir.getOffsetX(), y + connectionDir.getOffsetY(), z + connectionDir.getOffsetZ());
+						TilePos blastTilePos = new TilePos(tilePos.x + connectionDir.offsetX(), tilePos.y + connectionDir.offsetY(), tilePos.z + connectionDir.offsetZ());
+						BlockLogicFurnaceBlast.updateFurnaceBlockState(worldObj, blastTilePos, true);
 					} else {
-						BlockLogicFurnace.updateFurnaceBlockState(true, worldObj, x + connectionDir.getOffsetX(), y + connectionDir.getOffsetY(), z + connectionDir.getOffsetZ());
+						TilePos smeltTilePos = new TilePos(tilePos.x + connectionDir.offsetX(), tilePos.y + connectionDir.offsetY(), tilePos.z + connectionDir.offsetZ());
+						BlockLogicFurnace.updateFurnaceBlockState(worldObj, smeltTilePos, true);
 					}
 				}
 				energy -= isBlast ? 3 : 2;
@@ -249,9 +255,10 @@ public class TileEntityEnergyConnector extends TileEntity {
 			TileEntityCrafter crafter = (TileEntityCrafter) te;
 			if (energy > 0) {
 				int sent = crafter.addEnergy(1);
+				TilePos crafterPos = new TilePos(crafter.tilePos.x, crafter.tilePos.y, crafter.tilePos.z);
 				if (sent > 0) {
 					energy -= sent;
-					worldObj.markBlockNeedsUpdate(crafter.x, crafter.y, crafter.z);
+					worldObj.markBlockNeedsUpdate(crafterPos);
 				}
 			}
 		}
@@ -265,7 +272,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 					energy -= amountToTransfer;
 					teConn.energy += amountToTransfer;
 					teConn.setChanged();
-					worldObj.markBlockNeedsUpdate(teConn.x, teConn.y, teConn.z);
+					worldObj.markBlockNeedsUpdate(teConn.tilePos.x, teConn.tilePos.y, teConn.tilePos.z);
 				}
 			}
 
@@ -273,7 +280,8 @@ public class TileEntityEnergyConnector extends TileEntity {
 
 		if (energy != previousEnergy) {
 			this.setChanged();
-			worldObj.markBlockNeedsUpdate(this.x, this.y, this.z);
+			TilePos energyTilePos = new TilePos(this.tilePos.x, this.tilePos.y, this.tilePos.z);
+			worldObj.markBlockNeedsUpdate(energyTilePos);
 		}
 	}
 	@Override

@@ -1,6 +1,7 @@
 package goldenage.potatotech.screens;
 
 import goldenage.potatotech.blocks.entities.TileEntityCrafter;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.InventoryAction;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
@@ -70,7 +71,7 @@ public class MenuCrafter extends MenuAbstract {
 	}
 
 	@Override
-	public List<Integer> getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
+	public IntList getMoveSlots(InventoryAction action, Slot slot, int target, Player player) {
 		if (slot.index == 0) {
 			return this.getSlots(0, 1, false);
 		}
@@ -93,7 +94,7 @@ public class MenuCrafter extends MenuAbstract {
 	}
 
 	@Override
-	public List<Integer> getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
+	public IntList getTargetSlots(InventoryAction action, Slot slot, int target, Player player) {
 		if (slot.index >= 10 && slot.index <= 45) {
 			if (target == 1) {
 				return this.getSlots(1, 9, false);

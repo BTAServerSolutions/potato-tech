@@ -19,8 +19,8 @@ public class BlockLogicTestAreaMaker extends BlockLogic {
 	public void onBlockPlacedByMob(World world, int x, int y, int z, @NotNull Side side, Mob mob, double xPlaced, double yPlaced) {
 		super.onBlockPlacedByMob(world, x, y, z, side, mob, xPlaced, yPlaced);
 
-		int startX = world.getChunkFromBlockCoords(x, z).xPosition * 16;
-		int startZ = world.getChunkFromBlockCoords(x, z).zPosition * 16;
+		int startX = world.getChunkFromBlockCoords(x, z).pos.x * 16;
+		int startZ = world.getChunkFromBlockCoords(x, z).pos.z * 16;
 		int endX = startX + 15;
 		int endZ = startZ + 15;
 

@@ -11,10 +11,11 @@ import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Direction;
+import net.minecraft.core.world.pos.TilePos;
 
 import java.util.*;
 
-public class TileEntityPipe extends TileEntity {
+public abstract class TileEntityPipe extends TileEntity {
 	public PipeStack[] stacks;
 
 	// 0 - normal
@@ -41,10 +42,10 @@ public class TileEntityPipe extends TileEntity {
 	public void dropItems() {
 		for (int i = 0; i < stacks.length; i++) {
 			PipeStack stack = stacks[i];
-			if (stack != null) {
-				worldObj.dropItem(x, y, z, stack.stack);
+			if (stack != null && worldObj != null) {
+				worldObj.dropItem(new TilePos(), stack.stack);
 				stacks[i] = null;
-				worldObj.markBlockNeedsUpdate(x, y, z);
+				worldObj.markBlockNeedsUpdate(new TilePos());
 			}
 		}
 	}
@@ -67,15 +68,15 @@ public class TileEntityPipe extends TileEntity {
 				if (t > 1.0) t = 1.0f;
 
 				if (i > 0) {
-					Direction dir = Direction.getDirectionById(i - 1);
+					Direction dir = Direction.fromId(i - 1);
 
-					float x1 = dir.getOffsetX() * 0.325f;
-					float y1 = dir.getOffsetY() * 0.325f;
-					float z1 = dir.getOffsetZ() * 0.325f;
+					float x1 = dir.offsetX() * 0.325f;
+					float y1 = dir.offsetY() * 0.325f;
+					float z1 = dir.offsetZ() * 0.325f;
 
-					float x0 = x1 + stack.direction.getOffsetX() * 0.325f;
-					float y0 = y1 + stack.direction.getOffsetY() * 0.325f;
-					float z0 = z1 + stack.direction.getOffsetZ() * 0.325f;
+					float x0 = x1 + stack.direction.offsetX() * 0.325f;
+					float y0 = y1 + stack.direction.offsetY() * 0.325f;
+					float z0 = z1 + stack.direction.offsetZ() * 0.325f;
 
 					float xof = x0 * (1-t) + x1 * t;
 					float yof = y0 * (1-t) + y1 * t;
@@ -85,9 +86,9 @@ public class TileEntityPipe extends TileEntity {
 					pos[1] = 0.5f + yof;
 					pos[2] = 0.5f + zof;
 				} else {
-					float x0 = stack.direction.getOffsetX() * 0.325f;
-					float y0 = stack.direction.getOffsetY() * 0.325f;
-					float z0 = stack.direction.getOffsetZ() * 0.325f;
+					float x0 = stack.direction.offsetX() * 0.325f;
+					float y0 = stack.direction.offsetY() * 0.325f;
+					float z0 = stack.direction.offsetZ() * 0.325f;
 
 					float xof = x0 * (1-t);
 					float yof = y0 * (1-t);
@@ -109,7 +110,7 @@ public class TileEntityPipe extends TileEntity {
 	}
 
 	@Override
-	public void readFromNBT(CompoundTag nbttagcompound) {
+	public void readAdditionalData (CompoundTag nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		ListTag nbttaglist = nbttagcompound.getList("Items");
 		this.stacks = new PipeStack[7];
@@ -128,13 +129,13 @@ public class TileEntityPipe extends TileEntity {
 	}
 
 	@Override
-	public void writeToNBT(CompoundTag nbttagcompound) {
+	public void writeAdditionalData (CompoundTag nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		ListTag nbttaglist = new ListTag();
 		for (PipeStack stack : this.stacks) {
 			if (stack == null) {
 				PipeStack s = new PipeStack();
-				s.direction = Direction.getDirectionById(0);
+				s.direction = Direction.fromId(0);
 				CompoundTag nbttagcompound1 = new CompoundTag();
 				s.writeToNBT(nbttagcompound1);
 				nbttaglist.addTag(nbttagcompound1);
@@ -155,19 +156,19 @@ public class TileEntityPipe extends TileEntity {
 	}
 
 	public void inputItems() {
-		for (Direction dir : Direction.directions) {
-			if (modeBySide[dir.getId()] == 2) {
-				PipeStack stack = stacks[dir.getId() + 1];
-				if (stack == null) {
-					stack = Util.getItemFromInventory(worldObj, x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ(), dir, 0);
+		for (Direction dir : Direction.values()) {
+			if (modeBySide[dir.id] == 2) {
+				PipeStack stack = stacks[dir.id + 1];
+				if (stack == null && worldObj != null) {
+					stack = Util.getItemFromInventory(worldObj, tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ(), dir, 0);
 					if (stack != null) {
 						stack.timer = 0;
 						if (stack.color == 0) {
-							stack.color = colorBySide[dir.getId()];
+							stack.color = colorBySide[dir.id];
 						}
 					}
-					stacks[dir.getId() + 1] = stack;
-					worldObj.markBlockNeedsUpdate(x, y, z);
+					stacks[dir.id + 1] = stack;
+					worldObj.markBlockNeedsUpdate(new TilePos());
 				}
 			}
 		}
@@ -175,22 +176,24 @@ public class TileEntityPipe extends TileEntity {
 
 	public void outputItems() {
 		// Output
-		for (Direction dir : Direction.directions) {
-			PipeStack stack = stacks[dir.getId() + 1];
-			if (stack != null && stack.direction == dir.getOpposite() && stack.timer >= maxPipeStackTimer) {
-				int blockId = worldObj.getBlockId(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-				TileEntity te = worldObj.getTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
+		for (Direction dir : Direction.values()) {
+			PipeStack stack = stacks[dir.id + 1];
+			if (stack != null && stack.direction == dir.opposite() && stack.timer >= maxPipeStackTimer) {
+				TilePos blockIdPos = new TilePos(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
+				int blockId = worldObj.getBlockId(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
+				TileEntity te = worldObj.getTileEntity(blockIdPos);
 				if (blockId != 0 && te instanceof Container && !(te instanceof TileEntityPipe)) {
-					if (modeBySide[dir.getId()] <= 1) {
+					if (modeBySide[dir.id] <= 1) {
 						Container inventory = (Container) te;
 						if (Objects.equals(inventory.getNameTranslationKey(), "container.chest.name")) {
-							inventory = BlockLogicChest.getInventory(worldObj, x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
+							TilePos invPos = new TilePos(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
+							inventory = BlockLogicChest.getInventory(worldObj, invPos);
 						}
 
 						boolean inserted = Util.insertOnInventory(inventory, stack.stack, dir);
 						if (inserted) {
-							stacks[dir.getId() + 1] = null;
-							worldObj.markBlockNeedsUpdate(x, y, z);
+							stacks[dir.id + 1] = null;
+							worldObj.markBlockNeedsUpdate(new TilePos());
 						}
 					}
 				}
@@ -199,18 +202,19 @@ public class TileEntityPipe extends TileEntity {
 	}
 
 	public void moveItems() {
-		for (Direction dir : Direction.directions) {
-			PipeStack stack = stacks[dir.getId() + 1];
-			if (stack != null && stack.direction == dir.getOpposite() && stack.timer >= maxPipeStackTimer) {
-				int blockId = worldObj.getBlockId(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-				TileEntity te = worldObj.getTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
+		for (Direction dir : Direction.values()) {
+			PipeStack stack = stacks[dir.id + 1];
+			if (stack != null && stack.direction == dir.opposite() && stack.timer >= maxPipeStackTimer) {
+				TilePos movePos = new TilePos(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
+				int blockId = worldObj.getBlockId(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
+				TileEntity te = worldObj.getTileEntity(movePos);
 				if (blockId != 0 && te instanceof TileEntityPipe) {
 					TileEntityPipe p = (TileEntityPipe) te;
-					if (p.stacks[dir.getOpposite().getId() + 1] == null) {
+					if (p.stacks[dir.opposite().id + 1] == null) {
 						stack.timer = 0;
-						p.stacks[dir.getOpposite().getId() + 1] = stack;
-						stacks[dir.getId() + 1] = null;
-						worldObj.markBlockNeedsUpdate(x, y, z);
+						p.stacks[dir.opposite().id + 1] = stack;
+						stacks[dir.id + 1] = null;
+						worldObj.markBlockNeedsUpdate(new TilePos());
 					}
 				}
 			}
@@ -220,13 +224,14 @@ public class TileEntityPipe extends TileEntity {
 			List<Direction> freeDir = new ArrayList<>();
 			for (int i = 0; i < 6; i++) {
 				PipeStack stack2 = stacks[i + 1];
-				Direction dir = Direction.getDirectionById(i);
-				int blockId = worldObj.getBlockId(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-				TileEntity te = worldObj.getTileEntity(x + dir.getOffsetX(), y + dir.getOffsetY(), z + dir.getOffsetZ());
-				if (stack2 == null && blockId != 0 && (te instanceof Container || te instanceof TileEntityPipe) && i != stacks[0].direction.getId() && modeBySide[i] < 2) {
+				Direction dir = Direction.fromId(i);
+				TilePos movePos = new TilePos(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
+				int blockId = worldObj.getBlockId(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
+				TileEntity te = worldObj.getTileEntity(movePos);
+				if (stack2 == null && blockId != 0 && (te instanceof Container || te instanceof TileEntityPipe) && i != stacks[0].direction.id && modeBySide[i] < 2) {
 					if (te instanceof TileEntityPipe) {
 						TileEntityPipe pipe = (TileEntityPipe) te;
-						int pipeMode = pipe.modeBySide[dir.getOpposite().getId()];
+						int pipeMode = pipe.modeBySide[dir.opposite().id];
 						boolean cannotMove = (pipeMode == 3) || (pipeMode == 1);
 						//cannotMove |= pipe.stacks[dir.getOpposite().getId()] != null;
 						if (cannotMove) continue;
@@ -234,9 +239,9 @@ public class TileEntityPipe extends TileEntity {
 						boolean canInsert = modeBySide[i] == 1;
 						canInsert &= !Util.canInsertOnInventory(
 							worldObj,
-							x + dir.getOffsetX(),
-							y + dir.getOffsetY(),
-							z + dir.getOffsetZ(),
+							tilePos.x + dir.offsetX(),
+							tilePos.y + dir.offsetY(),
+							tilePos.z + dir.offsetZ(),
 							dir,
 							stacks[0].stack);
 
@@ -248,7 +253,7 @@ public class TileEntityPipe extends TileEntity {
 					if (this.colorBySide[i] > 0) {
 						if (this.colorBySide[i] == stacks[0].color) {
 							freeDir.clear();
-							freeDir.add(Direction.getDirectionById(i));
+							freeDir.add(Direction.fromId(i));
 							break;
 						} else {
 							continue;
@@ -257,35 +262,35 @@ public class TileEntityPipe extends TileEntity {
 
 					if (this.modeBySide[i] == 1) {
 						freeDir.clear();
-						freeDir.add(Direction.getDirectionById(i));
+						freeDir.add(Direction.fromId(i));
 						break;
 					}
-					freeDir.add(Direction.getDirectionById(i));
+					freeDir.add(Direction.fromId(i));
 				}
 			}
 
 			if (!freeDir.isEmpty()) {
 				int selected = (int) (Math.random() * freeDir.size());
 				Direction dir = freeDir.get(selected);
-				stacks[0].direction = dir.getOpposite();
+				stacks[0].direction = dir.opposite();
 				stacks[0].timer = 0;
-				stacks[dir.getId() + 1] = stacks[0];
+				stacks[dir.id + 1] = stacks[0];
 				stacks[0] = null;
 
-				worldObj.markBlockNeedsUpdate(x, y, z);
+				worldObj.markBlockNeedsUpdate(new TilePos());
 			}
 		}
 
-		boolean isPowered = worldObj.hasNeighborSignal(x, y, z) || worldObj.hasDirectSignal(x, y, z);
+		boolean isPowered = worldObj.hasNeighborSignal(new TilePos()) || worldObj.hasDirectSignal(new TilePos());
 		if (!isPowered) {
 			for (int i = 0; i < 6; i++) {
 				PipeStack stack = stacks[i + 1];
-				if (stack != null && stack.direction == Direction.getDirectionById(i) && stack.timer >= maxPipeStackTimer) {
+				if (stack != null && stack.direction == Direction.fromId(i) && stack.timer >= maxPipeStackTimer) {
 					if (stacks[0] == null) {
 						stacks[0] = stack;
 						stacks[0].timer = 0;
 						stacks[i + 1] = null;
-						worldObj.markBlockNeedsUpdate(x, y, z);
+						worldObj.markBlockNeedsUpdate(new TilePos());
 					}
 				}
 			}

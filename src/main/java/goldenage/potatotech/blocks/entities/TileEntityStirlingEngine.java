@@ -1,11 +1,14 @@
 package goldenage.potatotech.blocks.entities;
 
+import com.mojang.nbt.tags.CompoundTag;
 import net.minecraft.core.block.BlockLogicRotatable;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.util.helper.Direction;
+import net.minecraft.core.world.pos.TilePos;
+import org.jetbrains.annotations.NotNull;
 
 public class TileEntityStirlingEngine extends TileEntity {
 
@@ -19,7 +22,7 @@ public class TileEntityStirlingEngine extends TileEntity {
 
 		int previousPower = power;
 
-		Direction direction = BlockLogicRotatable.getDirectionFromMeta(worldObj.getBlockMetadata(x, y, z));
+		Direction direction = BlockLogicRotatable.getDirectionFromMeta(worldObj.getBlockMetadata(tilePos.x, tilePos.y, tilePos.z));
 		Direction directionCold = Direction.WEST;
 		Direction directionHot = Direction.EAST;
 		if (direction == Direction.WEST) {
@@ -33,8 +36,8 @@ public class TileEntityStirlingEngine extends TileEntity {
 			directionHot = Direction.WEST;
 		}
 
-		int coldBlock = worldObj.getBlockId(x + directionCold.getOffsetX(), y + directionCold.getOffsetY(), z + directionCold.getOffsetZ());
-		int hotBlock = worldObj.getBlockId(x + directionHot.getOffsetX(), y + directionHot.getOffsetY(), z + directionHot.getOffsetZ());
+		int coldBlock = worldObj.getBlockId(tilePos.x + directionCold.offsetX(), tilePos.y + directionCold.offsetY(), tilePos.z + directionCold.offsetZ());
+		int hotBlock = worldObj.getBlockId(tilePos.x + directionHot.offsetX(), tilePos.y + directionHot.offsetY(), tilePos.z + directionHot.offsetZ());
 
 		int coldTemperature = 0;
 		int hotTemperature = 0;
@@ -62,7 +65,8 @@ public class TileEntityStirlingEngine extends TileEntity {
 		power = Math.max(0, hotTemperature - coldTemperature);
 		if (power != previousPower) {
 			setChanged();
-			worldObj.markBlockNeedsUpdate(x, y, z);
+			TilePos powerPos = new TilePos(tilePos.x, tilePos.y, tilePos.z);
+			worldObj.markBlockNeedsUpdate(powerPos);
 		}
 
 		super.tick();
@@ -71,5 +75,15 @@ public class TileEntityStirlingEngine extends TileEntity {
 	@Override
 	public Packet getDescriptionPacket() {
 		return new PacketTileEntityData(this);
+	}
+
+	@Override
+	public void readAdditionalData(@NotNull CompoundTag compoundTag) {
+
+	}
+
+	@Override
+	public void writeAdditionalData(@NotNull CompoundTag compoundTag) {
+
 	}
 }

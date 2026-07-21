@@ -11,6 +11,7 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.player.inventory.menu.MenuContainer;
+import net.minecraft.core.world.pos.TilePos;
 import org.jetbrains.annotations.Nullable;
 
 class FilterPaintContainer implements Container {
@@ -75,7 +76,7 @@ class FilterPaintContainer implements Container {
 	}
 
 	@Override
-	public void sortContainer() {
+	public void sort() {
 
 	}
 
@@ -162,7 +163,7 @@ public class TileEntityFilter extends TileEntity implements Container {
 	}
 
 	@Override
-	public void readFromNBT(CompoundTag nbttagcompound) {
+	public void readAdditionalData(CompoundTag nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		ListTag nbttaglist = nbttagcompound.getList("Items");
 		this.filterContents = new ItemStack[this.getContainerSize()];
@@ -183,7 +184,7 @@ public class TileEntityFilter extends TileEntity implements Container {
 	}
 
 	@Override
-	public void writeToNBT(CompoundTag nbttagcompound) {
+	public void writeAdditionalData(CompoundTag nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		ListTag nbttaglist = new ListTag();
 		for (int i = 0; i < this.filterContents.length; ++i) {
@@ -215,14 +216,15 @@ public class TileEntityFilter extends TileEntity implements Container {
 
 	@Override
 	public boolean stillValid(Player player) {
-		if (worldObj.getTileEntity(this.x, this.y, this.z) != this) {
+		TilePos validPos = new TilePos(this.tilePos.x, this.tilePos.y, this.tilePos.z);
+		if (worldObj.getTileEntity(validPos) != this) {
 			return false;
 		}
-		return player.distanceToSqr((double)this.x + 0.5, (double)this.y + 0.5, (double)this.z + 0.5) <= 64.0;
+		return player.distanceToSqr((double)this.tilePos.x + 0.5, (double)this.tilePos.y + 0.5, (double)this.tilePos.z + 0.5) <= 64.0;
 	}
 
 	@Override
-	public void sortContainer() {
+	public void sort() {
 
 	}
 }
