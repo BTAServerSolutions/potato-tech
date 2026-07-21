@@ -2,7 +2,6 @@ package goldenage.potatotech.blocks.entities;
 
 import com.mojang.nbt.tags.CompoundTag;
 import com.mojang.nbt.tags.ListTag;
-import goldenage.potatotech.PTBlocks;
 import goldenage.potatotech.PTItems;
 import goldenage.potatotech.PotatoTech;
 import net.minecraft.core.block.BlockLogicFurnace;
@@ -18,6 +17,7 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.util.helper.Direction;
+import net.minecraft.core.world.pos.TilePos;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -58,6 +58,8 @@ public class TileEntityEnergyConnector extends TileEntity {
 	static public final int energyCapacity = 32;
 	public int energy = 0;
 
+	TilePos globalConnectPos = new TilePos(this.tilePos.x, this.tilePos.y, this.tilePos.z);
+
 	public TileEntityEnergyConnector() {
 
 	}
@@ -93,6 +95,8 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (worldObj == null || worldObj.isClientSide) {
 			return false;
 		}
+		TilePos connectPos = new TilePos(xi, yi, zi);
+
 		TileEntity te = worldObj.getTileEntity(xi, yi, zi);
 
 		if (!(te instanceof TileEntityEnergyConnector)) return false;
@@ -140,7 +144,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (i < connections.size()) {
 			connections.remove(i);
 			this.setChanged();
-			worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
+			worldObj.markBlockNeedsUpdate(globalConnectPos);
 		}
 	}
 
@@ -178,7 +182,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 			Iterator iter = listB.iterator();
 			while(iter.hasNext()) {
 				RecipeEntryBlastFurnace recipeEntryBase = (RecipeEntryBlastFurnace)iter.next();
-				if (recipeEntryBase != null && recipeEntryBase.matches(furnace.getItem(0), null)) {
+				if (recipeEntryBase != null && recipeEntryBase.matches(furnace.getItem(0), furnace.getItem(1))) {
 					itemstack = recipeEntryBase.getOutput();
 				}
 			}
@@ -249,6 +253,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 			TileEntityCrafter crafter = (TileEntityCrafter) te;
 			if (energy > 0) {
 				int sent = crafter.addEnergy(1);
+				TilePos crafterPos = new TilePos(crafter.tilePos.x, crafter.tilePos.y, crafter.tilePos.z);
 				if (sent > 0) {
 					energy -= sent;
 					worldObj.markBlockNeedsUpdate(crafter.tilePos.x, crafter.tilePos.y, crafter.tilePos.z);

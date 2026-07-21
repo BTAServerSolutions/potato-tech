@@ -11,6 +11,7 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.player.inventory.menu.MenuContainer;
+import net.minecraft.core.world.pos.TilePos;
 import org.jetbrains.annotations.Nullable;
 
 class FilterPaintContainer implements Container {

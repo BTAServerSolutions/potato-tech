@@ -13,10 +13,8 @@ import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
-import net.minecraft.core.world.pos.TilePosc;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.primitives.AABBd;
 import org.joml.primitives.AABBdc;
 
 import java.util.ArrayList;
@@ -33,7 +31,7 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 
 	@Override
 	public void onBlockPlacedOnSide(World world, int x, int y, int z, @NotNull Side side, double xPlaced, double yPlaced) {
-		world.setBlockMetadataWithNotify(x, y, z, side.id);
+		world.setBlockMetadataWithNotify(x, y, z, side.direction.id);
 		TileEntity te = world.getTileEntity(x, y, z);
 		if (te instanceof TileEntityEnergyConnector) {
 			//((TileEntityEnergyConnector) te).updateMachineConnections(side.getOpposite().getDirection());
@@ -66,20 +64,20 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 		float max = 1.0f - pixelSize * 5;
 		float len = pixelSize*9;
 
-		AABBd aabb = this.getBoundsRaw();
+		AABB aabbdc = (AABB) this.getBounds();
 		if (side == Side.TOP) {
-			aabb.set(new AABBd(min, 0, min, max, len, max));
+			aabbdc.set(min, 0, min, max, len, max);
 		} else if (side == Side.BOTTOM) {
-			aabb.set(new AABBd(min, 1 - len, min, max, 1, max));
+			aabbdc.set(min, 1 - len, min, max, 1, max);
 		} else if (side == Side.NORTH) {
-			aabb.set(new AABBd(min, min, 1 - len, max, max, 1));
+			aabbdc.set(min, min, 1 - len, max, max, 1);
 		} else if (side == Side.SOUTH) {
-			aabb.set(new AABBd(min, min, 0, max, max, len));
+			aabbdc.set(min, min, 0, max, max, len);
 		} else if (side == Side.EAST) {
-			aabb.set(new AABBd(0, min, min, len, max, max));
+			aabbdc.set(0, min, min, len, max, max);
 		} else {
-			aabb.set(new AABBd(1 - len, min, min, 1, max, max));
+			aabbdc.set(1 - len, min, min, 1, max, max);
 		}
-        return aabb;
+        return aabbdc.asJomlAABB();
     }
 }
