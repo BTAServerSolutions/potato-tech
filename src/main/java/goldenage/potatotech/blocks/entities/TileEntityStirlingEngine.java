@@ -7,7 +7,6 @@ import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.util.helper.Direction;
-import net.minecraft.core.world.pos.TilePos;
 import org.jetbrains.annotations.NotNull;
 
 public class TileEntityStirlingEngine extends TileEntity {
@@ -65,8 +64,7 @@ public class TileEntityStirlingEngine extends TileEntity {
 		power = Math.max(0, hotTemperature - coldTemperature);
 		if (power != previousPower) {
 			setChanged();
-			TilePos powerPos = new TilePos(tilePos.x, tilePos.y, tilePos.z);
-			worldObj.markBlockNeedsUpdate(powerPos);
+			worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
 		}
 
 		super.tick();
@@ -79,7 +77,7 @@ public class TileEntityStirlingEngine extends TileEntity {
 
 	@Override
 	public void readAdditionalData(@NotNull CompoundTag compoundTag) {
-
+		
 	}
 
 	@Override

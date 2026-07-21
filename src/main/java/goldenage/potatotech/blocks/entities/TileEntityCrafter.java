@@ -14,12 +14,12 @@ import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.player.inventory.container.*;
 import net.minecraft.core.player.inventory.container.Container;
-import net.minecraft.core.world.pos.TilePos;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class TileEntityCrafter extends TileEntity implements Container {
+public class TileEntityCrafter extends TileEntity implements Container {
 	public static final int energyCapacity = 1;
 	public static final int energyPerCraft = 1;
 
@@ -81,7 +81,6 @@ public abstract class TileEntityCrafter extends TileEntity implements Container 
 	public String getNameTranslationKey() {
 		return "container.crafter.name";
 	}
-
 
 	@Override
 	public void readAdditionalData(CompoundTag nbttagcompound) {
@@ -165,11 +164,10 @@ public abstract class TileEntityCrafter extends TileEntity implements Container 
 
 	@Override
 	public boolean stillValid(Player player) {
-		TilePos validPos = new TilePos(this.tilePos.x, this.tilePos.y, this.tilePos.z);
-		if (worldObj.getTileEntity(validPos) != this) {
+		if (worldObj.getTileEntity(tilePos.x, tilePos.y, tilePos.z) != this) {
 			return false;
 		}
-		return player.distanceToSqr((double) this.tilePos.x + 0.5, (double) this.tilePos.y + 0.5, (double) this.tilePos.z + 0.5) <= 64.0;
+		return player.distanceToSqr((double) tilePos.x + 0.5, (double) tilePos.y + 0.5, (double) tilePos.z + 0.5) <= 64.0;
 	}
 
 	@Override

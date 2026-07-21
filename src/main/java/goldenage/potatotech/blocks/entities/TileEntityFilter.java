@@ -216,11 +216,10 @@ public class TileEntityFilter extends TileEntity implements Container {
 
 	@Override
 	public boolean stillValid(Player player) {
-		TilePos validPos = new TilePos(this.tilePos.x, this.tilePos.y, this.tilePos.z);
-		if (worldObj.getTileEntity(validPos) != this) {
+		if (worldObj.getTileEntity(tilePos.x, tilePos.y, tilePos.z) != this) {
 			return false;
 		}
-		return player.distanceToSqr((double)this.tilePos.x + 0.5, (double)this.tilePos.y + 0.5, (double)this.tilePos.z + 0.5) <= 64.0;
+		return player.distanceToSqr((double)tilePos.x + 0.5, (double)tilePos.y + 0.5, (double)tilePos.z + 0.5) <= 64.0;
 	}
 
 	@Override

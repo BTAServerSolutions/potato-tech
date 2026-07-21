@@ -111,7 +111,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (hasConnection) return false;
 
 		for (Connection c: ((TileEntityEnergyConnector) te).connections) {
-			if (c.x == this.tilePos.x && c.y == this.tilePos.y && c.z == this.tilePos.z) {
+			if (c.x == tilePos.x && c.y == tilePos.y && c.z == tilePos.z) {
 				hasConnection = true;
 				break;
 			}
@@ -120,11 +120,11 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (hasConnection) return false;
 
 		connections.add(new Connection(xi, yi, zi));
-		((TileEntityEnergyConnector) te).connections.add(new Connection(this.tilePos.x, this.tilePos.y, this.tilePos.z));
+		((TileEntityEnergyConnector) te).connections.add(new Connection(tilePos.x, tilePos.y, tilePos.z));
 		this.setChanged();
 		((TileEntityEnergyConnector) te).setChanged();
-		worldObj.markBlockNeedsUpdate(globalConnectPos);
-		worldObj.markBlockNeedsUpdate(connectPos);
+		worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
+		worldObj.markBlockNeedsUpdate(xi, yi, zi);
 		PotatoTech.LOGGER.info("Added connection on: " + xi + " " + yi + " " + zi);
 
 		return true;
@@ -231,11 +231,9 @@ public class TileEntityEnergyConnector extends TileEntity {
 			if (furnaceCanSmelt(furnace, isBlast) && energy > 1 && fuel != null && fuel.itemID == PTItems.electricHeatingUnit.id) {
 				if (furnace.currentBurnTime == 0) {
 					if (isBlast) {
-						TilePos blastTilePos = new TilePos(tilePos.x + connectionDir.offsetX(), tilePos.y + connectionDir.offsetY(), tilePos.z + connectionDir.offsetZ());
-						BlockLogicFurnaceBlast.updateFurnaceBlockState(worldObj, blastTilePos, true);
+						BlockLogicFurnaceBlast.updateFurnaceBlockState(worldObj, tilePos.add(connectionDir), true);
 					} else {
-						TilePos smeltTilePos = new TilePos(tilePos.x + connectionDir.offsetX(), tilePos.y + connectionDir.offsetY(), tilePos.z + connectionDir.offsetZ());
-						BlockLogicFurnace.updateFurnaceBlockState(worldObj, smeltTilePos, true);
+						BlockLogicFurnace.updateFurnaceBlockState(worldObj, tilePos.add(connectionDir), true);
 					}
 				}
 				energy -= isBlast ? 3 : 2;
@@ -258,7 +256,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 				TilePos crafterPos = new TilePos(crafter.tilePos.x, crafter.tilePos.y, crafter.tilePos.z);
 				if (sent > 0) {
 					energy -= sent;
-					worldObj.markBlockNeedsUpdate(crafterPos);
+					worldObj.markBlockNeedsUpdate(crafter.tilePos.x, crafter.tilePos.y, crafter.tilePos.z);
 				}
 			}
 		}
@@ -280,8 +278,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 
 		if (energy != previousEnergy) {
 			this.setChanged();
-			TilePos energyTilePos = new TilePos(this.tilePos.x, this.tilePos.y, this.tilePos.z);
-			worldObj.markBlockNeedsUpdate(energyTilePos);
+			worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
 		}
 	}
 	@Override

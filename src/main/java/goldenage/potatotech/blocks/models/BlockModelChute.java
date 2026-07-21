@@ -8,11 +8,8 @@ import net.minecraft.client.render.texture.stitcher.TextureRegistry;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.util.phys.AABB;
-import net.minecraft.core.world.WorldSource;
-import net.minecraft.core.world.pos.TilePos;
-import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.Nullable;
 import org.joml.primitives.AABBdc;
-import org.jspecify.annotations.NonNull;
 
 public class BlockModelChute<T extends BlockLogic> extends BlockModelStandard<T> {
 	public BlockModelChute(Block<T> block) {

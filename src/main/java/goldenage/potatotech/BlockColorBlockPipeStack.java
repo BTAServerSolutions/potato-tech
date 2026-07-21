@@ -15,15 +15,6 @@ public abstract class BlockColorBlockPipeStack extends BlockColor {
 			return color;
 		}
 
-//		@Override
-//		public int getWorldColor(WorldSource world, int x, int y, int z) {
-//			int color = 0;
-//			color |= 0xff;
-//			color |= 0xff << 8;
-//			color |= 0xff << 16;
-//			color |= 0xff << 24;
-//			return color;
-//		}
 		@Override
 		public int getWorldColor(@NotNull WorldSource var1, @NotNull TilePosc var2, int var3) {
 			int color = 0;
@@ -33,4 +24,5 @@ public abstract class BlockColorBlockPipeStack extends BlockColor {
 			color |= 0xff << 24;
 			return color;
 		}
+
 }
