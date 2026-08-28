@@ -3,15 +3,16 @@ package goldenage.potatotech;
 import goldenage.potatotech.blocks.entities.TileEntityChute;
 import goldenage.potatotech.blocks.entities.TileEntityCrafter;
 import goldenage.potatotech.blocks.entities.TileEntityFilter;
-import net.minecraft.client.render.tessellator.Tessellator;
+import net.minecraft.client.render.renderer.DrawMode;
+import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.core.block.BlockLogicChest;
 import net.minecraft.core.block.entity.*;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.world.World;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector3f;
+import net.minecraft.core.world.pos.TilePos;
+import org.joml.Vector3f;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -33,51 +34,21 @@ public class Util {
         v[2] /= len;
     }
 
-    public static void draw3dLine(double width, double x1, double y1, double z1, double x2, double y2, double z2, float r, float g, float b) {
+    public static void draw3dLine(TessellatorGeneral tessellator, double width, double x1, double y1, double z1, double x2, double y2, double z2, float r, float g, float b) {
+        Vector3f direction = new Vector3f((float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1)).normalize();
+        Vector3f reference = Math.abs(direction.y) < 0.9f ? new Vector3f(0, 1, 0) : new Vector3f(1, 0, 0);
+        Vector3f right = direction.cross(reference, new Vector3f()).normalize().mul((float) width * 0.5f);
+        Vector3f up = right.cross(direction, new Vector3f()).normalize().mul((float) width * 0.5f);
 
-        GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-
-        Tessellator tessellator = Tessellator.instance;
-        double l = Math.sqrt(x2*x2 + y2*y2 + z2*x2);
-
-        Vector3f norm = new Vector3f((float)(x2 - x1), (float) (y2 - y1), (float)(z2 - z1));
-        norm.normalise(norm);
-
-        Vector3f perp = new Vector3f(1, 0, 0);
-        if (Math.abs(norm.x) > 0.9f) {
-            perp.x = 0.0f;
-            perp.y = 0.0f;
-            perp.z = 1.0f;
-        } else if (Math.abs(norm.z) > 0.9f) {
-            perp.x = 0.0f;
-            perp.y = 1.0f;
-            perp.z = 0.0f;
-        }
-
-        Vector3f up = new Vector3f(0, 0, 0) ;
-        Vector3f.cross(norm, perp, up);
-        up.normalise(up);
-
-        Vector3f right = new Vector3f();
-        Vector3f.cross(norm, up, right);
-
-        up.x *= (float) (width * 0.5);
-        up.y *= (float) (width * 0.5);
-        up.z *= (float) (width * 0.5);
-
-        right.x *= (float) (width * 0.5);
-        right.y *= (float) (width * 0.5);
-        right.z *= (float) (width * 0.5);
-
-        tessellator.startDrawing(GL11.GL_QUADS);
-
-        GL11.glColor4f(r, g, b, 1);
+        tessellator.startDrawing(DrawMode.TRIANGLES);
+        tessellator.setColor4f(r, g, b, 1.0f);
+        tessellator.setLightmapCoord1i(0xFF);
 
         tessellator.setNormal(-right.x, -right.y, -right.z);
         tessellator.addVertex(x1 - up.x - right.x, y1 - up.y - right.y, z1 - up.z - right.z);
         tessellator.addVertex(x1 + up.x - right.x, y1 + up.y - right.y, z1 + up.z - right.z);
+        tessellator.addVertex(x2 + up.x - right.x, y2 + up.y - right.y, z2 + up.z - right.z);
+        tessellator.addVertex(x1 - up.x - right.x, y1 - up.y - right.y, z1 - up.z - right.z);
         tessellator.addVertex(x2 + up.x - right.x, y2 + up.y - right.y, z2 + up.z - right.z);
         tessellator.addVertex(x2 - up.x - right.x, y2 - up.y - right.y, z2 - up.z - right.z);
 
@@ -85,11 +56,15 @@ public class Util {
         tessellator.addVertex(x1 - up.x + right.x, y1 - up.y + right.y, z1 - up.z + right.z);
         tessellator.addVertex(x2 - up.x + right.x, y2 - up.y + right.y, z2 - up.z + right.z);
         tessellator.addVertex(x2 + up.x + right.x, y2 + up.y + right.y, z2 + up.z + right.z);
+        tessellator.addVertex(x1 - up.x + right.x, y1 - up.y + right.y, z1 - up.z + right.z);
+        tessellator.addVertex(x2 + up.x + right.x, y2 + up.y + right.y, z2 + up.z + right.z);
         tessellator.addVertex(x1 + up.x + right.x, y1 + up.y + right.y, z1 + up.z + right.z);
 
         tessellator.setNormal(up.x, up.y, up.z);
         tessellator.addVertex(x1 - right.x + up.x, y1 - right.y + up.y, z1 - right.z + up.z);
         tessellator.addVertex(x1 + right.x + up.x, y1 + right.y + up.y, z1 + right.z + up.z);
+        tessellator.addVertex(x2 + right.x + up.x, y2 + right.y + up.y, z2 + right.z + up.z);
+        tessellator.addVertex(x1 - right.x + up.x, y1 - right.y + up.y, z1 - right.z + up.z);
         tessellator.addVertex(x2 + right.x + up.x, y2 + right.y + up.y, z2 + right.z + up.z);
         tessellator.addVertex(x2 - right.x + up.x, y2 - right.y + up.y, z2 - right.z + up.z);
 
@@ -97,24 +72,17 @@ public class Util {
         tessellator.addVertex(x1 - right.x - up.x, y1 - right.y - up.y, z1 - right.z - up.z);
         tessellator.addVertex(x2 - right.x - up.x, y2 - right.y - up.y, z2 - right.z - up.z);
         tessellator.addVertex(x2 + right.x - up.x, y2 + right.y - up.y, z2 + right.z - up.z);
+        tessellator.addVertex(x1 - right.x - up.x, y1 - right.y - up.y, z1 - right.z - up.z);
+        tessellator.addVertex(x2 + right.x - up.x, y2 + right.y - up.y, z2 - right.z - up.z);
         tessellator.addVertex(x1 + right.x - up.x, y1 + right.y - up.y, z1 + right.z - up.z);
 
         tessellator.draw();
-
-        GL11.glPopAttrib();
     }
-    public static void draw3dLineWithTexture(int textureId, double width, double x1, double y1, double z1, double x2, double y2, double z2, float r, float g, float b) {
-
-        GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glColor4f(r, g, b, 1);
-
-        Tessellator tessellator = Tessellator.instance;
-        double l = Math.sqrt(x2*x2 + y2*y2 + z2*x2);
+    public static void draw3dLineWithTexture(TessellatorGeneral tessellator, int textureId, double width, double x1, double y1, double z1, double x2, double y2, double z2, float r, float g, float b) {
+        double l = Math.sqrt(x2*x2 + y2*y2 + z2*z2);
 
         Vector3f norm = new Vector3f((float)(x2 - x1), (float) (y2 - y1), (float)(z2 - z1));
-        norm.normalise(norm);
+        norm.normalize();
 
         Vector3f perp = new Vector3f(1, 0, 0);
         if (Math.abs(norm.x) > 0.9f) {
@@ -127,12 +95,12 @@ public class Util {
             perp.z = 0.0f;
         }
 
-        Vector3f up = new Vector3f(0, 0, 0) ;
-        Vector3f.cross(norm, perp, up);
-        up.normalise(up);
+        Vector3f up = new Vector3f(0, 0, 0);
+        up.cross(norm, perp);
+        up.normalize();
 
         Vector3f right = new Vector3f();
-        Vector3f.cross(norm, up, right);
+        right.cross(norm, up);
 
         up.x *= (float) (width * 0.5);
         up.y *= (float) (width * 0.5);
@@ -142,7 +110,7 @@ public class Util {
         right.y *= (float) (width * 0.5);
         right.z *= (float) (width * 0.5);
 
-        tessellator.startDrawing(GL11.GL_QUADS);
+        tessellator.startDrawing(DrawMode.QUADS);
 
         tessellator.addVertex(x1 - up.x - right.x, y1 - up.y - right.y, z1 - up.z - right.z);
         tessellator.addVertex(x1 + up.x - right.x, y1 + up.y - right.y, z1 + up.z - right.z);
@@ -165,8 +133,6 @@ public class Util {
         tessellator.addVertex(x1 + right.x - up.x, y1 + right.y - up.y, z1 + right.z - up.z);
 
         tessellator.draw();
-
-        GL11.glPopAttrib();
     }
 
 
@@ -213,7 +179,7 @@ public class Util {
 			} else */
 			{
 				if (Objects.equals(inventoryName, "container.chest.name")) {
-					inventory = BlockLogicChest.getInventory(world, x, y ,z);
+					inventory = BlockLogicChest.getInventory(world, new TilePos(x, y ,z));
 				}
 
 				if (Objects.equals(inventoryName, "container.chest.name")
@@ -522,7 +488,7 @@ public class Util {
 			String inventoryName = inventory.getNameTranslationKey();
 
 			if (Objects.equals(inventoryName, "container.chest.name")) {
-				inventory = BlockLogicChest.getInventory(world, x, y ,z);
+				inventory = BlockLogicChest.getInventory(world, new TilePos(x, y ,z));
 			}
 
 			if (Objects.equals(inventoryName, "container.chest.name")

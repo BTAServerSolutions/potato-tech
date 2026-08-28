@@ -2,10 +2,10 @@ package goldenage.potatotech.screens;
 
 import goldenage.potatotech.blocks.entities.TileEntitySequencer;
 import net.minecraft.client.gui.container.ScreenContainerAbstract;
+import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.texture.Texture;
 import net.minecraft.core.lang.I18n;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
-import org.lwjgl.opengl.GL11;
 
 public class ScreenSequencer extends ScreenContainerAbstract {
 	public ScreenSequencer(ContainerInventory playerInventory, TileEntitySequencer sequencer) {
@@ -15,8 +15,8 @@ public class ScreenSequencer extends ScreenContainerAbstract {
 
 	@Override
 	protected void drawGuiContainerForegroundLayer() {
-		this.font.drawString(I18n.getInstance().translateKey("container.sequencer.name"), 8, 4, 0x404040);
-		this.font.drawString("Inventory", 8, this.ySize - 90, 0x404040);
+		this.drawStringNoShadow(fontRenderer, I18n.getInstance().translateKey("container.sequencer.name"), 8, 4, 0x404040);
+		this.drawStringNoShadow(fontRenderer, "Inventory", 8, this.ySize - 90, 0x404040);
 	}
 
 	@Override
@@ -40,11 +40,10 @@ public class ScreenSequencer extends ScreenContainerAbstract {
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f) {
 		Texture texture = this.mc.textureManager.loadTexture("/assets/potatotech/textures/gui/sequencer.png");
-		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		GLRenderer.setColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		this.mc.textureManager.bindTexture(texture);
 		int x = (this.width - this.xSize) / 2;
 		int y = (this.height - this.ySize) / 2;
 		this.drawTexturedModalRect(x, y, 0, 0, this.xSize, this.ySize);
 	}
 }
-

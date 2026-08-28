@@ -1,27 +1,35 @@
 package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.entities.TileEntityEnergyConnector;
-import net.minecraft.client.render.tessellator.Tessellator;
+import net.minecraft.client.render.renderer.BlendFactor;
+import net.minecraft.client.render.renderer.GLRenderer;
+import net.minecraft.client.render.renderer.Shaders;
+import net.minecraft.client.render.renderer.State;
+import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.client.render.tileentity.TileEntityRenderer;
 import net.minecraft.core.world.World;
-import org.lwjgl.opengl.GL11;
 
 public class TileEntityRendererEnergyConnector extends TileEntityRenderer<TileEntityEnergyConnector> {
+
 	@Override
 	public void onWorldChanged(World world) {
 		super.onWorldChanged(world);
 	}
-	@Override
-	public void doRender(Tessellator tessellator, TileEntityEnergyConnector tileEntity, double x, double y, double z, float g) {
+
+	public void doRender(TessellatorGeneral tessellator, TileEntityEnergyConnector tileEntity, double x, double y, double z, float g) {
 		if (tileEntity.connections.isEmpty()) return;
 
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float) x + 0.5f, (float) y + 0.5f, (float) z + 0.5f);
+		GLRenderer.pushFrame();
+		GLRenderer.setShader(Shaders.COLOR_WORLD);
+		GLRenderer.enableState(State.BLEND);
+		GLRenderer.setBlendFunc(BlendFactor.SRC_ALPHA, BlendFactor.ONE_MINUS_SRC_ALPHA);
+		GLRenderer.globalSetLightEnabled(false);
+		GLRenderer.modelM4f().translate((float) x + 0.5f, (float) y + 0.5f, (float) z + 0.5f);
 
 		for (TileEntityEnergyConnector.Connection c : tileEntity.connections){
-			double x2 = c.x - tileEntity.x;
-			double y2 = c.y - tileEntity.y;
-			double z2 = c.z - tileEntity.z;
+			double x2 = c.x - tileEntity.tilePos.x;
+			double y2 = c.y - tileEntity.tilePos.y;
+			double z2 = c.z - tileEntity.tilePos.z;
 
 			if (x2 > 0 || x2 == 0 && y2 > 0 || x2 == 0 && y2 == 0 && z2 > 0) continue;
 
@@ -53,13 +61,13 @@ public class TileEntityRendererEnergyConnector extends TileEntityRenderer<TileEn
 
 				float bright = 1f;
 
-				Util.draw3dLine(0.05,
+				Util.draw3dLine(tessellator, 0.05,
 					tx, ty - yOff0 , tz,
 					tx + x2 * t_increment, ty + y2 * t_increment - yOff1, tz + z2 * t_increment,
 					r_col * bright, g_col * bright, b_col * bright);
 			}
 		}
 
-		GL11.glPopMatrix();
+		GLRenderer.popFrame();
 	}
 }

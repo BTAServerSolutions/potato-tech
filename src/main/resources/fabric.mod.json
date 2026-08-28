@@ -29,35 +29,11 @@
 		"main": [
 			"goldenage.potatotech.PotatoTech"
 		],
-		"afterBlockInit": [
-			"goldenage.potatotech.PTBlocks"
-		],
-		"afterItemInit": [
-			"goldenage.potatotech.PTItems"
-		],
-		"recipesReady": [
-			"goldenage.potatotech.PTRecipes"
-		],
 		"client": [
 			"goldenage.potatotech.PotatoTechClient"
 		],
-		"beforeClientStart": [
-			"goldenage.potatotech.PotatoTechClient"
-		],
-		"afterClientStart": [
-			"goldenage.potatotech.PotatoTechClient"
-		],
-		"beforeGameStart": [
-			"goldenage.potatotech.PotatoTech"
-		],
-		"afterGameStart": [
-			"goldenage.potatotech.PotatoTech"
-		],
 		"server": [
 			"goldenage.potatotech.PotatoTechServer"
-		],
-		"initModels": [
-			"goldenage.potatotech.PTModels"
 		]
 	},
 	"mixins": [
@@ -65,7 +41,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=${fabricloader}",
-		"halplibe": ">=5.3.2",
+		"halplibe": ">=${halplibe}",
 		"minecraft": "*",
 		"java": ">=${java}"
 	},

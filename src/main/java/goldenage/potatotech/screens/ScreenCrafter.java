@@ -1,11 +1,12 @@
 package goldenage.potatotech.screens;
 
 import goldenage.potatotech.blocks.entities.TileEntityCrafter;
+import net.minecraft.client.gui.container.ScreenActivator;
 import net.minecraft.client.gui.container.ScreenContainerAbstract;
+import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.texture.Texture;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.opengl.GL11;
 
 public class ScreenCrafter extends ScreenContainerAbstract {
 
@@ -21,17 +22,16 @@ public class ScreenCrafter extends ScreenContainerAbstract {
         this.inventorySlots.onCraftGuiClosed(this.mc.thePlayer);
     }
 
-
     @Override
     protected void drawGuiContainerForegroundLayer() {
-        this.font.drawString("Auto Crafting", 28, 6, 0x404040);
-        this.font.drawString("Inventory", 8, this.ySize - 96 + 2, 0x404040);
+        this.drawStringNoShadow(fontRenderer, "Auto Crafting", 28, 6, 0x404040);
+        this.drawStringNoShadow(fontRenderer, "Inventory", 8, this.ySize - 96 + 2, 0x404040);
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float f) {
         @NotNull Texture i = this.mc.textureManager.loadTexture("/assets/potatotech/textures/gui/crafter.png");
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		GLRenderer.setColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.mc.textureManager.bindTexture(i);
         int j = (this.width - this.xSize) / 2;
         int k = (this.height - this.ySize) / 2;

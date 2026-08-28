@@ -13,45 +13,42 @@ import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
 import turniplabs.halplibe.helper.RecipeBuilder;
-import turniplabs.halplibe.util.RecipeEntrypoint;
 
 import static goldenage.potatotech.PotatoTech.LOGGER;
 
-public class PTRecipes implements RecipeEntrypoint {
+public class PTRecipes {
 
 	public static RecipeNamespace POTATO_TECH = new RecipeNamespace();
 	public static RecipeGroup<RecipeEntryCrafting<?, ?>> WORKBENCH;
 	public static RecipeGroup<RecipeEntryFurnace> FURNACE;
 
-	@Override
-	public void onRecipesReady() {
+	public static void onRecipesReady() {
 		LOGGER.info("Loading PotatoTech recipes...");
 		resetGroups();
 		registerNamespaces();
 		load();
 	}
 
-	@Override
-	public void initNamespaces() {
+	public static void initNamespaces() {
 		LOGGER.info("Loading PotatoTech recipe namespaces...");
 		resetGroups();
 
 		registerNamespaces();
 	}
 
-	public void registerNamespaces() {
+	public static void registerNamespaces() {
 		POTATO_TECH.register("workbench", WORKBENCH);
 		POTATO_TECH.register("furnace", FURNACE);
 		Registries.RECIPES.register("potatotech", POTATO_TECH);
 	}
 
-	public void resetGroups() {
+	public static void resetGroups() {
 		WORKBENCH = new RecipeGroup<>(new RecipeSymbol(new ItemStack(Blocks.WORKBENCH)));
 		FURNACE = new RecipeGroup<>(new RecipeSymbol(new ItemStack(Blocks.FURNACE_STONE_IDLE)));
 		Registries.RECIPES.unregister("potatotech");
 	}
 
-	public void load() {
+	public static void load() {
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
 			.setShape("CI", "IC", "  ")
 			.addInput('C', Items.CLAY)

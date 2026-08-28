@@ -12,5 +12,6 @@ public interface PlayerServerAccessor {
 
 	@Invoker("getNextWindowId")
 	void invokeGetNextWindowId();
+
 }
 

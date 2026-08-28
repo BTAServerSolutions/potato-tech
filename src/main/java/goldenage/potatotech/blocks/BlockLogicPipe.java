@@ -7,11 +7,13 @@ import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
+import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.block.material.Material;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
 import net.minecraft.core.sound.SoundCategory;
+import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
@@ -65,21 +67,21 @@ public class BlockLogicPipe extends BlockLogic {
 			mode = (mode + 1) % 4;
 			te.modeBySide[sideId] = (short)mode;
 
-			world.markBlockNeedsUpdate(x, y, z);
+			updateConnectionVisuals(world, x, y, z);
 			world.playSoundEffect(player, SoundCategory.WORLD_SOUNDS, (double) x + 0.5, (double) y + 0.5, (double) z + 0.5, "random.click", 0.3f, mode % 2 == 0 ? 0.5f : 0.6f);
 			return true;
 		} else if (heldItem.itemID == Items.DYE.id) {
 			te.colorBySide[sideId] = (short) (heldItem.getMetadata() + 1);
-			world.markBlockNeedsUpdate(x, y, z);
+			te.requestConnectionRenderUpdate();
 			return true;
 		} else if (heldItem.getItem().getClass().getName().equals("goocraft4evr.nonamedyes.item.ItemModDye")) {
 			// NoNameDyes support
 			te.colorBySide[sideId] = (short) (heldItem.getMetadata() + 17);
-			world.markBlockNeedsUpdate(x, y, z);
+			te.requestConnectionRenderUpdate();
 			return true;
 		} else if (heldItem.itemID == Items.PAPER.id) {
 			te.colorBySide[sideId] = 0;
-			world.markBlockNeedsUpdate(x, y, z);
+			te.requestConnectionRenderUpdate();
 			return true;
 		}
 		return false;
@@ -92,7 +94,22 @@ public class BlockLogicPipe extends BlockLogic {
 			 world.scheduleBlockUpdate(x, y, z, this.id(), 0);
 		}
 		if (EnvironmentHelper.isServerEnvironment()) {
-			world.markBlockNeedsUpdate(x, y, z);
+			updateConnectionVisuals(world, x, y, z);
+		}
+	}
+
+	private static void updateConnectionVisuals(World world, int x, int y, int z) {
+		TileEntity entity = world.getTileEntity(x, y, z);
+		TileEntityPipe pipe = entity instanceof TileEntityPipe ? (TileEntityPipe) entity : null;
+		if (pipe != null) {
+			pipe.requestConnectionRenderUpdate();
+		}
+		for (Direction direction : Direction.ID_MAP) {
+			TileEntity neighborEntity = world.getTileEntity(x + direction.offsetX(), y + direction.offsetY(), z + direction.offsetZ());
+			TileEntityPipe neighbor = neighborEntity instanceof TileEntityPipe ? (TileEntityPipe) neighborEntity : null;
+			if (neighbor != null) {
+				neighbor.requestConnectionRenderUpdate();
+			}
 		}
 	}
 }

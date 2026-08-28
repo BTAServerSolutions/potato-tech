@@ -3,44 +3,23 @@ package goldenage.potatotech;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.options.components.BooleanOptionComponent;
-import net.minecraft.client.gui.options.components.KeyBindingComponent;
-import net.minecraft.client.gui.options.components.OptionsCategory;
-import net.minecraft.client.gui.options.data.OptionsPage;
-import net.minecraft.client.gui.options.data.OptionsPages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import turniplabs.halplibe.util.ClientStartEntrypoint;
+import turniplabs.halplibe.event.defs.ClientEvents;
+import turniplabs.halplibe.util.dependency.Key;
 
 @Environment(EnvType.CLIENT)
-public class PotatoTechClient implements ClientModInitializer, ClientStartEntrypoint {
+public class PotatoTechClient implements ClientModInitializer {
 	public static final String MOD_ID = "potatotech|client";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	@Override
 	public void onInitializeClient() {
 		LOGGER.info("Potato tech client init");
-	}
 
-	@Override
-	public void beforeClientStart() {
-		LOGGER.info("Potato tech pre init");
-	}
-
-	@Override
-	public void afterClientStart() {
-		LOGGER.info("Potato tech post init");
-
-		IKeybindings gameSettings = (IKeybindings) Minecraft.getMinecraft().gameSettings;
-
-		//OptionsPage optionsPage = new OptionsPage("gui.options.page.potatotech", PTItems.potato.getDefaultStack());
-		//OptionsPages.register(optionsPage);
-
-		OptionsCategory category = new OptionsCategory("gui.options.page.controls.category.potatotech");
-		category
-			.withComponent(new KeyBindingComponent(gameSettings.potatotech$getWrenchMode()));
-		OptionsPages.CONTROLS
-			.withComponent(category);
+		ClientEvents.BLOCK_MODEL_RELOAD.listen(Key.of(PotatoTech.MOD_ID), PTModels::initBlockModels);
+		ClientEvents.ITEM_MODEL_RELOAD.listen(Key.of(PotatoTech.MOD_ID), PTModels::initItemModels);
+		ClientEvents.TILE_ENTITY_RENDERER_RELOAD.listen(Key.of(PotatoTech.MOD_ID), PTModels::initTileEntityModels);
+		ClientEvents.ENTITY_RENDERER_RELOAD.listen(Key.of(PotatoTech.MOD_ID), PTModels::initEntityModels);
 	}
 }

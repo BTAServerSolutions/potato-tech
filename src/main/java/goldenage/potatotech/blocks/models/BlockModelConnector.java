@@ -1,97 +1,53 @@
 package goldenage.potatotech.blocks.models;
 
-import net.minecraft.client.render.block.model.BlockModelStandard;
-import net.minecraft.client.render.tessellator.Tessellator;
+import net.minecraft.client.render.block.model.BlockModelDispatcher;
+import net.minecraft.client.render.block.model.generic.BlockModelGeneric;
+import net.minecraft.client.render.tessellator.TessellatorGeneral;
+import net.minecraft.client.render.texture.stitcher.IconCoordinate;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.util.helper.Side;
-import net.minecraft.core.util.phys.AABB;
+import net.minecraft.core.util.helper.Direction;
+import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.useless.dragonfly.models.block.StaticBlockModel;
 
-public class BlockModelConnector <T extends BlockLogic> extends BlockModelStandard<T> {
+public class BlockModelConnector<T extends BlockLogic> extends BlockModelGeneric<T> {
 	public BlockModelConnector(Block<T> block) {
-		super(block);
+		super(block, BlockModelDispatcher.loadDataModel("potatotech:block/energy_connector").asModel());
 	}
 
-	private static float[] getConnectorColor(int i ) {
-		float r = 0.41f;
-		float g = 0.23f;
-		float b = 0.18f;
-		if (i % 2 == 1) {
-			r *= 1.1f;
-			g *= 1.1f;
-			b *= 1.1f;
-		}
-		if (i == 0 || i == 8) {
-			r = 0.9f;
-			g = 0.9f;
-			b = 0.9f;
-		}
-
-		return new float[]{r, g, b};
-	}
-
-	/*
 	@Override
-	public boolean render(Tessellator tessellator, int x, int y, int z) {
-		int meta = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
-		Side side = Side.getSideById(meta & 7);
-		float pixelSize = 1.0f / 16.0f;
+	public boolean renderAttached(@NotNull TessellatorGeneral tessellator, @NotNull WorldSource worldSource, @NotNull TilePosc tilePos, boolean cullFaces, @Nullable IconCoordinate overrideTexture) {
+		int meta = worldSource.getBlockData(tilePos);
+		Direction direction = Direction.fromId(meta & 7);
 
-		AABB bounds = block.getBounds();
+		StaticBlockModel model = this.getModel(worldSource, tilePos);
+		// The 8.0 connector texture is a white mask. Apply the legacy connector tint.
+		tessellator.setColorOpaque3f(0.41f, 0.23f, 0.18f);
 
-		if (side == Side.TOP) {
-			for (int i = 0; i < 9; i++) {
-				float m = (i % 2 == 0) ? pixelSize * 6 : pixelSize * 5;
-				bounds.set(m, pixelSize * i, m, 1 - m, pixelSize * (i + 1), 1 - m);
-
-				float[] color = getConnectorColor(i);
-				this.renderStandardBlock(tessellator, bounds, x, y, z, color[0], color[1], color[2]);
-			}
-		} else if (side == Side.BOTTOM) {
-			for (int i = 0; i < 9; i++) {
-				float m = (i % 2 == 0) ? pixelSize * 6 : pixelSize * 5;
-				bounds.set(m, 1 - pixelSize * (i + 1), m, 1 - m, 1 - pixelSize * i, 1 - m);
-
-				float[] color = getConnectorColor(i);
-				this.renderStandardBlock(tessellator, bounds, x, y, z, color[0], color[1], color[2]);
-			}
-		} else if (side == Side.NORTH) {
-			for (int i = 0; i < 9; i++) {
-				float m = (i % 2 == 0) ? pixelSize * 6 : pixelSize * 5;
-				bounds.set(m, m, 1 - pixelSize * (i + 1), 1 - m, 1 - m, 1 - pixelSize * i);
-
-				float[] color = getConnectorColor(i);
-				this.renderStandardBlock(tessellator, bounds, x, y, z, color[0], color[1], color[2]);
-			}
-		} else if (side == Side.SOUTH) {
-			for (int i = 0; i < 9; i++) {
-				float m = (i % 2 == 0) ? pixelSize * 6 : pixelSize * 5;
-				bounds.set(m, m, pixelSize * i, 1 - m, 1 - m, pixelSize * (i + 1));
-
-				float[] color = getConnectorColor(i);
-				this.renderStandardBlock(tessellator, bounds, x, y, z, color[0], color[1], color[2]);
-			}
-		} else if (side == Side.EAST) {
-			for (int i = 0; i < 9; i++) {
-				float m = (i % 2 == 0) ? pixelSize * 6 : pixelSize * 5;
-				bounds.set(pixelSize * i, m, m,  pixelSize * (i + 1), 1 - m, 1 - m);
-
-				float[] color = getConnectorColor(i);
-				this.renderStandardBlock(tessellator, bounds, x, y, z, color[0], color[1], color[2]);
-			}
-		} else {
-			for (int i = 0; i < 9; i++) {
-				float m = (i % 2 == 0) ? pixelSize * 6 : pixelSize * 5;
-				bounds.set(1 - pixelSize * (i + 1), m, m, 1 - pixelSize * i, 1 - m, 1 - m);
-
-				float[] color = getConnectorColor(i);
-				this.renderStandardBlock(tessellator, bounds, x, y, z, color[0], color[1], color[2]);
-			}
+		// The JSON model extends along +Z (South) from z=0 to z=9.
+		// The base (z=0) must point toward the block this connector was placed on.
+		// Metadata stores side.direction.id, but the model is oriented so we need the
+		// opposite rotation to make the connector point toward the block it was placed on.
+		//   UP(1)    -> placed on top    -> extend UP    (+Y) -> -90° X -> 3,0,0
+		//   DOWN(0)  -> placed on bottom -> extend DOWN  (-Y) -> +90° X -> 1,0,0
+		//   NORTH(2) -> placed on north  -> extend NORTH (-Z) -> 180° Y -> 0,2,0
+		//   SOUTH(3) -> placed on south  -> extend SOUTH (+Z) ->   0°   -> 0,0,0
+		//   WEST(4)  -> placed on west   -> extend WEST  (-X) -> -90° Y -> 0,3,0
+		//   EAST(5)  -> placed on east   -> extend EAST  (+X) -> +90° Y -> 0,1,0
+		switch (direction) {
+			case UP -> model.renderAttached(this, tessellator, worldSource, tilePos, 3, 0, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+			case DOWN -> model.renderAttached(this, tessellator, worldSource, tilePos, 1, 0, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+			case NORTH -> model.renderAttached(this, tessellator, worldSource, tilePos, 0, 2, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+			case SOUTH -> model.renderAttached(this, tessellator, worldSource, tilePos, 0, 0, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+			case WEST -> model.renderAttached(this, tessellator, worldSource, tilePos, 0, 3, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+			case EAST -> model.renderAttached(this, tessellator, worldSource, tilePos, 0, 1, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+			default -> model.renderAttached(this, tessellator, worldSource, tilePos, 0, 0, 0, 0, 0, 0, false, cullFaces, overrideTexture);
 		}
+		tessellator.setColorOpaque3f(1.0f, 1.0f, 1.0f);
 
-		//block.setBlockBounds(pixelSize * 5, 0, pixelSize * 5, 1 - pixelSize * 5, pixelSize * 9, 1 - pixelSize * 5);
 		return true;
 	}
-	 */
 }

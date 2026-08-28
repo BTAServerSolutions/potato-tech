@@ -164,7 +164,6 @@ public class TileEntityFilter extends TileEntity implements Container {
 
 	@Override
 	public void readAdditionalData(CompoundTag nbttagcompound) {
-		super.readFromNBT(nbttagcompound);
 		ListTag nbttaglist = nbttagcompound.getList("Items");
 		this.filterContents = new ItemStack[this.getContainerSize()];
 		for (int i = 0; i < nbttaglist.tagCount(); ++i) {
@@ -185,7 +184,6 @@ public class TileEntityFilter extends TileEntity implements Container {
 
 	@Override
 	public void writeAdditionalData(CompoundTag nbttagcompound) {
-		super.writeToNBT(nbttagcompound);
 		ListTag nbttaglist = new ListTag();
 		for (int i = 0; i < this.filterContents.length; ++i) {
 			if (this.filterContents[i] == null) continue;

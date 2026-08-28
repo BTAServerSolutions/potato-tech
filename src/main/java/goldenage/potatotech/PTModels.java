@@ -1,10 +1,10 @@
 package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.entities.TileEntityEnergyConnector;
+import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import goldenage.potatotech.blocks.models.BlockModelChute;
 import goldenage.potatotech.blocks.models.BlockModelConnector;
 import goldenage.potatotech.blocks.models.BlockModelPipe;
-import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.EntityRendererDispatcher;
@@ -16,19 +16,23 @@ import net.minecraft.client.render.block.model.BlockModelStandard;
 import net.minecraft.client.render.block.model.BlockModelTransparent;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
 import net.minecraft.client.render.item.model.ItemModelStandard;
+import net.minecraft.client.render.texture.stitcher.IconCoordinate;
 import net.minecraft.client.render.texture.stitcher.TextureRegistry;
-import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.util.helper.Side;
-import turniplabs.halplibe.helper.ModelHelper;
-import turniplabs.halplibe.util.ModelEntrypoint;
 
 import static goldenage.potatotech.PotatoTechClient.LOGGER;
 
 @Environment(EnvType.CLIENT)
-public class PTModels implements ModelEntrypoint {
-	@Override
-	public void initBlockModels(BlockModelDispatcher dispatcher) {
+public class PTModels {
+	public static void initBlockModels(BlockModelDispatcher dispatcher) {
 		LOGGER.info("Initializing block models...");
+
+		try {
+			final IconCoordinate atlas = TextureRegistry.getTexture("potatotech:block/pipe");
+			TextureRegistry.initializeAllFiles("potatotech", atlas.parentAtlas, false);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		dispatcher.addDispatch(new BlockModelStandard<>(PTBlocks.testAreaMaker).setTex("potatotech:block/potato", Side.sides)
 		);
@@ -42,32 +46,35 @@ public class PTModels implements ModelEntrypoint {
 			new BlockModelStandard<>(PTBlocks.filter).setAllTextures("potatotech:block/filter")
 		);
 
-		dispatcher.addDispatch(new BlockModelPipe<>(PTBlocks.pipe)
-			.setAllTextures("potatotech:block/pipe")
-		);
-		dispatcher.addDispatch(new BlockModelPipe<>(PTBlocks.pipeGold)
-			.setAllTextures("potatotech:block/gold_pipe")
-		);
-		dispatcher.addDispatch(new BlockModelPipe<>(PTBlocks.pipeDiamond)
-			.setAllTextures("potatotech:block/diamond_pipe")
-		);
+		dispatcher.addDispatch(new BlockModelPipe<>(PTBlocks.pipe,
+			"potatotech:block/pipe/core",
+			"potatotech:block/pipe/arm",
+			"potatotech:block/pipe/arm_insert",
+			"potatotech:block/pipe/arm_extract"
+		));
+		dispatcher.addDispatch(new BlockModelPipe<>(PTBlocks.pipeGold,
+			"potatotech:block/gold_pipe/core",
+			"potatotech:block/gold_pipe/arm",
+			"potatotech:block/gold_pipe/arm_insert",
+			"potatotech:block/gold_pipe/arm_extract"
+		));
+		dispatcher.addDispatch(new BlockModelPipe<>(PTBlocks.pipeDiamond,
+			"potatotech:block/diamond_pipe/core",
+			"potatotech:block/diamond_pipe/arm",
+			"potatotech:block/diamond_pipe/arm_insert",
+			"potatotech:block/diamond_pipe/arm_extract"
+		));
 
-		dispatcher.addDispatch(new BlockModelStandard<>(PTBlocks.chute)
-			.setTex("potatotech:block/coil_sides", Side.NORTH, Side.SOUTH, Side.EAST, Side.WEST)
-			.setTex("potatotech:block/coil_top", Side.TOP, Side.BOTTOM)
-		);
-
-		dispatcher.addDispatch(new BlockModelChute<>(PTBlocks.chute)
-			.setTex("potatotech:block/chute_sides", Side.NORTH, Side.SOUTH, Side.EAST, Side.WEST)
-			.setTex("potatotech:block/chute_bottom", Side.TOP, Side.BOTTOM)
-		);
+		dispatcher.addDispatch(new BlockModelChute<>(PTBlocks.chute));
 		dispatcher.addDispatch(
 			new BlockModelTransparent<>(PTBlocks.pipeStack, true).setAllTextures("potatotech:block/pipe_stack")
 		);
 
+		dispatcher.addDispatch(new BlockModelConnector<>(PTBlocks.energyConnector));
 		dispatcher.addDispatch(
-			new BlockModelConnector<>(PTBlocks.energyConnector)
-				.setAllTextures("potatotech:block/energy_connector")
+			new BlockModelStandard<>(PTBlocks.coil)
+				.setTex("potatotech:block/coil_top", Side.TOP)
+				.setTex("potatotech:block/coil_sides", Side.BOTTOM, Side.NORTH, Side.SOUTH, Side.EAST, Side.WEST)
 		);
 
 		dispatcher.addDispatch(
@@ -94,28 +101,24 @@ public class PTModels implements ModelEntrypoint {
 		);
 	}
 
-	@Override
-	public void initItemModels(ItemModelDispatcher dispatcher) {
+	public static void initItemModels(ItemModelDispatcher dispatcher) {
 		LOGGER.info("Initializing item models...");
 		PTItems.itemTextures.forEach((item,texture)->{
-			dispatcher.addDispatch(new ItemModelStandard(item, null).setIcon(PotatoTech.MOD_ID +" :item/" + texture));
+			dispatcher.addDispatch(new ItemModelStandard(item, false).setIcon(PotatoTech.MOD_ID +":item/" + texture));
 		});
 	}
 
-	@Override
-	public void initEntityModels(EntityRendererDispatcher dispatcher) {
+	public static void initEntityModels(EntityRendererDispatcher dispatcher) {
 		LOGGER.info("Initializing entity models...");
 	}
 
-	@Override
-	public void initTileEntityModels(TileEntityRenderDispatcher dispatcher) {
+	public static void initTileEntityModels(TileEntityRenderDispatcher dispatcher) {
 		LOGGER.info("Initializing tile entity renderers...");
 		dispatcher.assignRenderer(TileEntityPipe.class, new TileEntityRendererPipe());
 		dispatcher.assignRenderer(TileEntityEnergyConnector.class, new TileEntityRendererEnergyConnector());
 	}
 
-	@Override
-	public void initBlockColors(BlockColorDispatcher dispatcher) {
+	public static void initBlockColors(BlockColorDispatcher dispatcher) {
 
 	}
 }

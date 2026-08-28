@@ -58,8 +58,6 @@ public class TileEntityEnergyConnector extends TileEntity {
 	static public final int energyCapacity = 32;
 	public int energy = 0;
 
-	TilePos globalConnectPos = new TilePos(this.tilePos.x, this.tilePos.y, this.tilePos.z);
-
 	public TileEntityEnergyConnector() {
 
 	}
@@ -67,7 +65,6 @@ public class TileEntityEnergyConnector extends TileEntity {
 	public ArrayList<Connection> connections = new ArrayList<>();
 	@Override
 	public void readAdditionalData(CompoundTag nbttagcompound) {
-		super.readFromNBT(nbttagcompound);
 		ListTag nbttaglist = nbttagcompound.getList("connections");
 		this.connections = new ArrayList<>();
 		for (int i = 0; i < nbttaglist.tagCount(); ++i) {
@@ -79,7 +76,6 @@ public class TileEntityEnergyConnector extends TileEntity {
 
 	@Override
 	public void writeAdditionalData(CompoundTag nbttagcompound) {
-		super.writeToNBT(nbttagcompound);
 		ListTag nbttaglist = new ListTag();
 		for (Connection connection : this.connections) {
 			if (connection == null) continue;
@@ -144,7 +140,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (i < connections.size()) {
 			connections.remove(i);
 			this.setChanged();
-			worldObj.markBlockNeedsUpdate(globalConnectPos);
+			worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
 		}
 	}
 
@@ -228,26 +224,48 @@ public class TileEntityEnergyConnector extends TileEntity {
 			TileEntityFurnace furnace = (TileEntityFurnace) te;
 			boolean isBlast = te instanceof TileEntityFurnaceBlast;
 			ItemStack fuel = furnace.getItem(1);
-			if (furnaceCanSmelt(furnace, isBlast) && energy > 1 && fuel != null && fuel.itemID == PTItems.electricHeatingUnit.id) {
+			int powerPerCoil = isBlast ? 3 : 2;
+			int coilCount = fuel == null ? 0 : Math.min(4, fuel.stackSize);
+			boolean isElectricHeating = coilCount > 0 && fuel.itemID == PTItems.electricHeatingUnit.id;
+			if (furnaceCanSmelt(furnace, isBlast) && isElectricHeating && energy >= powerPerCoil * coilCount) {
 				if (furnace.currentBurnTime == 0) {
 					if (isBlast) {
-						BlockLogicFurnaceBlast.updateFurnaceBlockState(worldObj, tilePos.add(connectionDir), true);
+						BlockLogicFurnaceBlast.updateFurnaceBlockState(worldObj, new TilePos(tilePos).add(connectionDir), true);
 					} else {
-						BlockLogicFurnace.updateFurnaceBlockState(worldObj, tilePos.add(connectionDir), true);
+						BlockLogicFurnace.updateFurnaceBlockState(worldObj, new TilePos(tilePos).add(connectionDir), true);
 					}
 				}
-				energy -= isBlast ? 3 : 2;
-				furnace.currentBurnTime = 10;
-				furnace.maxBurnTime = 10;
+				energy -= powerPerCoil * coilCount;
+				// The machine decrements burn time before checking whether to process.
+				furnace.currentBurnTime = 2;
+				furnace.maxBurnTime = 2;
+				furnace.currentCookTime += coilCount - 1;
+				if (furnace.currentCookTime >= furnace.maxCookTime) {
+					furnace.currentCookTime = 0;
+					furnace.smeltItem();
+				}
+			} else if (isElectricHeating) {
+				furnace.currentBurnTime = 0;
+				furnace.maxBurnTime = 0;
 			}
 		} else if (te instanceof TileEntityTrommel) {
 			TileEntityTrommel trommel = (TileEntityTrommel) te;
 			ItemStack fuel = trommel.getItem(4);
-			if (energy > 0 && fuel != null && fuel.itemID == PTItems.electricHeatingUnit.id) {
-				trommel.burnTime = 10;
-				if (trommel.currentItemBurnTime > 0) {
-					energy -= 2;
+			int coilCount = fuel == null ? 0 : Math.min(4, fuel.stackSize);
+			boolean hasIngredient = false;
+			for (int slot = 0; slot < 4; slot++) {
+				if (trommel.getItem(slot) != null) {
+					hasIngredient = true;
+					break;
 				}
+			}
+			boolean isElectricHeating = coilCount > 0 && fuel.itemID == PTItems.electricHeatingUnit.id;
+			if (hasIngredient && isElectricHeating && energy >= 2 * coilCount) {
+				trommel.burnTime = 2;
+				trommel.itemPopTime += coilCount - 1;
+				energy -= 2 * coilCount;
+			} else if (isElectricHeating) {
+				trommel.burnTime = 0;
 			}
 		} else if (te instanceof TileEntityCrafter) {
 			TileEntityCrafter crafter = (TileEntityCrafter) te;
@@ -276,9 +294,8 @@ public class TileEntityEnergyConnector extends TileEntity {
 
         }
 
-		if (energy != previousEnergy) {
+		if (energy != previousEnergy && worldObj.getWorldTime() % 20 == 0) {
 			this.setChanged();
-			worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
 		}
 	}
 	@Override

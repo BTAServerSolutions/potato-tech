@@ -5,18 +5,20 @@ import goldenage.potatotech.networks.client.OpenGuiCrafterClientMessage;
 import goldenage.potatotech.networks.client.OpenGuiFilterClientMessage;
 import goldenage.potatotech.networks.client.OpenGuiSequencerClientMessage;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.core.lang.Language;
 import net.minecraft.core.util.collection.NamespaceID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import turniplabs.halplibe.helper.EntityHelper;
+import net.minecraft.core.block.entity.TileEntityDispatcher;
+import turniplabs.halplibe.event.defs.CommonEvents;
 import turniplabs.halplibe.helper.network.NetworkHandler;
 import turniplabs.halplibe.util.ConfigHandler;
-import turniplabs.halplibe.util.GameStartEntrypoint;
+import turniplabs.halplibe.util.dependency.Key;
 
 import java.util.*;
 
 
-public class PotatoTech implements ModInitializer, GameStartEntrypoint {
+public class PotatoTech implements ModInitializer {
     public static final String MOD_ID = "potatotech";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -33,31 +35,27 @@ public class PotatoTech implements ModInitializer, GameStartEntrypoint {
 	public void onInitialize() {
 		LOGGER.info("Potato Tech initialized");
 
-		EntityHelper.createTileEntity(TileEntityPipe.class, id("tile.pipe"));
-		EntityHelper.createTileEntity(TileEntityGoldPipe.class, id("tile.gold_pipe"));
-		EntityHelper.createTileEntity(TileEntityDiamondPipe.class, id("tile.diamond_pipe"));
-		EntityHelper.createTileEntity(TileEntityChute.class, id("tile.chute"));
-		EntityHelper.createTileEntity(TileEntityFilter.class, id("tile.filter"));
-		EntityHelper.createTileEntity(TileEntityCrafter.class, id("tile.crafter"));
-		EntityHelper.createTileEntity(TileEntityEnergyConnector.class, id("tile.energy_connector"));
-		EntityHelper.createTileEntity(TileEntityStirlingEngine.class, id("tile.stirling_engine"));
-		EntityHelper.createTileEntity(TileEntitySequencer.class, id("tile.sequencer"));
+		PTBlocks.init();
+		PTItems.init();
+		Language.Default.INSTANCE.loadNamespace(MOD_ID);
+
+		TileEntityDispatcher.addMapping(TileEntityPipe.class, id("tile.pipe"));
+		TileEntityDispatcher.addMapping(TileEntityGoldPipe.class, id("tile.gold_pipe"));
+		TileEntityDispatcher.addMapping(TileEntityDiamondPipe.class, id("tile.diamond_pipe"));
+		TileEntityDispatcher.addMapping(TileEntityChute.class, id("tile.chute"));
+		TileEntityDispatcher.addMapping(TileEntityFilter.class, id("tile.filter"));
+		TileEntityDispatcher.addMapping(TileEntityCrafter.class, id("tile.crafter"));
+		TileEntityDispatcher.addMapping(TileEntityEnergyConnector.class, id("tile.energy_connector"));
+		TileEntityDispatcher.addMapping(TileEntityStirlingEngine.class, id("tile.stirling_engine"));
+		TileEntityDispatcher.addMapping(TileEntitySequencer.class, id("tile.sequencer"));
 
 		NetworkHandler.registerNetworkMessage(OpenGuiFilterClientMessage::new);
 		NetworkHandler.registerNetworkMessage(OpenGuiCrafterClientMessage::new);
 		NetworkHandler.registerNetworkMessage(OpenGuiSequencerClientMessage::new);
-	}
 
-	@Override
-	public void beforeGameStart() {
-		LOGGER.info("init");
+		CommonEvents.RECIPES_NAMESPACE_INIT.listen(Key.of(MOD_ID), PTRecipes::initNamespaces);
+		CommonEvents.RECIPES_READY.listen(Key.of(MOD_ID), PTRecipes::onRecipesReady);
 	}
-
-	@Override
-	public void afterGameStart() {
-		LOGGER.info("init");
-	}
-
 
 	public static NamespaceID id(String id) {
 		return NamespaceID.getPermanent(MOD_ID, id);

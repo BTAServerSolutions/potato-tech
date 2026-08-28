@@ -84,7 +84,6 @@ public class TileEntityCrafter extends TileEntity implements Container {
 
 	@Override
 	public void readAdditionalData(CompoundTag nbttagcompound) {
-		super.readFromNBT(nbttagcompound);
 		energy = nbttagcompound.getInteger("energy");
 		{
 			ListTag nbttaglist = nbttagcompound.getList("CraftGrid");
@@ -117,7 +116,6 @@ public class TileEntityCrafter extends TileEntity implements Container {
 
 	@Override
 	public void writeAdditionalData(CompoundTag nbttagcompound) {
-		super.writeToNBT(nbttagcompound);
 		nbttagcompound.putInt("energy", energy);
 		{
 			ListTag nbttaglist = new ListTag();

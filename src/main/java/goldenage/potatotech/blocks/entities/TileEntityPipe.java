@@ -11,6 +11,7 @@ import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Direction;
+import net.minecraft.core.world.pos.TilePos;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -27,6 +28,8 @@ public class TileEntityPipe extends TileEntity {
 	public int maxInputTimer;
 	public int inputTimer;
 	public int maxPipeStackTimer;
+	public int connectionRenderRevision;
+	private int clientConnectionRenderRevision = -1;
 
 	public TileEntityPipe() {
 		stacks = new PipeStack[7];
@@ -110,7 +113,6 @@ public class TileEntityPipe extends TileEntity {
 
 	@Override
 	public void readAdditionalData(@NotNull CompoundTag nbttagcompound) {
-		super.readFromNBT(nbttagcompound);
 		ListTag nbttaglist = nbttagcompound.getList("Items");
 		this.stacks = new PipeStack[7];
 		for (int i = 0; i < nbttaglist.tagCount(); ++i) {
@@ -125,11 +127,15 @@ public class TileEntityPipe extends TileEntity {
 		for (int i = 0; i < colorBySide.length; i++) {
 			colorBySide[i] = nbttagcompound.getShort("color"+i);
 		}
+		connectionRenderRevision = nbttagcompound.getInteger("connectionRenderRevision");
+		if (worldObj != null && worldObj.isClientSide && clientConnectionRenderRevision != connectionRenderRevision) {
+			clientConnectionRenderRevision = connectionRenderRevision;
+			worldObj.markBlocksDirty(tilePos.x - 1, tilePos.y - 1, tilePos.z - 1, tilePos.x + 1, tilePos.y + 1, tilePos.z + 1);
+		}
 	}
 
 	@Override
 	public void writeAdditionalData(CompoundTag nbttagcompound) {
-		super.writeToNBT(nbttagcompound);
 		ListTag nbttaglist = new ListTag();
 		for (PipeStack stack : this.stacks) {
 			if (stack == null) {
@@ -152,6 +158,13 @@ public class TileEntityPipe extends TileEntity {
 		for (int i = 0; i < colorBySide.length; i++) {
 			nbttagcompound.putShort("color"+i, colorBySide[i]);
 		}
+		nbttagcompound.putInt("connectionRenderRevision", connectionRenderRevision);
+	}
+
+	public void requestConnectionRenderUpdate() {
+		connectionRenderRevision++;
+		setChanged();
+		worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
 	}
 
 	public void inputItems() {
@@ -184,7 +197,7 @@ public class TileEntityPipe extends TileEntity {
 					if (modeBySide[dir.id] <= 1) {
 						Container inventory = (Container) te;
 						if (Objects.equals(inventory.getNameTranslationKey(), "container.chest.name")) {
-							inventory = BlockLogicChest.getInventory(worldObj, tilePos.add(dir));
+							inventory = BlockLogicChest.getInventory(worldObj, new TilePos(tilePos).add(dir));
 						}
 
 						boolean inserted = Util.insertOnInventory(inventory, stack.stack, dir);
@@ -210,6 +223,8 @@ public class TileEntityPipe extends TileEntity {
 						stack.timer = 0;
 						p.stacks[dir.opposite().id + 1] = stack;
 						stacks[dir.id + 1] = null;
+						p.setChanged();
+						worldObj.markBlockNeedsUpdate(p.tilePos.x, p.tilePos.y, p.tilePos.z);
 						worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
 					}
 				}

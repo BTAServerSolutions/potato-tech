@@ -10,11 +10,12 @@ import net.minecraft.core.block.material.Material;
 import net.minecraft.core.enums.EnumDropCause;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.helper.Side;
-import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePosc;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.primitives.AABBd;
 import org.joml.primitives.AABBdc;
 
 import java.util.ArrayList;
@@ -30,54 +31,52 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 	}
 
 	@Override
-	public void onBlockPlacedOnSide(World world, int x, int y, int z, @NotNull Side side, double xPlaced, double yPlaced) {
-		world.setBlockMetadataWithNotify(x, y, z, side.direction.id);
-		TileEntity te = world.getTileEntity(x, y, z);
+	public void onPlacedOnSide(World world, TilePosc tilePos, @NotNull Side side, double xPlaced, double yPlaced) {
+		world.setBlockDataNotify(tilePos, side.direction.id);
+		TileEntity te = world.getTileEntity(tilePos);
 		if (te instanceof TileEntityEnergyConnector) {
 			//((TileEntityEnergyConnector) te).updateMachineConnections(side.getOpposite().getDirection());
 		}
-		super.onBlockPlacedOnSide(world, x, y, z, side, xPlaced, yPlaced);
+		super.onPlacedOnSide(world, tilePos, side, xPlaced, yPlaced);
 	}
 
 	@Override
-	public void onBlockRemoved(World world, int x, int y, int z, int data) {
+	public void onRemoved(World world, TilePosc tilePos, int data) {
 		if (!world.isClientSide) {
-			TileEntity te = world.getTileEntity(x, y, z);
+			TileEntity te = world.getTileEntity(tilePos);
 			if (te instanceof TileEntityEnergyConnector) {
 				((TileEntityEnergyConnector) te).getBreakDrops(true);
 			}
 		}
-		super.onBlockRemoved(world, x, y, z, data);
+		super.onRemoved(world, tilePos, data);
 	}
 
 	@Override
-	public ItemStack @Nullable [] getBreakResult(World world, EnumDropCause dropCause, int x, int y, int z, int meta, TileEntity tileEntity) {
+	public ItemStack @Nullable [] getBreakResult(World world, EnumDropCause dropCause, TilePosc tilePos, int meta, TileEntity tileEntity) {
 		PotatoTech.LOGGER.info("Get break result");
 		return new ItemStack[]{new ItemStack(PTItems.energyConnector), ((TileEntityEnergyConnector)tileEntity).getBreakDrops(true)};
 	}
 
 	@Override
-	public AABBdc getBlockBoundsFromState(WorldSource world, int x, int y, int z) {
-		Side side = Side.fromId(world.getBlockMetadata(x, y, z) & 7);
+	public AABBdc getBoundsFromState(WorldSource world, TilePosc tilePos) {
+		Side side = Side.fromId(world.getBlockData(tilePos) & 7);
 		float pixelSize = 1.0f / 16.0f;
 		float min = pixelSize * 5;
 		float max = 1.0f - pixelSize * 5;
 		float len = pixelSize*9;
 
-		AABB aabbdc = (AABB) this.getBounds();
 		if (side == Side.TOP) {
-			aabbdc.set(min, 0, min, max, len, max);
+			return new AABBd(min, 0, min, max, len, max);
 		} else if (side == Side.BOTTOM) {
-			aabbdc.set(min, 1 - len, min, max, 1, max);
+			return new AABBd(min, 1 - len, min, max, 1, max);
 		} else if (side == Side.NORTH) {
-			aabbdc.set(min, min, 1 - len, max, max, 1);
+			return new AABBd(min, min, 1 - len, max, max, 1);
 		} else if (side == Side.SOUTH) {
-			aabbdc.set(min, min, 0, max, max, len);
+			return new AABBd(min, min, 0, max, max, len);
 		} else if (side == Side.EAST) {
-			aabbdc.set(0, min, min, len, max, max);
+			return new AABBd(0, min, min, len, max, max);
 		} else {
-			aabbdc.set(1 - len, min, min, 1, max, max);
+			return new AABBd(1 - len, min, min, 1, max, max);
 		}
-        return aabbdc.asJomlAABB();
     }
 }

@@ -18,6 +18,7 @@ import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.pos.TilePos;
 import org.jetbrains.annotations.NotNull;
 import org.joml.primitives.AABBd;
 import org.joml.primitives.AABBdc;
@@ -137,7 +138,6 @@ public class TileEntityChute extends TileEntity {
 
 	@Override
 	public void readAdditionalData(@NotNull CompoundTag tag) {
-		super.readFromNBT(tag);
 		ListTag itemsTag = tag.getList("Items");
 		this.contents.clear();
 		for (int i = 0; i < itemsTag.tagCount(); ++i) {
@@ -181,7 +181,7 @@ public class TileEntityChute extends TileEntity {
 
 				Container inventory;
 				if (outTe instanceof TileEntityChest) {
-					inventory = BlockLogicChest.getInventory(worldObj, tilePos.add(0, -1, 0));
+					inventory = BlockLogicChest.getInventory(worldObj, new TilePos(tilePos).add(0, -1, 0));
 				} else {
 					inventory = (Container) outTe;
 				}
@@ -219,7 +219,6 @@ public class TileEntityChute extends TileEntity {
 
 	@Override
 	public void writeAdditionalData(@NotNull CompoundTag tag) {
-		super.writeToNBT(tag);
 		ListTag itemsTag = new ListTag();
 		for (Map.Entry<ChuteEntry, Integer> entry : this.contents.entrySet()) {
 			CompoundTag itemTag = new CompoundTag();
