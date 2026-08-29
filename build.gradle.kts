@@ -37,6 +37,9 @@ dependencies {
     // included in builds as a runtime dependency
     implementation(libs.loader)
     implementation(libs.halplibe) // If you do not need halplibe you can delete this line
+    compileOnly(libs.catalyst.core)
+    compileOnly(libs.catalyst.energy)
+    compileOnly(libs.btwaila)
 
     // Only required at compilation
     // provides documentation, can be removed if that isn't needed
@@ -47,6 +50,13 @@ dependencies {
 
     // Only required for development/launch at runtime, won't be part of any builds
     localRuntime(libs.modMenu) // Optional, can be removed
+    if (providers.gradleProperty("runWithCatalyst").orNull == "true") {
+        localRuntime(libs.catalyst.core)
+        localRuntime(libs.catalyst.energy)
+    }
+    if (providers.gradleProperty("runWithBTWaila").orNull == "true") {
+        localRuntime(libs.btwaila)
+    }
     runtimeClasspath(libs.clientJar)
     val lwjglVer = libs.versions.lwjgl.get()
     localRuntime(platform("org.lwjgl:lwjgl-bom:${lwjglVer}"))

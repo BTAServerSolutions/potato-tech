@@ -34,6 +34,9 @@
 		],
 		"server": [
 			"goldenage.potatotech.PotatoTechServer"
+		],
+		"btwaila": [
+			"goldenage.potatotech.compat.btwaila.PotatoTechBTWailaPlugin"
 		]
 	},
 	"mixins": [
@@ -45,6 +48,9 @@
 		"minecraft": "*",
 		"java": ">=${java}"
 	},
-	"suggests": {
-	}
+  "suggests": {
+    "catalyst-core": "*",
+    "catalyst-energy": "*",
+    "btwaila": "*"
+  }
 }

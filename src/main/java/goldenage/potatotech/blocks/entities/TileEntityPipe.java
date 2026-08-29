@@ -4,6 +4,8 @@ import com.mojang.nbt.tags.CompoundTag;
 import com.mojang.nbt.tags.ListTag;
 import goldenage.potatotech.PipeStack;
 import goldenage.potatotech.Util;
+import goldenage.potatotech.compat.catalyst.CatalystItemIoCompat;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.block.BlockLogicChest;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.item.ItemStack;
@@ -193,6 +195,13 @@ public class TileEntityPipe extends TileEntity {
 			if (stack != null && stack.direction == dir.opposite() && stack.timer >= maxPipeStackTimer) {
 				int blockId = worldObj.getBlockId(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
 				TileEntity te = worldObj.getTileEntity(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
+				if (FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(te)) {
+					if (modeBySide[dir.id] <= 1 && CatalystItemIoCompat.insert(te, dir, stack.stack)) {
+						stacks[dir.id + 1] = null;
+						worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
+					}
+					continue;
+				}
 				if (blockId != 0 && te instanceof Container && !(te instanceof TileEntityPipe)) {
 					if (modeBySide[dir.id] <= 1) {
 						Container inventory = (Container) te;
@@ -238,13 +247,18 @@ public class TileEntityPipe extends TileEntity {
 				Direction dir = Direction.fromId(i);
 				int blockId = worldObj.getBlockId(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
 				TileEntity te = worldObj.getTileEntity(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
-				if (stack2 == null && blockId != 0 && (te instanceof Container || te instanceof TileEntityPipe) && i != stacks[0].direction.id && modeBySide[i] < 2) {
+				boolean catalystItemIo = FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(te);
+				if (stack2 == null && blockId != 0 && (te instanceof Container || te instanceof TileEntityPipe || catalystItemIo) && i != stacks[0].direction.id && modeBySide[i] < 2) {
 					if (te instanceof TileEntityPipe) {
 						TileEntityPipe pipe = (TileEntityPipe) te;
 						int pipeMode = pipe.modeBySide[dir.opposite().id];
 						boolean cannotMove = (pipeMode == 3) || (pipeMode == 1);
 						//cannotMove |= pipe.stacks[dir.opposite().id] != null;
 						if (cannotMove) continue;
+					} else if (catalystItemIo) {
+						if (!CatalystItemIoCompat.canInsert(te, dir, stacks[0].stack)) {
+							continue;
+						}
 					} else {
 						boolean canInsert = modeBySide[i] == 1;
 						canInsert &= !Util.canInsertOnInventory(

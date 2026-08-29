@@ -17,6 +17,9 @@ import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePosc;
+import org.joml.primitives.AABBd;
+import org.joml.primitives.AABBdc;
 import turniplabs.halplibe.helper.EnvironmentHelper;
 import turniplabs.halplibe.helper.NetworkHelper;
 
@@ -34,8 +37,23 @@ public class BlockLogicPipe extends BlockLogic {
 	}
 
 	@Override
+	public boolean isCubeShaped() {
+		return false;
+	}
+
+	@Override
+	public boolean blocksLight() {
+		return false;
+	}
+
+	@Override
 	public boolean renderAsNormalBlockOnCondition(WorldSource world, int x, int y, int z) {
 		return false;
+	}
+
+	@Override
+	public AABBdc getCollisionAABB(WorldSource world, TilePosc tilePos) {
+		return new AABBd(tilePos.x() + 0.25, tilePos.y() + 0.25, tilePos.z() + 0.25, tilePos.x() + 0.75, tilePos.y() + 0.75, tilePos.z() + 0.75);
 	}
 
 	@Override

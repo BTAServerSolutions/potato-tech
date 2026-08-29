@@ -1,6 +1,9 @@
 package goldenage.potatotech.blocks.models;
 
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
+import goldenage.potatotech.blocks.entities.TileEntityChute;
+import goldenage.potatotech.compat.catalyst.CatalystItemIoCompat;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.block.model.generic.BlockModelGeneric;
 import net.minecraft.client.render.renderer.DrawMode;
@@ -95,8 +98,14 @@ public class BlockModelPipe<T extends BlockLogic> extends BlockModelGeneric<T> {
 						if (neighborPipe.modeBySide[opposite] != 3) {
 							shouldConnect = true;
 						}
-					} else if (neighborTe instanceof Container) {
+					} else if (neighborTe instanceof TileEntityChute) {
 						shouldConnect = true;
+					} else if (neighborTe instanceof Container) {
+						if (FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(neighborTe)) {
+							shouldConnect = CatalystItemIoCompat.hasConfiguredSide(neighborTe, Direction.fromId(i));
+						} else {
+							shouldConnect = true;
+						}
 					}
 				}
 

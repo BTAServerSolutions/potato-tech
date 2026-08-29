@@ -2,10 +2,13 @@
   "required": true,
   "minVersion": "0.8",
   "package": "goldenage.potatotech.mixins",
+  "plugin": "goldenage.potatotech.mixins.PotatoTechMixinPlugin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "ItemDyeMixin",
-    "ItemPaperMixin"
+    "ItemPaperMixin",
+    "CatalystEnergyConnectorMixin",
+    "CatalystEnergyConnectorBlockMixin"
   ],
   "client": [
     "GameSettingsMixin",

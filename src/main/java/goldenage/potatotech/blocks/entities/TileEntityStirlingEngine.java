@@ -42,19 +42,15 @@ public class TileEntityStirlingEngine extends TileEntity {
 		int hotTemperature = 0;
 
 		if (coldBlock == Blocks.FLUID_WATER_STILL.id() || coldBlock == Blocks.FLUID_WATER_FLOWING.id()) {
-			coldTemperature = -1;
-		}
-
-		if (coldBlock == Blocks.PERMAICE.id()) {
 			coldTemperature = -2;
 		}
 
-		if (coldBlock == Blocks.ICE.id()) {
-			coldTemperature = -3;
+		if (coldBlock == Blocks.PERMAICE.id() || coldBlock == Blocks.ICE.id()) {
+			coldTemperature = -4;
 		}
 
-		if (hotBlock == Blocks.FLUID_LAVA_STILL.id() || hotBlock == Blocks.FLUID_LAVA_FLOWING.id()) {
-			hotTemperature = 3;
+		if (hotBlock == Blocks.FLUID_LAVA_STILL.id() || hotBlock == Blocks.FLUID_LAVA_FLOWING.id() || hotBlock == Blocks.MAGMA.id()) {
+			hotTemperature = 4;
 		}
 
 		if (hotBlock == Blocks.FIRE.id()) {
@@ -77,7 +73,7 @@ public class TileEntityStirlingEngine extends TileEntity {
 
 	@Override
 	public void readAdditionalData(@NotNull CompoundTag compoundTag) {
-		
+
 	}
 
 	@Override

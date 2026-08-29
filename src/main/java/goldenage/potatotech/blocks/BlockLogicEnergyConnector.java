@@ -31,6 +31,16 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 	}
 
 	@Override
+	public boolean isCubeShaped() {
+		return false;
+	}
+
+	@Override
+	public boolean blocksLight() {
+		return false;
+	}
+
+	@Override
 	public void onPlacedOnSide(World world, TilePosc tilePos, @NotNull Side side, double xPlaced, double yPlaced) {
 		world.setBlockDataNotify(tilePos, side.direction.id);
 		TileEntity te = world.getTileEntity(tilePos);
@@ -53,8 +63,8 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 
 	@Override
 	public ItemStack @Nullable [] getBreakResult(World world, EnumDropCause dropCause, TilePosc tilePos, int meta, TileEntity tileEntity) {
-		PotatoTech.LOGGER.info("Get break result");
-		ItemStack wireDrops = ((TileEntityEnergyConnector)tileEntity).getBreakDrops(true);
+		// Tooltip mods may query drops without loading the block's tile entity.
+		ItemStack wireDrops = tileEntity instanceof TileEntityEnergyConnector connector ? connector.getBreakDrops(false) : null;
 		if (wireDrops == null) {
 			return new ItemStack[]{new ItemStack(PTItems.energyConnector)};
 		}

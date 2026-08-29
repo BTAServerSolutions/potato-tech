@@ -9,11 +9,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.block.entity.TileEntityFurnace;
+import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemDye;
 import net.minecraft.core.item.ItemPaintBrush;
 import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.item.material.ToolMaterial;
 import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
@@ -24,6 +26,11 @@ import org.jetbrains.annotations.Nullable;
 public class ItemWrench extends Item {
 	public ItemWrench(String translationKey, @NotNull NamespaceID namespaceId, int id) {
 		super(translationKey, String.valueOf(namespaceId), id);
+	}
+
+	@Override
+	public int getDamageVsEntity(@NotNull ItemStack stack, @NotNull Entity entity) {
+		return 4 + ToolMaterial.stone.getDamage() * 2;
 	}
 
 	@Override

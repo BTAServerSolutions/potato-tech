@@ -4,6 +4,8 @@ import com.mojang.nbt.tags.CompoundTag;
 import com.mojang.nbt.tags.ListTag;
 import goldenage.potatotech.PTItems;
 import goldenage.potatotech.PotatoTech;
+import goldenage.potatotech.compat.catalyst.CatalystCompat;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.block.BlockLogicFurnace;
 import net.minecraft.core.block.BlockLogicFurnaceBlast;
 import net.minecraft.core.block.entity.TileEntity;
@@ -55,7 +57,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 		}
 	}
 
-	static public final int energyCapacity = 32;
+	static public final int energyCapacity = 128;
 	public int energy = 0;
 
 	public TileEntityEnergyConnector() {
@@ -277,6 +279,9 @@ public class TileEntityEnergyConnector extends TileEntity {
 					worldObj.markBlockNeedsUpdate(crafter.tilePos.x, crafter.tilePos.y, crafter.tilePos.z);
 				}
 			}
+		}
+		if (FabricLoader.getInstance().isModLoaded("catalyst-energy")) {
+			CatalystCompat.transferEnergy(this, te, connectionDir);
 		}
 
         for (Connection conn : connections) {

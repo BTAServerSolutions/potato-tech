@@ -3,6 +3,8 @@ package goldenage.potatotech;
 import goldenage.potatotech.blocks.entities.TileEntityChute;
 import goldenage.potatotech.blocks.entities.TileEntityCrafter;
 import goldenage.potatotech.blocks.entities.TileEntityFilter;
+import goldenage.potatotech.compat.catalyst.CatalystItemIoCompat;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.render.renderer.DrawMode;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.core.block.BlockLogicChest;
@@ -157,9 +159,16 @@ public class Util {
 		PipeStack returnStack = null;
 
 		TileEntity te = world.getTileEntity(x, y, z);
+		if (FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(te)) {
+			return CatalystItemIoCompat.extract(te, dir, stackTimer);
+		}
 		if (te instanceof Container) {
 			Container inventory = (Container) te;
 			String inventoryName = inventory.getNameTranslationKey();
+			if (isSignalIndustriesStorageContainer(inventory)) {
+				ItemStack stack = extractSignalIndustriesStorageItem(inventory);
+				return stack == null ? null : new PipeStack(stack, dir, stackTimer);
+			}
 
 			/*if (te instanceof IItemIO && !isFromIronChests) {
 				sunsetsatellite.catalyst.core.util.Direction sdir = sunsetsatellite.catalyst.core.util.Direction.getDirectionFromSide(dir.getId()).getOpposite();
@@ -296,6 +305,9 @@ public class Util {
 		}
 		int inventorySize = inventory.getContainerSize();
 		String inventoryName = inventory.getNameTranslationKey();
+		if (isSignalIndustriesStorageContainer(inventory)) {
+			return insertSignalIndustriesStorageItem(inventory, stack);
+		}
 
 		if (inventory instanceof TileEntityFurnace || Objects.equals(inventoryName, "container.trommel.name")) {
 			int fuelSlot = 1;
@@ -397,6 +409,9 @@ public class Util {
 		Container inventory = (Container)te;
 		int inventorySize = inventory.getContainerSize();
 		String inventoryName = inventory.getNameTranslationKey();
+		if (isSignalIndustriesStorageContainer(inventory)) {
+			return true;
+		}
 
 		if (Objects.equals(inventoryName, "container.chest.name")
 			|| Objects.equals(inventoryName, "container.dispenser.name")
@@ -458,6 +473,28 @@ public class Util {
 		}
 
 		return false;
+	}
+
+	private static boolean isSignalIndustriesStorageContainer(Container inventory) {
+		return Objects.equals(inventory.getNameTranslationKey(), "container.signalindustries.storageContainer");
+	}
+
+	private static boolean insertSignalIndustriesStorageItem(Container inventory, ItemStack stack) {
+		try {
+			return (boolean) inventory.getClass().getMethod("insertStack", ItemStack.class).invoke(inventory, stack);
+		} catch (ReflectiveOperationException e) {
+			PotatoTech.LOGGER.error("Unable to insert into Signal Industries storage container", e);
+			return false;
+		}
+	}
+
+	private static ItemStack extractSignalIndustriesStorageItem(Container inventory) {
+		try {
+			return (ItemStack) inventory.getClass().getMethod("extractStack", int.class).invoke(inventory, 1);
+		} catch (ReflectiveOperationException e) {
+			PotatoTech.LOGGER.error("Unable to extract from Signal Industries storage container", e);
+			return null;
+		}
 	}
 
 	public static boolean insertOnInventory(Container inventory, ItemStack stack, Direction direction) {
