@@ -4,10 +4,12 @@
   "package": "goldenage.potatotech.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "ItemDyeMixin"
+    "ItemDyeMixin",
+    "ItemPaperMixin"
   ],
   "client": [
-    "GameSettingsMixin"
+    "GameSettingsMixin",
+    "PlayerControllerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

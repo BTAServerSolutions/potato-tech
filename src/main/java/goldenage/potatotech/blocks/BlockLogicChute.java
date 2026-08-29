@@ -8,6 +8,7 @@ import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePosc;
 
 public class BlockLogicChute extends BlockLogic {
 	public BlockLogicChute(Block<?> block, Material material) {
@@ -16,9 +17,8 @@ public class BlockLogicChute extends BlockLogic {
 
 
 	@Override
-	public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
-		TileEntityChute te = (TileEntityChute)world.getTileEntity(x, y, z);
-		if (te.getNumUnitsInside() > 0) {
+	public boolean onInteracted(World world, TilePosc tilePos, Player player, Side side, double xHit, double yHit) {
+		if (world.getTileEntity(tilePos) instanceof TileEntityChute te && te.getNumUnitsInside() > 0) {
 			te.givePlayerAllItems(world, player);
 			return true;
 		}
@@ -30,10 +30,12 @@ public class BlockLogicChute extends BlockLogic {
 		return false;
 	}
 
-	public int getFillLevel(WorldSource world, int x, int y, int z) {
-		TileEntityChute te = (TileEntityChute)world.getTileEntity(x, y, z);
-		float fill = (float)te.getNumUnitsInside() / (float)te.getMaxUnits();
-		return (int)Math.ceil(10.0f * fill);
+	public int getFillLevel(WorldSource world, TilePosc tilePos) {
+		if (world.getTileEntity(tilePos) instanceof TileEntityChute te) {
+			float fill = Math.min(1.0f, (float) te.getNumUnitsInside() / te.getMaxUnits());
+			return (int) Math.ceil(10.0f * fill);
+		}
+		return 0;
 	}
 
 	@Override
@@ -58,21 +60,14 @@ public class BlockLogicChute extends BlockLogic {
 	}
 
 	@Override
-	public boolean getSignal(WorldSource worldSource, int x, int y, int z, Side side) {
-		TileEntityChute basketTileEntity = (TileEntityChute) worldSource.getTileEntity(x, y, z);
-		if (basketTileEntity != null) {
-			return basketTileEntity.getNumUnitsInside() == basketTileEntity.getMaxUnits();
-		}
-		return false;
+	public boolean isEmittingSignal(WorldSource world, TilePosc tilePos, Side side) {
+		return world.getTileEntity(tilePos) instanceof TileEntityChute chute
+			&& chute.getNumUnitsInside() >= chute.getMaxUnits();
 	}
 
 	@Override
-	public boolean getDirectSignal(World world, int x, int y, int z, Side side) {
-		TileEntityChute basketTileEntity = (TileEntityChute) world.getTileEntity(x, y, z);
-		if (basketTileEntity != null) {
-			return basketTileEntity.getNumUnitsInside() == basketTileEntity.getMaxUnits();
-		}
-		return false;
+	public boolean isEmittingDirectSignal(World world, TilePosc tilePos, Side side) {
+		return isEmittingSignal(world, tilePos, side);
 	}
 
 }

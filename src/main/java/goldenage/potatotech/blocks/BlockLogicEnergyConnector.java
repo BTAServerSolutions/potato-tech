@@ -54,7 +54,11 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 	@Override
 	public ItemStack @Nullable [] getBreakResult(World world, EnumDropCause dropCause, TilePosc tilePos, int meta, TileEntity tileEntity) {
 		PotatoTech.LOGGER.info("Get break result");
-		return new ItemStack[]{new ItemStack(PTItems.energyConnector), ((TileEntityEnergyConnector)tileEntity).getBreakDrops(true)};
+		ItemStack wireDrops = ((TileEntityEnergyConnector)tileEntity).getBreakDrops(true);
+		if (wireDrops == null) {
+			return new ItemStack[]{new ItemStack(PTItems.energyConnector)};
+		}
+		return new ItemStack[]{new ItemStack(PTItems.energyConnector), wireDrops};
 	}
 
 	@Override

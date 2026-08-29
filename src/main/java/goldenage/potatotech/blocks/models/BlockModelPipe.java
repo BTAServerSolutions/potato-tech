@@ -3,7 +3,9 @@ package goldenage.potatotech.blocks.models;
 import goldenage.potatotech.blocks.entities.TileEntityPipe;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.block.model.generic.BlockModelGeneric;
+import net.minecraft.client.render.renderer.DrawMode;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
+import net.minecraft.client.render.tessellator.RenderBuffer;
 import net.minecraft.client.render.texture.stitcher.IconCoordinate;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
@@ -64,7 +66,6 @@ public class BlockModelPipe<T extends BlockLogic> extends BlockModelGeneric<T> {
 		{0.45f, 0.18f, 0.54f},
 		{0.24f, 0.54f, 0.44f}
 	};
-
 	public BlockModelPipe(Block<T> block, String corePath, String armPath, String armInsertPath, String armExtractPath) {
 		super(block, BlockModelDispatcher.loadDataModel(corePath).asModel());
 		this.arm = BlockModelDispatcher.loadDataModel(armPath).asModel();
@@ -111,21 +112,85 @@ public class BlockModelPipe<T extends BlockLogic> extends BlockModelGeneric<T> {
 				}
 
 				float[] color = COLORS[pipe.colorBySide[i]];
-				tessellator.setColorOpaque3f(color[0], color[1], color[2]);
-
+				TessellatorGeneral tintedTessellator = new DyeTintTessellator(tessellator, color[0], color[1], color[2]);
 				switch (i) {
-					case 0 -> modelToRender.renderAttached(this, tessellator, worldSource, tilePos, 1, 0, 0, 0, 0, 0, false, cullFaces, overrideTexture);
-					case 1 -> modelToRender.renderAttached(this, tessellator, worldSource, tilePos, 3, 0, 0, 0, 0, 0, false, cullFaces, overrideTexture);
-					case 2 -> modelToRender.renderAttached(this, tessellator, worldSource, tilePos, 0, 2, 0, 0, 0, 0, false, cullFaces, overrideTexture);
-					case 3 -> modelToRender.renderAttached(this, tessellator, worldSource, tilePos, 0, 0, 0, 0, 0, 0, false, cullFaces, overrideTexture);
-					case 4 -> modelToRender.renderAttached(this, tessellator, worldSource, tilePos, 0, 3, 0, 0, 0, 0, false, cullFaces, overrideTexture);
-					case 5 -> modelToRender.renderAttached(this, tessellator, worldSource, tilePos, 0, 1, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+					case 0 -> modelToRender.renderAttached(this, tintedTessellator, worldSource, tilePos, 1, 0, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+					case 1 -> modelToRender.renderAttached(this, tintedTessellator, worldSource, tilePos, 3, 0, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+					case 2 -> modelToRender.renderAttached(this, tintedTessellator, worldSource, tilePos, 0, 2, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+					case 3 -> modelToRender.renderAttached(this, tintedTessellator, worldSource, tilePos, 0, 0, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+					case 4 -> modelToRender.renderAttached(this, tintedTessellator, worldSource, tilePos, 0, 3, 0, 0, 0, 0, false, cullFaces, overrideTexture);
+					case 5 -> modelToRender.renderAttached(this, tintedTessellator, worldSource, tilePos, 0, 1, 0, 0, 0, 0, false, cullFaces, overrideTexture);
 				}
-
-				tessellator.setColorOpaque3f(1.0f, 1.0f, 1.0f);
 			}
 		}
 
 		return true;
+	}
+
+	private record DyeTintTessellator(TessellatorGeneral delegate, float red, float green, float blue) implements TessellatorGeneral {
+		@Override
+		public void startDrawing(DrawMode drawMode) {
+			delegate.startDrawing(drawMode);
+		}
+
+		@Override
+		public void addVertex(double x, double y, double z) {
+			delegate.addVertex(x, y, z);
+		}
+
+		@Override
+		public void setTranslation(double x, double y, double z) {
+			delegate.setTranslation(x, y, z);
+		}
+
+		@Override
+		public void offsetTranslation(double x, double y, double z) {
+			delegate.offsetTranslation(x, y, z);
+		}
+
+		@Override
+		public void draw() {
+			delegate.draw();
+		}
+
+		@Override
+		public RenderBuffer record(int drawMode, int vertexCount) {
+			return delegate.record(drawMode, vertexCount);
+		}
+
+		@Override
+		public void setColorOpaque3f(float red, float green, float blue) {
+			delegate.setColorOpaque3f(red * this.red, green * this.green, blue * this.blue);
+		}
+
+		@Override
+		public void setColor1i(int color) {
+			delegate.setColor1i(color);
+		}
+
+		@Override
+		public void lockColor() {
+			delegate.lockColor();
+		}
+
+		@Override
+		public void setTextureUV(double u, double v) {
+			delegate.setTextureUV(u, v);
+		}
+
+		@Override
+		public void setLightmapCoord1i(int lightmapCoordinate) {
+			delegate.setLightmapCoord1i(lightmapCoordinate);
+		}
+
+		@Override
+		public void setNormal(float x, float y, float z) {
+			delegate.setNormal(x, y, z);
+		}
+
+		@Override
+		public void setShade1i(int shade) {
+			delegate.setShade1i(shade);
+		}
 	}
 }

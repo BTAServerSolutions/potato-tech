@@ -4,6 +4,7 @@ import goldenage.potatotech.blocks.entities.*;
 import goldenage.potatotech.networks.client.OpenGuiCrafterClientMessage;
 import goldenage.potatotech.networks.client.OpenGuiFilterClientMessage;
 import goldenage.potatotech.networks.client.OpenGuiSequencerClientMessage;
+import goldenage.potatotech.networks.server.DropPipeItemsMessage;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.lang.Language;
 import net.minecraft.core.util.collection.NamespaceID;
@@ -52,6 +53,7 @@ public class PotatoTech implements ModInitializer {
 		NetworkHandler.registerNetworkMessage(OpenGuiFilterClientMessage::new);
 		NetworkHandler.registerNetworkMessage(OpenGuiCrafterClientMessage::new);
 		NetworkHandler.registerNetworkMessage(OpenGuiSequencerClientMessage::new);
+		NetworkHandler.registerNetworkMessage(DropPipeItemsMessage::new);
 
 		CommonEvents.RECIPES_NAMESPACE_INIT.listen(Key.of(MOD_ID), PTRecipes::initNamespaces);
 		CommonEvents.RECIPES_READY.listen(Key.of(MOD_ID), PTRecipes::onRecipesReady);

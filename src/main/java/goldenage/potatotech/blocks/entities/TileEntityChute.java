@@ -3,6 +3,7 @@ package goldenage.potatotech.blocks.entities;
 import com.mojang.nbt.tags.CompoundTag;
 import com.mojang.nbt.tags.ListTag;
 import goldenage.potatotech.PTBlocks;
+import goldenage.potatotech.PipeStack;
 import goldenage.potatotech.Util;
 import net.minecraft.core.block.BlockLogicChest;
 import net.minecraft.core.block.entity.TileEntity;
@@ -198,6 +199,16 @@ public class TileEntityChute extends TileEntity {
 			if (itemToRemove != null) {
 				if (!((TileEntityChute)outTe).importItemStack(itemToRemove)) {
 					this.importItemStack(itemToRemove);
+				}
+			}
+		} else if (outTe instanceof TileEntityPipe pipe) {
+			int inputSide = Direction.UP.id;
+			if (pipe.modeBySide[inputSide] != 1 && pipe.modeBySide[inputSide] != 3 && pipe.stacks[inputSide + 1] == null) {
+				ItemStack itemToRemove = this.removeOneItem();
+				if (itemToRemove != null) {
+					pipe.stacks[inputSide + 1] = new PipeStack(itemToRemove, Direction.UP, 0);
+					pipe.setChanged();
+					worldObj.markBlockNeedsUpdate(pipe.tilePos.x, pipe.tilePos.y, pipe.tilePos.z);
 				}
 			}
 		}

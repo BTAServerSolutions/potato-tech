@@ -61,7 +61,11 @@ public class BlockLogicPipe extends BlockLogic {
 		int sideId = player.isSneaking() ? side.opposite().id : side.id;
 
 		if (heldItem == null) {
-			if (player.isSneaking()) te.dropItems();
+			if (player.isSneaking()) {
+				te.dropItems();
+				te.setChanged();
+				return true;
+			}
 		} else if (heldItem.itemID == PTItems.wrench.id) {
 			int mode = te.modeBySide[sideId];
 			mode = (mode + 1) % 4;

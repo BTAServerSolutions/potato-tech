@@ -154,7 +154,10 @@ public class TileEntityRendererPipe extends TileEntityRenderer<TileEntityPipe> {
 					GLRenderer.modelM4f().scale(itemSize, itemSize, itemSize);
 
 					BlockModelStandard blockModel = (BlockModelStandard) BlockModelDispatcher.getInstance().getDispatch(PTBlocks.pipeStack);
+					int color = colors[pipeStack.color];
+					GLRenderer.setColor4f(((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, 1.0f);
 					blockModel.renderStandalone(tessellator, 0, lightIndex);
+					GLRenderer.setColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 					GLRenderer.popFrame();
 				}

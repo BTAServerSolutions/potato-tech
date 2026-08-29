@@ -1,0 +1,23 @@
+{
+    "parent": "block/block",
+    "textures": {
+        "up": "minecraft:block/basket/fill",
+        "particle": "minecraft:block/basket/fill",
+        "particle_up": "minecraft:block/basket/fill",
+        "particle_down": "minecraft:block/basket/fill",
+        "particle_north": "minecraft:block/basket/fill",
+        "particle_south": "minecraft:block/basket/fill",
+        "particle_west": "minecraft:block/basket/fill",
+        "particle_east": "minecraft:block/basket/fill",
+        "overlay": "minecraft:block/basket/fill"
+    },
+    "elements": [
+        {
+            "from": [0, 0, 0],
+            "to": [16, 1, 16],
+            "faces": {
+                "up": { "uv": [0, 0, 16, 16], "texture": "#up" }
+            }
+        }
+    ]
+}
