@@ -26,6 +26,7 @@ public class PTItems {
 	public static Item electricHeatingUnit;
 	public static Item redstoneIronMix;
 	public static Item redstoneAlloy;
+	public static Item bedrockDust;
 
 
 	public static void init() {
@@ -42,6 +43,7 @@ public class PTItems {
 		electricHeatingUnit = simpleItem("electric_heating_unit", "electric_heating_unit", "electric_heating_unit", id++).setMaxStackSize(4);
 		redstoneIronMix = simpleItem("redstone_iron_mix", "redstone_iron_mix", "redstone_iron_mix", id++);
 		redstoneAlloy = simpleItem("redstone_alloy", "redstone_alloy", "redstone_alloy", id++);
+		bedrockDust = simpleItem("bedrock_dust", "bedrock_dust", "bedrock_dust", id++);
 	}
 
 

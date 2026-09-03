@@ -111,6 +111,10 @@ public class TileEntityChute extends TileEntity {
 		this.worldObj.notifyBlockChange(this.tilePos.x, this.tilePos.y, this.tilePos.z, PTBlocks.chute.id());
 	}
 	public ItemStack removeOneItem() {
+		return removeItems(1);
+	}
+
+	public ItemStack removeItems(int count) {
 		ChuteEntry firstKey = null;
 		int itemCount = 0;
 		for (Map.Entry<ChuteEntry, Integer> entry : this.contents.entrySet()) {
@@ -119,11 +123,12 @@ public class TileEntityChute extends TileEntity {
 			break;
 		}
 
-		if (firstKey == null || itemCount == 0) return null;
+		if (firstKey == null || itemCount == 0 || count <= 0) return null;
 
-		ItemStack itemStack = new ItemStack(firstKey.getItem(), 1, firstKey.metadata);
+		int removed = Math.min(Math.min(count, itemCount), firstKey.getItem().getItemStackLimit(null));
+		ItemStack itemStack = new ItemStack(firstKey.id, removed, firstKey.metadata, firstKey.tag);
 
-		itemCount--;
+		itemCount -= removed;
 
 		if (itemCount == 0) {
 			this.contents.remove(firstKey);

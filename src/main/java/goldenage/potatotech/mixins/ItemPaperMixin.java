@@ -25,7 +25,7 @@ public class ItemPaperMixin {
 		}
 
 		int blockId = world.getBlockId(tilePos.x(), tilePos.y(), tilePos.z());
-		if (blockId != PTBlocks.pipe.id() && blockId != PTBlocks.pipeGold.id() && blockId != PTBlocks.pipeDiamond.id()) {
+		if (blockId != PTBlocks.pipe.id() && blockId != PTBlocks.pipeGold.id() && blockId != PTBlocks.pipeDiamond.id() && blockId != PTBlocks.pipeSteel.id()) {
 			return;
 		}
 

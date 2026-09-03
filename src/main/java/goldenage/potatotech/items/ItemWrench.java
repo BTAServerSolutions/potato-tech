@@ -40,7 +40,7 @@ public class ItemWrench extends Item {
 		int blockZ = blockPos.z();
 
 		int blockId = world.getBlockId(blockX, blockY, blockZ);
-		if (blockId == PTBlocks.pipe.id() || blockId == PTBlocks.pipeDiamond.id() || blockId == PTBlocks.pipeGold.id()) {
+		if (blockId == PTBlocks.pipe.id() || blockId == PTBlocks.pipeDiamond.id() || blockId == PTBlocks.pipeGold.id() || blockId == PTBlocks.pipeSteel.id()) {
 			BlockLogic pipeBlock = world.getBlockLogic(blockX, blockY, blockZ, BlockLogicPipe.class);
 			if (pipeBlock != null) {
 				pipeBlock.onBlockRightClicked(world, blockX, blockY, blockZ, player, side, xHit, yHit);

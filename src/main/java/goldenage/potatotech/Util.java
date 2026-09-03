@@ -21,20 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Util {
-    public static double[] crossProduct(double[] v0, double[] v1) {
-        double[] crossProduct = new double[3];
-        crossProduct[0] = v0[1] * v1[2] - v0[2] * v1[1];
-        crossProduct[1] = v0[2] * v1[0] - v0[0] * v1[2];
-        crossProduct[2] = v0[0] * v1[1] - v0[1] * v1[0];
-        return crossProduct;
-    }
-
-    public static void normalize(double[] v) {
-        double len = Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2] * v[2]);
-        v[0] /= len;
-        v[1] /= len;
-        v[2] /= len;
-    }
 
     public static void draw3dLine(TessellatorGeneral tessellator, double width, double x1, double y1, double z1, double x2, double y2, double z2, float r, float g, float b) {
         Vector3f direction = new Vector3f((float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1)).normalize();
@@ -80,112 +66,33 @@ public class Util {
 
         tessellator.draw();
     }
-    public static void draw3dLineWithTexture(TessellatorGeneral tessellator, int textureId, double width, double x1, double y1, double z1, double x2, double y2, double z2, float r, float g, float b) {
-        double l = Math.sqrt(x2*x2 + y2*y2 + z2*z2);
 
-        Vector3f norm = new Vector3f((float)(x2 - x1), (float) (y2 - y1), (float)(z2 - z1));
-        norm.normalize();
-
-        Vector3f perp = new Vector3f(1, 0, 0);
-        if (Math.abs(norm.x) > 0.9f) {
-            perp.x = 0.0f;
-            perp.y = 0.0f;
-            perp.z = 1.0f;
-        } else if (Math.abs(norm.z) > 0.9f) {
-            perp.x = 0.0f;
-            perp.y = 1.0f;
-            perp.z = 0.0f;
-        }
-
-        Vector3f up = new Vector3f(0, 0, 0);
-        up.cross(norm, perp);
-        up.normalize();
-
-        Vector3f right = new Vector3f();
-        right.cross(norm, up);
-
-        up.x *= (float) (width * 0.5);
-        up.y *= (float) (width * 0.5);
-        up.z *= (float) (width * 0.5);
-
-        right.x *= (float) (width * 0.5);
-        right.y *= (float) (width * 0.5);
-        right.z *= (float) (width * 0.5);
-
-        tessellator.startDrawing(DrawMode.QUADS);
-
-        tessellator.addVertex(x1 - up.x - right.x, y1 - up.y - right.y, z1 - up.z - right.z);
-        tessellator.addVertex(x1 + up.x - right.x, y1 + up.y - right.y, z1 + up.z - right.z);
-        tessellator.addVertex(x2 + up.x - right.x, y2 + up.y - right.y, z2 + up.z - right.z);
-        tessellator.addVertex(x2 - up.x - right.x, y2 - up.y - right.y, z2 - up.z - right.z);
-
-        tessellator.addVertex(x1 - up.x  + right.x, y1 - up.y + right.y, z1 - up.z + right.z);
-        tessellator.addVertex(x2 - up.x  + right.x, y2 - up.y + right.y, z2 - up.z + right.z);
-        tessellator.addVertex(x2 + up.x  + right.x, y2 + up.y + right.y, z2 + up.z + right.z);
-        tessellator.addVertex(x1 + up.x  + right.x, y1 + up.y + right.y, z1 + up.z + right.z);
-
-        tessellator.addVertex(x1 - right.x + up.x, y1 - right.y + up.y, z1 - right.z + up.z);
-        tessellator.addVertex(x1 + right.x + up.x, y1 + right.y + up.y, z1 + right.z + up.z);
-        tessellator.addVertex(x2 + right.x + up.x, y2 + right.y + up.y, z2 + right.z + up.z);
-        tessellator.addVertex(x2 - right.x + up.x, y2 - right.y + up.y, z2 - right.z + up.z);
-
-        tessellator.addVertex(x1 - right.x - up.x, y1 - right.y - up.y, z1 - right.z - up.z);
-        tessellator.addVertex(x2 - right.x - up.x, y2 - right.y - up.y, z2 - right.z - up.z);
-        tessellator.addVertex(x2 + right.x - up.x, y2 + right.y - up.y, z2 + right.z - up.z);
-        tessellator.addVertex(x1 + right.x - up.x, y1 + right.y - up.y, z1 + right.z - up.z);
-
-        tessellator.draw();
-    }
-
-
-	public static ItemStack[] cloneStackArray(ItemStack[] stacks){
-		ItemStack[] _result = new ItemStack[stacks.length];
-		for (int i = 0; i < _result.length; i++) {
-			ItemStack stack = stacks[i];
-			_result[i] = new ItemStack(stack.itemID,  stack.stackSize, stack.getMetadata());
+	public static ItemStack removeItemFromStack(ItemStack stack, int count) {
+		if (count > 0) {
+			count = Math.min(count, stack.stackSize);
+			ItemStack newStack = stack.copy();
+			newStack.stackSize = count;
+			stack.stackSize -= count;
+			return newStack;
 		}
-		return _result;
+		return null;
 	}
 
-	public static ItemStack removeItemFromStack(ItemStack stack) {
-		ItemStack newStack = stack.copy();
-		newStack.stackSize = 1;
-		stack.stackSize--;
-		return newStack;
-	}
-
-
-	public static PipeStack getItemFromInventoryNoCatch(World world, int x, int y, int z, Direction dir, int stackTimer) {
+	public static PipeStack getItemFromInventoryNoCatch(World world, int x, int y, int z, Direction dir, int stackTimer, int count) {
 		PipeStack returnStack = null;
 
 		TileEntity te = world.getTileEntity(x, y, z);
 		if (FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(te)) {
-			return CatalystItemIoCompat.extract(te, dir, stackTimer);
+			return CatalystItemIoCompat.extract(te, dir, stackTimer, count);
 		}
 		if (te instanceof Container) {
 			Container inventory = (Container) te;
 			String inventoryName = inventory.getNameTranslationKey();
 			if (isSignalIndustriesStorageContainer(inventory)) {
-				ItemStack stack = extractSignalIndustriesStorageItem(inventory);
+				ItemStack stack = extractSignalIndustriesStorageItem(inventory, count);
 				return stack == null ? null : new PipeStack(stack, dir, stackTimer);
 			}
 
-			/*if (te instanceof IItemIO && !isFromIronChests) {
-				sunsetsatellite.catalyst.core.util.Direction sdir = sunsetsatellite.catalyst.core.util.Direction.getDirectionFromSide(dir.getId()).getOpposite();
-				IItemIO itemIo = (IItemIO) te;
-
-				Connection con = itemIo.getItemIOForSide(sdir);
-				if (con == Connection.OUTPUT || con == Connection.BOTH) {
-					int index = itemIo.getActiveItemSlotForSide(sdir);
-
-					ItemStack stack = inventory.getStackInSlot(index);
-					if (stack != null) {
-						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
-						if (stack.stackSize <= 0) stack = null;
-						inventory.setInventorySlotContents(index, stack);
-					}
-				}
-			} else */
 			{
 				if (Objects.equals(inventoryName, "container.chest.name")) {
 					inventory = BlockLogicChest.getInventory(world, new TilePos(x, y ,z));
@@ -216,7 +123,7 @@ public class Util {
 							color = filter.getColorInSlot(j - 1);
 						}
 
-						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer, color);
+						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer, color);
 						if (stack.stackSize <= 0) stack = null;
 						inventory.setItem(j - 1, stack);
 						return returnStack;
@@ -229,7 +136,7 @@ public class Util {
 					for (; stack == null && j < inventorySize; j++) stack = inventory.getItem(j);
 
 					if (stack != null && j > 0) {
-						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
+						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer);
 						if (stack.stackSize <= 0) stack = null;
 						inventory.setItem(j - 1, stack);
 						return returnStack;
@@ -238,11 +145,11 @@ public class Util {
 					TileEntityCrafter ac = (TileEntityCrafter) te;
 					ItemStack stack = ac.removeOneResult();
 					if (stack != null) {
-						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
+						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer);
 					} else {
 						ItemStack extra = ac.extraOutputs.getItem(0);
 						if (extra != null) {
-							ItemStack r = removeItemFromStack(extra);
+							ItemStack r = removeItemFromStack(extra, count);
 							if (extra.stackSize <= 0) {
 								ac.extraOutputs.setItem(0, null);
 							}
@@ -252,28 +159,29 @@ public class Util {
 				} else if (te instanceof TileEntityFlag) {
 					ItemStack stack = inventory.getItem(36);
 					if (stack != null) {
-						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
+						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer);
 						if (stack.stackSize <= 0) stack = null;
 						inventory.setItem(36, stack);
 					}
-				} else if (te instanceof TileEntityFurnace) {
-					ItemStack stack = inventory.getItem(2);
+				} else if (te instanceof TileEntityFurnace || te instanceof TileEntityFurnaceBlast) {
+					int outputSlot = te instanceof TileEntityFurnaceBlast ? 3 : 2;
+					ItemStack stack = inventory.getItem(outputSlot);
 					if (stack != null) {
-						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
+						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer);
 						if (stack.stackSize <= 0) stack = null;
-						inventory.setItem(2, stack);
+						inventory.setItem(outputSlot, stack);
 					}
 				} else if (inventory.getContainerSize() > 0) {
 					ItemStack stack = inventory.getItem(0);
 					if (stack != null) {
-						returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
+						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer);
 						if (stack.stackSize <= 0) stack = null;
 						inventory.setItem(0, stack);
 					}
 				}
 			}
 		} else if (te instanceof TileEntityChute && dir == Direction.UP) {
-			ItemStack stack = ((TileEntityChute)te).removeOneItem();
+			ItemStack stack = ((TileEntityChute)te).removeItems(count);
 			if (stack != null) {
 				returnStack = new PipeStack(stack, dir, stackTimer);
 			}
@@ -282,16 +190,33 @@ public class Util {
 		return returnStack;
 	}
 
-	public static PipeStack getItemFromInventory(World world, int x, int y, int z, Direction dir, int stackTimer) {
+	public static PipeStack getItemFromInventory(World world, int x, int y, int z, Direction dir, int stackTimer, int count) {
 		PipeStack result = null;
 		try {
-			result = getItemFromInventoryNoCatch(world, x, y, z, dir, stackTimer);
+			result = getItemFromInventoryNoCatch(world, x, y, z, dir, stackTimer, count);
 
 		} catch(Exception e) {
 			PotatoTech.LOGGER.error(e.getMessage());
 		}
 
 		return result;
+	}
+
+	public static void stackPipeStack(PipeStack pipeStack, ItemStack stack) {
+		if (stack.canStackWith(pipeStack.stack)) {
+			int remainder = stack.getMaxStackSize() - stack.stackSize;
+			int count = Math.min(pipeStack.stack.stackSize, remainder);
+			pipeStack.stack.stackSize -= count;
+			stack.stackSize += count;
+		}
+	}
+
+	public static boolean canStackPipeStack(PipeStack pipeStack, ItemStack stack) {
+		if (stack.canStackWith(pipeStack.stack)) {
+			int remainder = stack.getMaxStackSize() - stack.stackSize;
+			return remainder >= pipeStack.stack.stackSize;
+		}
+		return false;
 	}
 
 	public static boolean insertOnInventoryNoCatch(Container inventory, ItemStack stack, Direction direction) {
@@ -305,11 +230,8 @@ public class Util {
 		}
 		int inventorySize = inventory.getContainerSize();
 		String inventoryName = inventory.getNameTranslationKey();
-		if (isSignalIndustriesStorageContainer(inventory)) {
-			return insertSignalIndustriesStorageItem(inventory, stack);
-		}
 
-		if (inventory instanceof TileEntityFurnace || Objects.equals(inventoryName, "container.trommel.name")) {
+		if (inventory instanceof TileEntityFurnace || inventory instanceof TileEntityFurnaceBlast || Objects.equals(inventoryName, "container.trommel.name")) {
 			int fuelSlot = 1;
 			int inputSlot = 0;
 
@@ -318,8 +240,14 @@ public class Util {
 				for (; inputSlot < 3; inputSlot++) {
 					ItemStack s = inventory.getItem(inputSlot);
 					if (s == null) break;
-					int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : s.getMaxStackSize();
-					if (s.canStackWith(stack) && s.stackSize < maxStackSize) break;
+					if (s.canStackWith(stack) && s.stackSize < s.getMaxStackSize()) break;
+				}
+			}
+
+			if (inventory instanceof TileEntityFurnaceBlast) {
+				fuelSlot = 2;
+				if (direction == Direction.DOWN) {
+					inputSlot = 1;
 				}
 			}
 
@@ -330,7 +258,6 @@ public class Util {
 				inventory.setItem(targetSlot, stack);
 				hasInserted = true;
 			} else {
-				//int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : furnaceStack.getMaxStackSize();
 				int maxStackSize = 8;
 				if (furnaceStack.canStackWith(stack) && furnaceStack.stackSize < maxStackSize) {
 					furnaceStack.stackSize++;
@@ -390,7 +317,6 @@ public class Util {
 		return hasInserted;
 	}
 
-
 	public static boolean canInsertOnInventory(World world, int x, int y, int z, Direction dir, ItemStack item) {
 		TileEntity te = world.getTileEntity(x, y, z);
 
@@ -409,9 +335,6 @@ public class Util {
 		Container inventory = (Container)te;
 		int inventorySize = inventory.getContainerSize();
 		String inventoryName = inventory.getNameTranslationKey();
-		if (isSignalIndustriesStorageContainer(inventory)) {
-			return true;
-		}
 
 		if (Objects.equals(inventoryName, "container.chest.name")
 			|| Objects.equals(inventoryName, "container.dispenser.name")
@@ -475,6 +398,102 @@ public class Util {
 		return false;
 	}
 
+	public static boolean insertPipeStackOnInventory(Container inventory, PipeStack pipeStack, Direction direction) {
+		if (inventory == null || pipeStack == null || pipeStack.stack == null || pipeStack.stack.stackSize <= 0) {
+			return false;
+		}
+		if (isSignalIndustriesStorageContainer(inventory)) {
+			return insertSignalIndustriesStorageItem(inventory, pipeStack.stack);
+		}
+
+		String inventoryName = inventory.getNameTranslationKey();
+		if (inventory instanceof TileEntityFurnace || inventory instanceof TileEntityFurnaceBlast || Objects.equals(inventoryName, "container.trommel.name")) {
+			int targetSlot = getMachineInputSlot(inventory, inventoryName, direction, pipeStack.stack);
+			return insertIntoSlot(inventory, targetSlot, pipeStack, 8);
+		}
+		if (inventory instanceof TileEntityFlag) {
+			return insertIntoSlot(inventory, 36, pipeStack, inventory.getMaxStackSize());
+		}
+		if (Objects.equals(inventoryName, "container.crafter.name")) {
+			TileEntityCrafter crafter = (TileEntityCrafter) inventory;
+			boolean inserted = false;
+			while (pipeStack.stack.stackSize > 0) {
+				ItemStack oneItem = pipeStack.stack.copy();
+				oneItem.stackSize = 1;
+				if (!crafter.insertItem(oneItem)) {
+					break;
+				}
+				pipeStack.stack.stackSize--;
+				inserted = true;
+			}
+			return inserted;
+		}
+
+		boolean inserted = false;
+		for (int slot = 0; slot < inventory.getContainerSize() && pipeStack.stack.stackSize > 0; slot++) {
+			if (inventoryName.equals("container.activator.name") && ((TileEntityActivator) inventory).locked(slot)) {
+				continue;
+			}
+			ItemStack current = inventory.getItem(slot);
+			if (current != null) {
+				inserted |= insertIntoSlot(inventory, slot, pipeStack, getSlotCapacity(inventory, current));
+			}
+		}
+		if (Objects.equals(inventoryName, "container.filter.name")) {
+			return inserted;
+		}
+		for (int slot = 0; slot < inventory.getContainerSize() && pipeStack.stack.stackSize > 0; slot++) {
+			if (inventoryName.equals("container.activator.name") && ((TileEntityActivator) inventory).locked(slot)) {
+				continue;
+			}
+			if (inventory.getItem(slot) == null) {
+				inserted |= insertIntoSlot(inventory, slot, pipeStack, getSlotCapacity(inventory, pipeStack.stack));
+			}
+		}
+		return inserted;
+	}
+
+	private static int getMachineInputSlot(Container inventory, String inventoryName, Direction direction, ItemStack stack) {
+		if (Objects.equals(inventoryName, "container.trommel.name")) {
+			for (int slot = 0; slot < 3; slot++) {
+				ItemStack current = inventory.getItem(slot);
+				if (current == null || (current.canStackWith(stack) && current.stackSize < 8)) {
+					return slot;
+				}
+			}
+			return 0;
+		}
+		if (inventory instanceof TileEntityFurnaceBlast) {
+			if (direction == Direction.UP) return 2;
+			return direction == Direction.DOWN ? 1 : 0;
+		}
+		return direction == Direction.UP ? 1 : 0;
+	}
+
+	private static boolean insertIntoSlot(Container inventory, int slot, PipeStack pipeStack, int capacity) {
+		ItemStack current = inventory.getItem(slot);
+		if (current == null) {
+			int amount = Math.min(pipeStack.stack.stackSize, capacity);
+			if (amount <= 0) return false;
+			ItemStack inserted = pipeStack.stack.copy();
+			inserted.stackSize = amount;
+			pipeStack.stack.stackSize -= amount;
+			inventory.setItem(slot, inserted);
+			return true;
+		}
+		if (!current.canStackWith(pipeStack.stack)) return false;
+		int amount = Math.min(pipeStack.stack.stackSize, capacity - current.stackSize);
+		if (amount <= 0) return false;
+		current.stackSize += amount;
+		pipeStack.stack.stackSize -= amount;
+		inventory.setItem(slot, current);
+		return true;
+	}
+
+	private static int getSlotCapacity(Container inventory, ItemStack stack) {
+		return Math.min(inventory.getMaxStackSize(), stack.getMaxStackSize());
+	}
+
 	private static boolean isSignalIndustriesStorageContainer(Container inventory) {
 		return Objects.equals(inventory.getNameTranslationKey(), "container.signalindustries.storageContainer");
 	}
@@ -488,9 +507,9 @@ public class Util {
 		}
 	}
 
-	private static ItemStack extractSignalIndustriesStorageItem(Container inventory) {
+	private static ItemStack extractSignalIndustriesStorageItem(Container inventory, int count) {
 		try {
-			return (ItemStack) inventory.getClass().getMethod("extractStack", int.class).invoke(inventory, 1);
+			return (ItemStack) inventory.getClass().getMethod("extractStack", int.class).invoke(inventory, count);
 		} catch (ReflectiveOperationException e) {
 			PotatoTech.LOGGER.error("Unable to extract from Signal Industries storage container", e);
 			return null;
@@ -507,101 +526,4 @@ public class Util {
 		return result;
 	}
 
-	public static PipeStack peekItemFromInventory(World world, int x, int y, int z, Direction dir, int stackTimer) {
-		PipeStack result = null;
-		try {
-			result = peekItemFromInventoryNoCatch(world, x, y, z, dir, stackTimer);
-		} catch (Exception e) {
-			PotatoTech.LOGGER.error(e.getMessage());
-		}
-		return result;
-	}
-
-	public static PipeStack peekItemFromInventoryNoCatch(World world, int x, int y, int z, Direction dir, int stackTimer) {
-		PipeStack returnStack = null;
-		TileEntity te = world.getTileEntity(x, y, z);
-		if (te instanceof Container) {
-			Container inventory = (Container) te;
-			String inventoryName = inventory.getNameTranslationKey();
-
-			if (Objects.equals(inventoryName, "container.chest.name")) {
-				inventory = BlockLogicChest.getInventory(world, new TilePos(x, y ,z));
-			}
-
-			if (Objects.equals(inventoryName, "container.chest.name")
-				|| Objects.equals(inventoryName, "container.dispenser.name")
-				|| inventoryName.startsWith("container.ironchest")
-				|| Objects.equals(inventoryName, "container.filter.name")
-			) {
-				int inventorySize = inventory.getContainerSize();
-				ItemStack stack = null;
-				int j = 0;
-
-				if (!inventoryName.equals("container.filter.name")) {
-					while (stack == null && j < inventorySize) stack = inventory.getItem(j++);
-					if (stack != null && stack.stackSize <= 1) {
-						returnStack = null;
-					}
-				} else {
-					while (stack == null && j < inventorySize) {
-						stack = inventory.getItem(j++);
-						if (stack != null && stack.stackSize++ <= 1) {
-							returnStack = null;
-						}
-					}
-				}
-
-				if (stack != null && j > 0) {
-					returnStack = new PipeStack(stack.copy(), dir, stackTimer);
-					return returnStack;
-				}
-			} else if (inventoryName.equals("container.trommel.name")) {
-				int inventorySize = 4;
-				ItemStack stack = null;
-				int j = 0;
-				while (stack == null && j < inventorySize) stack = inventory.getItem(j++);
-
-				if (stack != null && j > 0) {
-					returnStack = new PipeStack(stack, dir, stackTimer);
-					return returnStack;
-				}
-			} else if (inventoryName.equals("container.crafter.name")) {
-				TileEntityCrafter ac = (TileEntityCrafter) te;
-				ItemStack stack = ac.craftResult.getItem(0).copy();
-				if (stack != null) {
-					returnStack = new PipeStack(stack, dir, stackTimer);
-				} else {
-					ItemStack extra = ac.extraOutputs.getItem(0).copy();
-					if (extra != null) {
-						returnStack = new PipeStack(extra, dir, stackTimer);
-					}
-				}
-			} else if (te instanceof TileEntityFurnace) {
-				ItemStack stack = inventory.getItem(2);
-				if (stack != null) {
-					returnStack = new PipeStack(removeItemFromStack(stack), dir, stackTimer);
-					if (stack.stackSize <= 0) stack = null;
-					inventory.setItem(2, stack);
-				}
-			} else if (inventory.getContainerSize() > 0){
-				ItemStack stack = inventory.getItem(0);
-				if (stack != null) {
-					stack = stack.copy();
-					returnStack = new PipeStack(stack, dir, stackTimer);
-				}
-			}
-		} else if (te instanceof TileEntityChute && dir == Direction.UP) {
-			TileEntityChute.ChuteEntry firstKey = null;
-			for (Map.Entry<TileEntityChute.ChuteEntry, Integer> entry : ((TileEntityChute) te).contents.entrySet()) {
-				firstKey = entry.getKey();
-				break;
-			}
-			if (firstKey == null) return null;
-
-			ItemStack stack = new ItemStack(firstKey.getItem(), 1, firstKey.metadata);
-			returnStack = new PipeStack(stack, dir, stackTimer);
-		}
-
-		return returnStack;
-	}
 }

@@ -40,6 +40,9 @@ item.potatotech.redstone_alloy.desc=Who needs copper anyway?
 item.potatotech.redstone_iron_mix.name=Redstone-Iron Mix
 item.potatotech.redstone_iron_mix.desc=Try melting it!
 
+item.potatotech.bedrock_dust.name=Bedrock Dust
+item.potatotech.bedrock_dust.desc=Put on a trommel
+
 tile.potatotech.potato.name=Potato Block
 tile.potatotech.potato.desc=Not to be trusted!
 
@@ -72,6 +75,9 @@ tile.potatotech.gold_pipe.desc=Speedy
 
 tile.potatotech.diamond_pipe.name=Diamond Pipe
 tile.potatotech.diamond_pipe.desc=Gotta Go Fast
+
+tile.potatotech.steel_pipe.name=Steel Pipe
+tile.potatotech.steel_pipe.desc=Moves a full stack at a time.
 
 tile.potatotech.filter.name=Filter
 tile.potatotech.filter.desc=Does what you should do to your room.

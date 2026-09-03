@@ -64,6 +64,12 @@ public class PTModels {
 			"potatotech:block/diamond_pipe/arm_insert",
 			"potatotech:block/diamond_pipe/arm_extract"
 		));
+		dispatcher.addDispatch(new BlockModelPipe<>(PTBlocks.pipeSteel,
+			"potatotech:block/steel_pipe/core",
+			"potatotech:block/steel_pipe/arm",
+			"potatotech:block/steel_pipe/arm_insert",
+			"potatotech:block/steel_pipe/arm_extract"
+		));
 
 		dispatcher.addDispatch(new BlockModelChute<>(PTBlocks.chute));
 		dispatcher.addDispatch(

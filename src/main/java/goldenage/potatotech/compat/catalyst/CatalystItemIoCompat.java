@@ -43,24 +43,31 @@ public final class CatalystItemIoCompat {
 		return current == null || (current.canStackWith(stack) && current.stackSize < Math.min(container.getMaxStackSize(), current.getMaxStackSize()));
 	}
 
-	public static boolean insert(TileEntity tileEntity, Direction direction, ItemStack stack) {
-		if (!canInsert(tileEntity, direction, stack)) {
+	public static boolean insert(TileEntity tileEntity, Direction direction, PipeStack pipeStack) {
+		if (!canInsert(tileEntity, direction, pipeStack.stack)) {
 			return false;
 		}
 		IItemIO itemIo = getItemIo(tileEntity);
 		Container container = (Container) tileEntity;
-		int slot = itemIo.getActiveItemSlotForSide(toCatalystDirection(direction.opposite()), stack);
+		int slot = itemIo.getActiveItemSlotForSide(toCatalystDirection(direction.opposite()), pipeStack.stack);
 		ItemStack current = container.getItem(slot);
 		if (current == null) {
-			container.setItem(slot, stack);
+			int amount = Math.min(pipeStack.stack.stackSize, Math.min(container.getMaxStackSize(), pipeStack.stack.getMaxStackSize()));
+			ItemStack inserted = pipeStack.stack.copy();
+			inserted.stackSize = amount;
+			pipeStack.stack.stackSize -= amount;
+			container.setItem(slot, inserted);
 		} else {
-			current.stackSize += stack.stackSize;
+			int capacity = Math.min(container.getMaxStackSize(), current.getMaxStackSize());
+			int amount = Math.min(pipeStack.stack.stackSize, capacity - current.stackSize);
+			current.stackSize += amount;
+			pipeStack.stack.stackSize -= amount;
 			container.setItem(slot, current);
 		}
 		return true;
 	}
 
-	public static PipeStack extract(TileEntity tileEntity, Direction direction, int stackTimer) {
+	public static PipeStack extract(TileEntity tileEntity, Direction direction, int stackTimer, int count) {
 		if (!isItemIo(tileEntity)) {
 			return null;
 		}
@@ -79,7 +86,7 @@ public final class CatalystItemIoCompat {
 		if (stack == null) {
 			return null;
 		}
-		ItemStack extracted = Util.removeItemFromStack(stack);
+		ItemStack extracted = Util.removeItemFromStack(stack, count);
 		container.setItem(slot, stack.stackSize > 0 ? stack : null);
 		return new PipeStack(extracted, direction, stackTimer);
 	}

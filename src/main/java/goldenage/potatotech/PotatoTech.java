@@ -44,6 +44,7 @@ public class PotatoTech implements ModInitializer {
 		TileEntityDispatcher.addMapping(TileEntityPipe.class, id("tile.pipe"));
 		TileEntityDispatcher.addMapping(TileEntityGoldPipe.class, id("tile.gold_pipe"));
 		TileEntityDispatcher.addMapping(TileEntityDiamondPipe.class, id("tile.diamond_pipe"));
+		TileEntityDispatcher.addMapping(TileEntitySteelPipe.class, id("tile.steel_pipe"));
 		TileEntityDispatcher.addMapping(TileEntityChute.class, id("tile.chute"));
 		TileEntityDispatcher.addMapping(TileEntityFilter.class, id("tile.filter"));
 		TileEntityDispatcher.addMapping(TileEntityCrafter.class, id("tile.crafter"));

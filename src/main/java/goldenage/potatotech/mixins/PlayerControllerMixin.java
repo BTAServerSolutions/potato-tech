@@ -26,7 +26,7 @@ public class PlayerControllerMixin {
 		}
 
 		int blockId = world.getBlockId(tilePos.x(), tilePos.y(), tilePos.z());
-		if (blockId == PTBlocks.pipe.id() || blockId == PTBlocks.pipeGold.id() || blockId == PTBlocks.pipeDiamond.id()) {
+		if (blockId == PTBlocks.pipe.id() || blockId == PTBlocks.pipeGold.id() || blockId == PTBlocks.pipeDiamond.id() || blockId == PTBlocks.pipeSteel.id()) {
 			if (EnvironmentHelper.isSinglePlayer()) {
 				BlockLogic pipe = world.getBlockLogic(tilePos.x(), tilePos.y(), tilePos.z(), BlockLogicPipe.class);
 				if (pipe == null || !pipe.onBlockRightClicked(world, tilePos.x(), tilePos.y(), tilePos.z(), player, side, xHit, yHit)) {

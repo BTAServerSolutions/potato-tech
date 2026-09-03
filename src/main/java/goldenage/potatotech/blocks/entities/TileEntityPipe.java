@@ -31,6 +31,7 @@ public class TileEntityPipe extends TileEntity {
 	public int inputTimer;
 	public int maxPipeStackTimer;
 	public int connectionRenderRevision;
+	public int maxStackSize = 1;
 	private int clientConnectionRenderRevision = -1;
 
 	public TileEntityPipe() {
@@ -174,7 +175,7 @@ public class TileEntityPipe extends TileEntity {
 			if (modeBySide[dir.id] == 2) {
 				PipeStack stack = stacks[dir.id + 1];
 				if (stack == null) {
-					stack = Util.getItemFromInventory(worldObj, tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ(), dir, 0);
+					stack = Util.getItemFromInventory(worldObj, tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ(), dir, 0, maxStackSize);
 					if (stack != null) {
 						stack.timer = 0;
 						if (stack.color == 0) {
@@ -196,8 +197,10 @@ public class TileEntityPipe extends TileEntity {
 				int blockId = worldObj.getBlockId(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
 				TileEntity te = worldObj.getTileEntity(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
 				if (FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(te)) {
-					if (modeBySide[dir.id] <= 1 && CatalystItemIoCompat.insert(te, dir, stack.stack)) {
-						stacks[dir.id + 1] = null;
+					if (modeBySide[dir.id] <= 1 && CatalystItemIoCompat.insert(te, dir, stack)) {
+						if (stack.stack.stackSize <= 0) {
+							stacks[dir.id + 1] = null;
+						}
 						worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
 					}
 					continue;
@@ -209,9 +212,11 @@ public class TileEntityPipe extends TileEntity {
 							inventory = BlockLogicChest.getInventory(worldObj, new TilePos(tilePos).add(dir));
 						}
 
-						boolean inserted = Util.insertOnInventory(inventory, stack.stack, dir);
+						boolean inserted = Util.insertPipeStackOnInventory(inventory, stack, dir);
 						if (inserted) {
-							stacks[dir.id + 1] = null;
+							if (stack.stack.stackSize <= 0) {
+								stacks[dir.id + 1] = null;
+							}
 							worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
 						}
 					}
@@ -229,9 +234,12 @@ public class TileEntityPipe extends TileEntity {
 				if (blockId != 0 && te instanceof TileEntityPipe) {
 					TileEntityPipe p = (TileEntityPipe) te;
 					if (p.stacks[dir.opposite().id + 1] == null) {
-						stack.timer = 0;
-						p.stacks[dir.opposite().id + 1] = stack;
-						stacks[dir.id + 1] = null;
+						int amount = Math.min(stack.stack.stackSize, p.maxStackSize);
+						ItemStack moved = Util.removeItemFromStack(stack.stack, amount);
+						p.stacks[dir.opposite().id + 1] = new PipeStack(moved, stack.direction, 0, stack.color);
+						if (stack.stack.stackSize <= 0) {
+							stacks[dir.id + 1] = null;
+						}
 						p.setChanged();
 						worldObj.markBlockNeedsUpdate(p.tilePos.x, p.tilePos.y, p.tilePos.z);
 						worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);

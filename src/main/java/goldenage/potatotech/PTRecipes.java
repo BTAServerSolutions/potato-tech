@@ -1,6 +1,7 @@
 package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.entities.TileEntityCrafter;
+import net.minecraft.core.WeightedRandomLootObject;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.data.registry.Registries;
@@ -9,6 +10,7 @@ import net.minecraft.core.data.registry.recipe.RecipeNamespace;
 import net.minecraft.core.data.registry.recipe.RecipeSymbol;
 import net.minecraft.core.data.registry.recipe.entry.RecipeEntryCrafting;
 import net.minecraft.core.data.registry.recipe.entry.RecipeEntryFurnace;
+import net.minecraft.core.data.registry.recipe.entry.RecipeEntryTrommel;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
@@ -21,6 +23,7 @@ public class PTRecipes {
 	public static RecipeNamespace POTATO_TECH = new RecipeNamespace();
 	public static RecipeGroup<RecipeEntryCrafting<?, ?>> WORKBENCH;
 	public static RecipeGroup<RecipeEntryFurnace> FURNACE;
+	public static RecipeGroup<RecipeEntryTrommel> TROMMEL;
 
 	public static void onRecipesReady() {
 		LOGGER.info("Loading PotatoTech recipes...");
@@ -39,12 +42,14 @@ public class PTRecipes {
 	public static void registerNamespaces() {
 		POTATO_TECH.register("workbench", WORKBENCH);
 		POTATO_TECH.register("furnace", FURNACE);
+		POTATO_TECH.register("trommel", TROMMEL);
 		Registries.RECIPES.register("potatotech", POTATO_TECH);
 	}
 
 	public static void resetGroups() {
 		WORKBENCH = new RecipeGroup<>(new RecipeSymbol(new ItemStack(Blocks.WORKBENCH)));
 		FURNACE = new RecipeGroup<>(new RecipeSymbol(new ItemStack(Blocks.FURNACE_STONE_IDLE)));
+		TROMMEL = new RecipeGroup<>(new RecipeSymbol(new ItemStack(Blocks.TROMMEL_IDLE)));
 		Registries.RECIPES.unregister("potatotech");
 	}
 
@@ -87,6 +92,11 @@ public class PTRecipes {
 			.addInput('D', Items.DIAMOND)
 			.addInput('G', Blocks.GLASS)
 			.create("Diamond Pipe", new ItemStack(PTBlocks.pipeDiamond, 8));
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape("IGI")
+			.addInput('I', Items.INGOT_STEEL)
+			.addInput('G', Blocks.GLASS)
+			.create("Steel Pipe", new ItemStack(PTBlocks.pipeSteel, 16));
 
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
 			.setShape("WRW", "RMR", "WRW")
@@ -152,6 +162,16 @@ public class PTRecipes {
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
 			.setInput(PTItems.redstoneIronMix)
 			.create("Ingot Iron", new ItemStack(PTItems.redstoneAlloy));
+
+		RecipeBuilder.Trommel(PotatoTech.MOD_ID)
+			.setInput(PTItems.bedrockDust)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.COAL), 1, 2), 70)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.DIAMOND), 1), 10)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.DUST_REDSTONE), 3, 6), 64)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.DYE, 1, 4), 1, 3), 8)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.ORE_RAW_IRON), 1, 2), 64)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.ORE_RAW_GOLD), 1), 16)
+			.create("bedrock_dust");
 
 		TileEntityCrafter.updateRecipeEntriesCache();
 	}

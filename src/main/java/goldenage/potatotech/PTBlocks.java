@@ -26,6 +26,7 @@ public class PTBlocks {
 	public static Block<? extends BlockLogic> crafter;
 	public static Block<? extends BlockLogic> pipeGold;
 	public static Block<? extends BlockLogic> pipeDiamond;
+	public static Block<? extends BlockLogic> pipeSteel;
 	public static Block<? extends BlockLogic> energyConnector;
 	public static Block<? extends BlockLogic> stirlingEngine;
 	public static Block<? extends BlockLogic> sequencer;
@@ -124,7 +125,6 @@ public class PTBlocks {
 			.setHardness(1.0f)
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("energy_connector", "energy_connector", id++, block -> new BlockLogicEnergyConnector(block, Materials.METAL));
 
 		stirlingEngine = new BlockBuilder(MOD_ID)
@@ -149,5 +149,13 @@ public class PTBlocks {
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("sequencer", "sequencer", id++, block -> new BlockLogicSequencer(block, Materials.METAL));
+
+		pipeSteel = new BlockBuilder(MOD_ID)
+			.setTileEntity(TileEntitySteelPipe::new)
+			.setHardness(1.0f)
+			.setResistance(3.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
+			.build("steel_pipe", "steel_pipe", id++, block -> new BlockLogicPipe(block, Materials.METAL));
 	}
 }

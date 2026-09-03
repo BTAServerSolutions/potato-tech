@@ -1,0 +1,6 @@
+{
+    "parent": "potatotech:block/pipe_arm_base",
+    "textures": {
+        "side": "potatotech:block/steel_pipe"
+    }
+}
