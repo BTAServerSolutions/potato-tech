@@ -4,7 +4,6 @@ import goldenage.potatotech.blocks.*;
 import goldenage.potatotech.blocks.entities.*;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.block.material.Material;
 import net.minecraft.core.block.material.Materials;
 import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.sound.BlockSounds;
@@ -37,7 +36,7 @@ public class PTBlocks {
 		int id = config.getInt("starting_block_id");
 
 		testAreaMaker = new BlockBuilder(MOD_ID)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.BASICS))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("test_area_maker", "test_area_maker", id++, block -> new BlockLogicTestAreaMaker(block, Materials.STONE));
 
 		pipe = new BlockBuilder(MOD_ID)
@@ -45,7 +44,7 @@ public class PTBlocks {
 			.setHardness(1.0f)
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.REDSTONE))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("pipe", "pipe", id++, block -> new BlockLogicPipe(block, Materials.METAL));
 
 		clayIron = new BlockBuilder(MOD_ID)
@@ -53,7 +52,7 @@ public class PTBlocks {
 			.setResistance(3.0f)
 			.setBlockSound(BlockSounds.SAND)
 			.addTags(BlockTags.MINEABLE_BY_SHOVEL)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.BASICS))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("clay_iron", "clay_iron", id++, block ->
 				new BlockLogicCrushable(block, Materials.CLAY, "Iron")
 			);
@@ -63,7 +62,7 @@ public class PTBlocks {
 			.setResistance(3.0f)
 			.setBlockSound(BlockSounds.SAND)
 			.addTags(BlockTags.MINEABLE_BY_SHOVEL)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.BASICS))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("clay_gold", "clay_gold", id++, block ->
 				new BlockLogicCrushable(block, Materials.CLAY, "Gold")
 			);
@@ -74,7 +73,7 @@ public class PTBlocks {
 			.setResistance(3.0f)
 			.setBlockSound(BlockSounds.STONE)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.REDSTONE))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("chute", "chute", id++, block ->
 				new BlockLogicChute(block, Materials.STONE)
 			);
@@ -85,7 +84,7 @@ public class PTBlocks {
 			.setResistance(3.0f)
 			.setBlockSound(BlockSounds.WOOD)
 			.addTags(BlockTags.MINEABLE_BY_AXE)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.REDSTONE))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("filter", "filter", id++, block ->
 				new BlockLogicFilter(block, Materials.WOOD)
 			);
@@ -99,7 +98,7 @@ public class PTBlocks {
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.setBlockSound(BlockSounds.METAL)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.REDSTONE))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("crafter", "crafter", id++, block ->
 					new BlockLogicCrafter(block, Materials.METAL)
 			);
@@ -109,7 +108,7 @@ public class PTBlocks {
 			.setHardness(1.0f)
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.REDSTONE))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("gold_pipe", "gold_pipe", id++, block -> new BlockLogicPipe(block, Materials.METAL));
 
 		pipeDiamond = new BlockBuilder(MOD_ID)
@@ -117,7 +116,7 @@ public class PTBlocks {
 			.setHardness(1.0f)
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.REDSTONE))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("diamond_pipe", "diamond_pipe", id++, block -> new BlockLogicPipe(block, Materials.METAL));
 
 		energyConnector = new BlockBuilder(MOD_ID)
@@ -125,7 +124,7 @@ public class PTBlocks {
 			.setHardness(1.0f)
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.REDSTONE))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("energy_connector", "energy_connector", id++, block -> new BlockLogicEnergyConnector(block, Materials.METAL));
 
 		stirlingEngine = new BlockBuilder(MOD_ID)
@@ -133,14 +132,14 @@ public class PTBlocks {
 			.setHardness(1.0f)
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.REDSTONE))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("stirling_engine", "stirling_engine", id++, block -> new BlockLogicStirlingEngine(block, Materials.METAL));
 
 		coil = new BlockBuilder(MOD_ID)
 			.setHardness(1.0f)
 			.setResistance(3.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.REDSTONE))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("coil", "coil", id++, block -> new BlockLogic(block, Materials.METAL));
 
 		sequencer = new BlockBuilder(MOD_ID)
@@ -148,7 +147,7 @@ public class PTBlocks {
 			.setHardness(0.0f)
 			.setResistance(2.0f)
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
-			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.REDSTONE))
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("sequencer", "sequencer", id++, block -> new BlockLogicSequencer(block, Materials.METAL));
 	}
 }
