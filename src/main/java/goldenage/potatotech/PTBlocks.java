@@ -31,6 +31,9 @@ public class PTBlocks {
 	public static Block<? extends BlockLogic> stirlingEngine;
 	public static Block<? extends BlockLogic> sequencer;
 	public static Block<? extends BlockLogic> coil;
+	public static Block<? extends BlockLogic> bedrockExtractor;
+	public static Block<? extends BlockLogic> bedrockDrill;
+	public static Block<? extends BlockLogic> energyConnectorMV;
 
 
 	public static void init() {
@@ -157,5 +160,28 @@ public class PTBlocks {
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
 			.build("steel_pipe", "steel_pipe", id++, block -> new BlockLogicPipe(block, Materials.METAL));
+
+		bedrockExtractor = new BlockBuilder(MOD_ID)
+			.setTileEntity(TileEntityBedrockExtractor::new)
+			.setHardness(3.0f)
+			.setResistance(6.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
+			.build("bedrock_extractor", "bedrock_extractor", id++, block -> new BlockLogic(block, Materials.METAL));
+
+		bedrockDrill = new BlockBuilder(MOD_ID)
+			.setHardness(3.0f)
+			.setResistance(6.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
+			.build("bedrock_drill", "bedrock_drill", id++, block -> new BlockLogic(block, Materials.METAL));
+
+		energyConnectorMV = new BlockBuilder(MOD_ID)
+			.setTileEntity(TileEntityEnergyConnector::new)
+			.setHardness(1.0f)
+			.setResistance(3.0f)
+			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
+			.build("energy_connector_mv", "energy_connector_mv", id++, block ->
+				new BlockLogicEnergyConnector(block, Materials.METAL, TileEntityEnergyConnector.MV_ENERGY_CAPACITY, TileEntityEnergyConnector.MV_BLOCK_TRANSFER_RATE));
 	}
 }

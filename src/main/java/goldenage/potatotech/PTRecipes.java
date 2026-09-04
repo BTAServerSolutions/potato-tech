@@ -133,6 +133,18 @@ public class PTRecipes {
 			.create("Energy Connector", new ItemStack(PTItems.energyConnector, 4));
 
 		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape(" G ", "GSG", " G ")
+			.addInput('G', Items.INGOT_GOLD)
+			.addInput('S', Items.STICK)
+			.create("MV Wire Spool", new ItemStack(PTItems.wireSpoolMV, 8));
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape(" S ", "BSB", "BSB")
+			.addInput('S', Items.INGOT_STEEL)
+			.addInput('B', Items.BRICK_CLAY)
+			.create("MV Energy Connector", new ItemStack(PTItems.energyConnectorMV, 4));
+
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
 			.setShape(" R ", "RSR", " R ")
 			.addInput('R', Items.INGOT_IRON)
 			.addInput('S', PTBlocks.coil)
@@ -149,6 +161,11 @@ public class PTRecipes {
 			.addInput(new ItemStack(Items.DUST_REDSTONE))
 			.addInput(new ItemStack(Items.DUST_REDSTONE))
 			.addInput(new ItemStack(Items.DUST_REDSTONE))
+			.addInput(new ItemStack(Items.DUST_REDSTONE))
+			.addInput(new ItemStack(Items.DUST_REDSTONE))
+			.addInput(new ItemStack(Items.DUST_REDSTONE))
+			.addInput(new ItemStack(Items.DUST_REDSTONE))
+			.addInput(new ItemStack(Items.DUST_REDSTONE))
 			.create("Redstone Iron Mix", new ItemStack(PTItems.redstoneIronMix, 1));
 
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
@@ -162,6 +179,11 @@ public class PTRecipes {
 		RecipeBuilder.Furnace(PotatoTech.MOD_ID)
 			.setInput(PTItems.redstoneIronMix)
 			.create("Ingot Iron", new ItemStack(PTItems.redstoneAlloy));
+
+		RecipeBuilder.BlastFurnace(PotatoTech.MOD_ID)
+			.setInput(0, Items.INGOT_IRON)
+			.setInput(1, new ItemStack(Items.DUST_REDSTONE, 4))
+			.create("Redstone Alloy", new ItemStack(PTItems.redstoneAlloy, 1));
 
 		RecipeBuilder.Trommel(PotatoTech.MOD_ID)
 			.setInput(PTItems.bedrockDust)

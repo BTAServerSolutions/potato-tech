@@ -4,6 +4,7 @@ import goldenage.potatotech.PTBlocks;
 import goldenage.potatotech.PotatoTech;
 import goldenage.potatotech.blocks.BlockLogicPipe;
 import goldenage.potatotech.blocks.entities.TileEntityEnergyConnector;
+import goldenage.potatotech.blocks.entities.TileEntityBedrockExtractor;
 import goldenage.potatotech.blocks.entities.TileEntityStirlingEngine;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.block.BlockLogic;
@@ -49,7 +50,18 @@ public class ItemWrench extends Item {
 		}
 
 		if (!world.isClientSide) {
-			if (blockId == PTBlocks.energyConnector.id()) {
+			if (blockId == PTBlocks.bedrockExtractor.id()) {
+				TileEntityBedrockExtractor extractor = (TileEntityBedrockExtractor) world.getTileEntity(blockX, blockY, blockZ);
+				if (player != null) {
+					if (extractor == null || !extractor.hasValidDrillAssembly()) {
+						player.sendMessage("Invalid Bedrock Extractor position: place a Bedrock Drill directly on top of bedrock below it.");
+					} else {
+						player.sendMessage("Bedrock Extractor charge: " + extractor.energy + "/" + TileEntityBedrockExtractor.getEnergyCapacity() + " PE");
+					}
+				}
+				return true;
+			}
+			if (blockId == PTBlocks.energyConnector.id() || blockId == PTBlocks.energyConnectorMV.id()) {
 				TileEntityEnergyConnector conn = (TileEntityEnergyConnector) world.getTileEntity(blockX, blockY, blockZ);
 				player.sendMessage("energy amount = " + conn.energy);
 			}

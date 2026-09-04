@@ -23,6 +23,10 @@ import sunsetsatellite.catalyst.core.util.network.NetworkPath;
 import sunsetsatellite.catalyst.core.util.network.NetworkType;
 import sunsetsatellite.catalyst.core.util.vector.Vec3i;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
+
 @Mixin(value = TileEntityEnergyConnector.class, remap = false)
 public class CatalystEnergyConnectorMixin implements IEnergyContainer, NetworkComponentTile {
 	@Shadow public int energy;
@@ -45,17 +49,17 @@ public class CatalystEnergyConnectorMixin implements IEnergyContainer, NetworkCo
 
 	@Override
 	public long getCapacity() {
-		return (long) TileEntityEnergyConnector.energyCapacity * potatotech$getMultiplier();
+		return (long) potatotech$connector().getEnergyCapacity() * potatotech$getMultiplier();
 	}
 
 	@Override
 	public long getMaxReceive() {
-		return getCapacity();
+		return (long) potatotech$connector().getRemainingBlockTransfer() * potatotech$getMultiplier();
 	}
 
 	@Override
 	public long getMaxProvide() {
-		return getCapacity();
+		return (long) potatotech$connector().getRemainingBlockTransfer() * potatotech$getMultiplier();
 	}
 
 	@Override
@@ -69,11 +73,14 @@ public class CatalystEnergyConnectorMixin implements IEnergyContainer, NetworkCo
 
 	@Override
 	public long receiveEnergy(@NotNull Direction dir, long amount) {
-		if (!canReceive(dir) || amount <= 0) {
+		TileEntityEnergyConnector connector = potatotech$connector();
+		if (!canReceive(dir) || amount <= 0 || !connector.canTransferWithBlock(true)) {
 			return 0;
 		}
-		long accepted = Math.min(amount, getCapacity() - getEnergy());
+		long accepted = Math.min(amount, Math.min(getCapacity() - getEnergy(), getMaxReceive()));
 		internalChangeEnergy(accepted);
+		long multiplier = potatotech$getMultiplier();
+		connector.recordExternalBlockTransfer(true, (int) ((accepted + multiplier - 1) / multiplier));
 		return accepted;
 	}
 
@@ -126,13 +133,16 @@ public class CatalystEnergyConnectorMixin implements IEnergyContainer, NetworkCo
 		if (network == null) {
 			return;
 		}
+		TileEntityEnergyConnector connector = potatotech$connector();
+		Set<IEnergyContainer> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+		boolean changed = false;
 		for (Direction direction : Direction.values()) {
 			TileEntity adjacent = direction.getTileEntity(world, self);
 			if (!(adjacent instanceof TileEntityEnergyConductor conductor)) {
 				continue;
 			}
 			for (NetworkPath path : network.getPathData(conductor.getPosition())) {
-			if (path.target == (Object) this || !(path.target instanceof IEnergyContainer destination)) {
+			if (path.target == (Object) this || !(path.target instanceof IEnergyContainer destination) || !visited.add(destination)) {
 				continue;
 			}
 			long throughput = Long.MAX_VALUE;
@@ -141,29 +151,46 @@ public class CatalystEnergyConnectorMixin implements IEnergyContainer, NetworkCo
 					throughput = Math.min(throughput, pathConductor.getMaxThroughput());
 				}
 			}
-			if (destination.canProvide(path.targetDirection)) {
+			if (connector.canTransferWithBlock(true) && destination.canProvide(path.targetDirection)) {
 				long received = Math.min(Math.min(destination.getEnergy(), destination.getMaxProvide()), Math.min(getMaxReceive(), getCapacity() - getEnergy()));
 				received = Math.min(received, throughput);
 				if (received > 0) {
 					destination.internalChangeEnergy(-received);
 					internalChangeEnergy(received);
+					connector.recordExternalBlockTransfer(true, potatotech$toPE(received));
+					changed = true;
 				}
 			}
-			if (getEnergy() > 0 && destination.canReceive(path.targetDirection)) {
+			if (connector.canTransferWithBlock(false) && getEnergy() > 0 && destination.canReceive(path.targetDirection)) {
 				long sent = Math.min(Math.min(getEnergy(), getMaxProvide()), Math.min(destination.getMaxReceive(), destination.getCapacityRemaining()));
 				sent = Math.min(sent, throughput);
 				if (sent > 0) {
 					internalChangeEnergy(-sent);
 					destination.internalChangeEnergy(sent);
+					connector.recordExternalBlockTransfer(false, potatotech$toPE(sent));
+					changed = true;
 				}
 			}
 		}
 		}
-		self.setChanged();
+		if (changed) {
+			self.setChanged();
+		}
+	}
+
+	@Unique
+	private int potatotech$toPE(long catalystEnergy) {
+		long multiplier = potatotech$getMultiplier();
+		return (int) ((catalystEnergy + multiplier - 1) / multiplier);
 	}
 
 	@Unique
 	private TileEntity potatotech$self() {
 		return (TileEntity) (Object) this;
+	}
+
+	@Unique
+	private TileEntityEnergyConnector potatotech$connector() {
+		return (TileEntityEnergyConnector) (Object) this;
 	}
 }

@@ -22,7 +22,9 @@ public class PTItems {
 	public static Item crushedIronOre;
 	public static Item crushedGoldOre;
 	public static Item energyConnector;
+	public static Item energyConnectorMV;
 	public static Item wireSpool;
+	public static Item wireSpoolMV;
 	public static Item electricHeatingUnit;
 	public static Item redstoneIronMix;
 	public static Item redstoneAlloy;
@@ -39,11 +41,13 @@ public class PTItems {
 		crushedIronOre = simpleItem("crushed_iron_ore", "crushed_iron_ore", "crushed_iron_ore", id++);
 		crushedGoldOre = simpleItem("crushed_gold_ore", "crushed_gold_ore", "crushed_gold_ore", id++);
 		energyConnector = customItem(new ItemPlaceable(new NamespaceID(MOD_ID, "item_energy_connector"), "energy_connector", id++, PTBlocks.energyConnector), "item_connector");
-		wireSpool = customItem(new ItemWireSpool("wire_spool", new NamespaceID(MOD_ID, "wire_spool"), id++), "wire_spool");
+		wireSpool = customItem(new ItemWireSpool("wire_spool", new NamespaceID(MOD_ID, "wire_spool"), id++, EnergyWireType.LV), "wire_spool");
 		electricHeatingUnit = simpleItem("electric_heating_unit", "electric_heating_unit", "electric_heating_unit", id++).setMaxStackSize(4);
 		redstoneIronMix = simpleItem("redstone_iron_mix", "redstone_iron_mix", "redstone_iron_mix", id++);
 		redstoneAlloy = simpleItem("redstone_alloy", "redstone_alloy", "redstone_alloy", id++);
 		bedrockDust = simpleItem("bedrock_dust", "bedrock_dust", "bedrock_dust", id++);
+		energyConnectorMV = customItem(new ItemPlaceable(new NamespaceID(MOD_ID, "item_energy_connector_mv"), "energy_connector_mv", id++, PTBlocks.energyConnectorMV), "item_connector");
+		wireSpoolMV = customItem(new ItemWireSpool("wire_spool_mv", new NamespaceID(MOD_ID, "wire_spool_mv"), id++, EnergyWireType.MV), "wire_spool");
 	}
 
 

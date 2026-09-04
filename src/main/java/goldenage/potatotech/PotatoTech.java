@@ -29,6 +29,7 @@ public class PotatoTech implements ModInitializer {
 		prop.setProperty("starting_block_id","1999");
 		prop.setProperty("starting_item_id","17900");
 		prop.setProperty("catalyst_energy_multiplier", "2");
+		prop.setProperty("bedrock_extractor_energy_required", "512");
 		config = new ConfigHandler(MOD_ID, prop);
 		config.updateConfig();
 	}
@@ -51,6 +52,7 @@ public class PotatoTech implements ModInitializer {
 		TileEntityDispatcher.addMapping(TileEntityEnergyConnector.class, id("tile.energy_connector"));
 		TileEntityDispatcher.addMapping(TileEntityStirlingEngine.class, id("tile.stirling_engine"));
 		TileEntityDispatcher.addMapping(TileEntitySequencer.class, id("tile.sequencer"));
+		TileEntityDispatcher.addMapping(TileEntityBedrockExtractor.class, id("tile.bedrock_extractor"));
 
 		NetworkHandler.registerNetworkMessage(OpenGuiFilterClientMessage::new);
 		NetworkHandler.registerNetworkMessage(OpenGuiCrafterClientMessage::new);

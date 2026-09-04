@@ -1,6 +1,7 @@
 package goldenage.potatotech.compat.btwaila;
 
 import goldenage.potatotech.blocks.entities.TileEntityChute;
+import goldenage.potatotech.blocks.entities.TileEntityBedrockExtractor;
 import goldenage.potatotech.blocks.entities.TileEntityCrafter;
 import goldenage.potatotech.blocks.entities.TileEntityEnergyConnector;
 import goldenage.potatotech.blocks.entities.TileEntityFilter;
@@ -28,6 +29,7 @@ public class PotatoTechBTWailaPlugin implements BTWailaCustomTooltipPlugin {
 		tooltipRegistry.register(new FilterTooltip());
 		tooltipRegistry.register(new ChuteTooltip());
 		tooltipRegistry.register(new CrafterTooltip());
+		tooltipRegistry.register(new BedrockExtractorTooltip());
 	}
 }
 
@@ -51,7 +53,7 @@ class EnergyConnectorTooltip extends PotatoTechTooltip<TileEntityEnergyConnector
 	@Override
 	public void drawAdvancedTooltip(TileEntityEnergyConnector connector, AdvancedInfoComponent component) {
 		component.drawStringWithShadow("Energy Connector", 0, 0x55D9FF);
-		drawBar(component, connector.energy, TileEntityEnergyConnector.energyCapacity, "Buffer (PE)", 0x55D9FF);
+		drawBar(component, connector.energy, connector.getEnergyCapacity(), "Buffer (PE)", 0x55D9FF);
 		component.drawStringWithShadow(connector.connections.size() + " linked connector" + (connector.connections.size() == 1 ? "" : "s"), 0);
 	}
 }
@@ -145,5 +147,24 @@ class CrafterTooltip extends PotatoTechTooltip<TileEntityCrafter> {
 		ItemStack result = crafter.getItem(0);
 		component.drawStringWithShadow(result == null ? "Awaiting a valid recipe" : "Output: " + result.getDisplayName(), 0);
 		component.drawInventory(crafter, 0);
+	}
+}
+
+class BedrockExtractorTooltip extends PotatoTechTooltip<TileEntityBedrockExtractor> {
+	@Override
+	public void initTooltip() {
+		addClass(TileEntityBedrockExtractor.class);
+	}
+
+	@Override
+	public void drawAdvancedTooltip(TileEntityBedrockExtractor extractor, AdvancedInfoComponent component) {
+		boolean validAssembly = extractor.hasValidDrillAssembly();
+		component.drawStringWithShadow("Bedrock Extractor", 0, 0x55D9FF);
+		component.drawStringWithShadow(
+			validAssembly ? "Drill assembly ready" : "Requires a Bedrock Drill on bedrock below",
+			0,
+			validAssembly ? 0x55D955 : 0xFF5555
+		);
+		drawBar(component, extractor.energy, TileEntityBedrockExtractor.getEnergyCapacity(), "Charge (PE)", 0x55D9FF);
 	}
 }

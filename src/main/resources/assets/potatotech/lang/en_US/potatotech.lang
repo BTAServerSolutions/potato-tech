@@ -34,6 +34,15 @@ tile.potatotech.energy_connector.desc=Provides energy to your machines
 item.potatotech.wire_spool.name=LV Wire Spool
 item.potatotech.wire_spool.desc=Used to connect two connectors.
 
+item.potatotech.energy_connector_mv.name=MV Energy Connector
+item.potatotech.energy_connector_mv.desc=Transfers up to 32 PE/t to and from machines.
+
+tile.potatotech.energy_connector_mv.name=MV Energy Connector
+tile.potatotech.energy_connector_mv.desc=Transfers up to 32 PE/t to and from machines.
+
+item.potatotech.wire_spool_mv.name=MV Wire Spool
+item.potatotech.wire_spool_mv.desc=Connects two connectors at up to 128 PE/t.
+
 item.potatotech.redstone_alloy.name=Redstone Alloy
 item.potatotech.redstone_alloy.desc=Who needs copper anyway?
 
@@ -136,6 +145,12 @@ tile.potatotech.dust.desc=Not angel, do not consume.
 container.filter.name=Filter
 container.sequencer.name=Sequencer
 tile.potatotech.pipe_stack.name=Pipe Stack
+
+tile.potatotech.bedrock_extractor.name=Bedrock Extractor
+tile.potatotech.bedrock_extractor.desc=Extracts resources from bedrock.
+
+tile.potatotech.bedrock_drill.name=Bedrock Drill
+tile.potatotech.bedrock_drill.desc=Works with the Bedrock Extractor.
 
 key.potatotech.wrenchMode=Wrench Mode
 gui.options.page.potatotech=Potato Logistics

@@ -14,8 +14,19 @@ import org.jetbrains.annotations.Nullable;
 import org.useless.dragonfly.models.block.StaticBlockModel;
 
 public class BlockModelConnector<T extends BlockLogic> extends BlockModelGeneric<T> {
+	private final float red;
+	private final float green;
+	private final float blue;
+
 	public BlockModelConnector(Block<T> block) {
+		this(block, 0.41f, 0.23f, 0.18f);
+	}
+
+	public BlockModelConnector(Block<T> block, float red, float green, float blue) {
 		super(block, BlockModelDispatcher.loadDataModel("potatotech:block/energy_connector").asModel());
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
 	}
 
 	@Override
@@ -25,7 +36,7 @@ public class BlockModelConnector<T extends BlockLogic> extends BlockModelGeneric
 
 		StaticBlockModel model = this.getModel(worldSource, tilePos);
 		// The 8.0 connector texture is a white mask. Apply the legacy connector tint.
-		tessellator.setColorOpaque3f(0.41f, 0.23f, 0.18f);
+		tessellator.setColorOpaque3f(red, green, blue);
 
 		// The JSON model extends along +Z (South) from z=0 to z=9.
 		// The base (z=0) must point toward the block this connector was placed on.

@@ -17,6 +17,7 @@ import net.minecraft.core.world.pos.TilePos;
 import org.joml.Vector3f;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -66,6 +67,109 @@ public class Util {
 
         tessellator.draw();
     }
+
+	/** Draws a connected square tube with shared cross-sections at every joint. */
+	public static void draw3dTube(TessellatorGeneral tessellator, double width, List<Vector3f> points, float lightR, float lightG, float lightB, float darkR, float darkG, float darkB) {
+		if (points.size() < 2) {
+			return;
+		}
+
+		float halfWidth = (float) width * 0.5f;
+		Vector3f[] right = new Vector3f[points.size()];
+		Vector3f[] up = new Vector3f[points.size()];
+		for (int i = 0; i < points.size(); i++) {
+			Vector3f tangent;
+			if (i == 0) {
+				tangent = new Vector3f(points.get(1)).sub(points.get(0));
+			} else if (i == points.size() - 1) {
+				tangent = new Vector3f(points.get(i)).sub(points.get(i - 1));
+			} else {
+				tangent = new Vector3f(points.get(i + 1)).sub(points.get(i - 1));
+			}
+			if (tangent.lengthSquared() == 0.0f) {
+				return;
+			}
+			tangent.normalize();
+			Vector3f reference = Math.abs(tangent.y) < 0.9f ? new Vector3f(0, 1, 0) : new Vector3f(1, 0, 0);
+			right[i] = tangent.cross(reference, new Vector3f()).normalize().mul(halfWidth);
+			up[i] = right[i].cross(tangent, new Vector3f()).normalize().mul(halfWidth);
+			if (i > 0 && right[i].dot(right[i - 1]) < 0.0f) {
+				right[i].negate();
+				up[i].negate();
+			}
+		}
+
+		tessellator.startDrawing(DrawMode.TRIANGLES);
+		tessellator.setLightmapCoord1i(0xFF);
+		for (int i = 0; i < points.size() - 1; i++) {
+			boolean lightSegment = i % 2 == 0;
+			tessellator.setColor4f(lightSegment ? lightR : darkR, lightSegment ? lightG : darkG, lightSegment ? lightB : darkB, 1.0f);
+			addTubeFace(tessellator, points.get(i), right[i], up[i], points.get(i + 1), right[i + 1], up[i + 1], -1, 0);
+			addTubeFace(tessellator, points.get(i), right[i], up[i], points.get(i + 1), right[i + 1], up[i + 1], 1, 0);
+			addTubeFace(tessellator, points.get(i), right[i], up[i], points.get(i + 1), right[i + 1], up[i + 1], 0, 1);
+			addTubeFace(tessellator, points.get(i), right[i], up[i], points.get(i + 1), right[i + 1], up[i + 1], 0, -1);
+		}
+		tessellator.setColor4f(lightR, lightG, lightB, 1.0f);
+		addTubeCap(tessellator, points.get(0), right[0], up[0], true);
+		boolean lightLastSegment = (points.size() - 2) % 2 == 0;
+		tessellator.setColor4f(lightLastSegment ? lightR : darkR, lightLastSegment ? lightG : darkG, lightLastSegment ? lightB : darkB, 1.0f);
+		addTubeCap(tessellator, points.get(points.size() - 1), right[points.size() - 1], up[points.size() - 1], false);
+		tessellator.draw();
+	}
+
+	private static void addTubeFace(TessellatorGeneral tessellator, Vector3f start, Vector3f startRight, Vector3f startUp, Vector3f end, Vector3f endRight, Vector3f endUp, int rightSign, int upSign) {
+		Vector3f a;
+		Vector3f b;
+		Vector3f c;
+		Vector3f d;
+		if (rightSign < 0) {
+			a = tubeCorner(start, startRight, startUp, -1, -1);
+			b = tubeCorner(start, startRight, startUp, -1, 1);
+			c = tubeCorner(end, endRight, endUp, -1, 1);
+			d = tubeCorner(end, endRight, endUp, -1, -1);
+		} else if (rightSign > 0) {
+			a = tubeCorner(start, startRight, startUp, 1, -1);
+			b = tubeCorner(end, endRight, endUp, 1, -1);
+			c = tubeCorner(end, endRight, endUp, 1, 1);
+			d = tubeCorner(start, startRight, startUp, 1, 1);
+		} else if (upSign > 0) {
+			a = tubeCorner(start, startRight, startUp, -1, 1);
+			b = tubeCorner(start, startRight, startUp, 1, 1);
+			c = tubeCorner(end, endRight, endUp, 1, 1);
+			d = tubeCorner(end, endRight, endUp, -1, 1);
+		} else {
+			a = tubeCorner(start, startRight, startUp, -1, -1);
+			b = tubeCorner(end, endRight, endUp, -1, -1);
+			c = tubeCorner(end, endRight, endUp, 1, -1);
+			d = tubeCorner(start, startRight, startUp, 1, -1);
+		}
+		addQuad(tessellator, a, b, c, d);
+	}
+
+	private static void addTubeCap(TessellatorGeneral tessellator, Vector3f point, Vector3f right, Vector3f up, boolean start) {
+		Vector3f a = tubeCorner(point, right, up, -1, -1);
+		Vector3f b = tubeCorner(point, right, up, 1, -1);
+		Vector3f c = tubeCorner(point, right, up, 1, 1);
+		Vector3f d = tubeCorner(point, right, up, -1, 1);
+		if (start) {
+			addQuad(tessellator, a, b, c, d);
+		} else {
+			addQuad(tessellator, a, d, c, b);
+		}
+	}
+
+	private static Vector3f tubeCorner(Vector3f point, Vector3f right, Vector3f up, int rightSign, int upSign) {
+		return new Vector3f(point).fma(rightSign, right).fma(upSign, up);
+	}
+
+	private static void addQuad(TessellatorGeneral tessellator, Vector3f a, Vector3f b, Vector3f c, Vector3f d) {
+		tessellator.addVertex(a.x, a.y, a.z);
+		tessellator.addVertex(b.x, b.y, b.z);
+		tessellator.addVertex(c.x, c.y, c.z);
+		tessellator.addVertex(a.x, a.y, a.z);
+		tessellator.addVertex(c.x, c.y, c.z);
+		tessellator.addVertex(d.x, d.y, d.z);
+	}
 
 	public static ItemStack removeItemFromStack(ItemStack stack, int count) {
 		if (count > 0) {

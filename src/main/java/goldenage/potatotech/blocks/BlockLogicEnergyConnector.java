@@ -1,6 +1,7 @@
 package goldenage.potatotech.blocks;
 
 import goldenage.potatotech.PTItems;
+import goldenage.potatotech.PTBlocks;
 import goldenage.potatotech.PotatoTech;
 import goldenage.potatotech.blocks.entities.TileEntityEnergyConnector;
 import net.minecraft.core.block.Block;
@@ -21,8 +22,25 @@ import org.joml.primitives.AABBdc;
 import java.util.ArrayList;
 
 public class BlockLogicEnergyConnector extends BlockLogic {
+	private final int energyCapacity;
+	private final int blockTransferRate;
+
 	public BlockLogicEnergyConnector(Block<?> block, Material material) {
+		this(block, material, TileEntityEnergyConnector.energyCapacity, TileEntityEnergyConnector.LV_BLOCK_TRANSFER_RATE);
+	}
+
+	public BlockLogicEnergyConnector(Block<?> block, Material material, int energyCapacity, int blockTransferRate) {
 		super(block, material);
+		this.energyCapacity = energyCapacity;
+		this.blockTransferRate = blockTransferRate;
+	}
+
+	public int getEnergyCapacity() {
+		return energyCapacity;
+	}
+
+	public int getBlockTransferRate() {
+		return blockTransferRate;
 	}
 
 	@Override
@@ -64,11 +82,16 @@ public class BlockLogicEnergyConnector extends BlockLogic {
 	@Override
 	public ItemStack @Nullable [] getBreakResult(World world, EnumDropCause dropCause, TilePosc tilePos, int meta, TileEntity tileEntity) {
 		// Tooltip mods may query drops without loading the block's tile entity.
-		ItemStack wireDrops = tileEntity instanceof TileEntityEnergyConnector connector ? connector.getBreakDrops(false) : null;
-		if (wireDrops == null) {
-			return new ItemStack[]{new ItemStack(PTItems.energyConnector)};
-		}
-		return new ItemStack[]{new ItemStack(PTItems.energyConnector), wireDrops};
+		ItemStack connectorDrop = new ItemStack(world.getBlockId(tilePos.x(), tilePos.y(), tilePos.z()) == PTBlocks.energyConnectorMV.id()
+			? PTItems.energyConnectorMV
+			: PTItems.energyConnector);
+		ItemStack[] wireDrops = tileEntity instanceof TileEntityEnergyConnector connector
+			? connector.getBreakDrops(false)
+			: new ItemStack[0];
+		ItemStack[] result = new ItemStack[wireDrops.length + 1];
+		result[0] = connectorDrop;
+		System.arraycopy(wireDrops, 0, result, 1, wireDrops.length);
+		return result;
 	}
 
 	@Override

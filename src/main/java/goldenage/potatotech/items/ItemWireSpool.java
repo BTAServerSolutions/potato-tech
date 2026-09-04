@@ -1,7 +1,7 @@
 package goldenage.potatotech.items;
 
-import goldenage.potatotech.PTBlocks;
 import goldenage.potatotech.PotatoTech;
+import goldenage.potatotech.EnergyWireType;
 import goldenage.potatotech.blocks.entities.TileEntityEnergyConnector;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.entity.TileEntity;
@@ -17,9 +17,11 @@ import org.jetbrains.annotations.Nullable;
 
 public class ItemWireSpool extends Item {
 	private String displayName;
+	private final EnergyWireType wireType;
 
-	public ItemWireSpool(String translationKey, @NotNull NamespaceID namespaceId, int id) {
+	public ItemWireSpool(String translationKey, @NotNull NamespaceID namespaceId, int id, EnergyWireType wireType) {
 		super(translationKey, String.valueOf(namespaceId), id);
+		this.wireType = wireType;
 	}
 
 	@Override
@@ -34,16 +36,17 @@ public class ItemWireSpool extends Item {
 		int blockZ = blockPos.z();
 
 		Block block = world.getBlock(blockX, blockY, blockZ);
-		if (block != null && block.id() == PTBlocks.energyConnector.id()) {
+		TileEntity connectorTile = world.getTileEntity(blockX, blockY, blockZ);
+		if (block != null && connectorTile instanceof TileEntityEnergyConnector) {
 			boolean connected = selfStack.getData().getBoolean("connected");
 			if (connected) {
-				TileEntity te = world.getTileEntity(blockX, blockY, blockZ);
+				TileEntity te = connectorTile;
 				if (te instanceof TileEntityEnergyConnector) {
 					selfStack.getData().putBoolean("connected", false);
 					int x = selfStack.getData().getInteger("x");
 					int y = selfStack.getData().getInteger("y");
 					int z = selfStack.getData().getInteger("z");
-					boolean connectedSuccessfully = ((TileEntityEnergyConnector) te).addConnection(x, y, z);
+					boolean connectedSuccessfully = ((TileEntityEnergyConnector) te).addConnection(x, y, z, wireType);
 					if (connectedSuccessfully) {
 						selfStack.consumeItem(player);
 					}

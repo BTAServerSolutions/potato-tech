@@ -1,5 +1,6 @@
 package goldenage.potatotech.compat.catalyst;
 
+import goldenage.potatotech.PotatoTech;
 import goldenage.potatotech.blocks.entities.TileEntityEnergyConnector;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.block.entity.TileEntity;
@@ -19,12 +20,15 @@ public final class CatalystCompat {
 			return;
 		}
 		sunsetsatellite.catalyst.core.util.Direction targetSide = toCatalystDirection(direction.opposite());
-		if (!destination.canReceive(targetSide) || source.getEnergy() <= 0) {
+		if (!destination.canReceive(targetSide) || source.getEnergy() <= 0 || !connector.canTransferWithBlock(false)) {
 			return;
 		}
-		long accepted = destination.receiveEnergy(targetSide, source.getEnergy());
+		long multiplier = Math.max(1, PotatoTech.config.getInt("catalyst_energy_multiplier"));
+		long offered = Math.min(source.getEnergy(), (long) connector.getRemainingBlockTransfer() * multiplier);
+		long accepted = destination.receiveEnergy(targetSide, offered);
 		if (accepted > 0) {
 			source.internalChangeEnergy(-accepted);
+			connector.recordExternalBlockTransfer(false, (int) ((accepted + multiplier - 1) / multiplier));
 			connector.setChanged();
 		}
 	}

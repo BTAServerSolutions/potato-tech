@@ -8,6 +8,10 @@ import net.minecraft.client.render.renderer.State;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.client.render.tileentity.TileEntityRenderer;
 import net.minecraft.core.world.World;
+import org.joml.Vector3f;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TileEntityRendererEnergyConnector extends TileEntityRenderer<TileEntityEnergyConnector> {
 
@@ -36,36 +40,22 @@ public class TileEntityRendererEnergyConnector extends TileEntityRenderer<TileEn
 			double dist = Math.sqrt(x2*x2 + y2*y2 + z2*z2);
 			double yOff = Math.log(dist + 0.15);
 
-			boolean b = false;
-
 			double t_increment = 0.25 / dist;
-			for (double t = 0.0; t < 1.0 - t_increment * 0.5; t += t_increment) {
-				double tx = t * x2;
-				double ty = t * y2;
-				double tz = t * z2;
+			List<Vector3f> points = new ArrayList<>();
+			for (double t = 0.0; t <= 1.0; t += t_increment) {
+				double clampedT = Math.min(t, 1.0);
+				double tx = clampedT * x2;
+				double ty = clampedT * y2;
+				double tz = clampedT * z2;
 
-				double yOff0 = -0.8*((t-0.5)*(t-0.5)) + 0.2f;
-				double yOff1 = -0.8*((t-0.5 + t_increment)*(t-0.5 + t_increment)) + 0.2f;
-				yOff0 *= yOff;
-				yOff1 *= yOff;
-
-				b = !b;
-				float r_col = 0.88f;
-				float g_col = 0.22f;
-				float b_col = 0.22f;
-				if (b) {
-					r_col = 1.0f;
-					g_col = 0.57f;
-					b_col = 0.57f;
-				}
-
-				float bright = 1f;
-
-				Util.draw3dLine(tessellator, 0.05,
-					tx, ty - yOff0 , tz,
-					tx + x2 * t_increment, ty + y2 * t_increment - yOff1, tz + z2 * t_increment,
-					r_col * bright, g_col * bright, b_col * bright);
+				double yOffset = (-0.8 * ((clampedT - 0.5) * (clampedT - 0.5)) + 0.2f) * yOff;
+				points.add(new Vector3f((float) tx, (float) (ty - yOffset), (float) tz));
 			}
+			if (points.get(points.size() - 1).distanceSquared((float) x2, (float) (y2 - (-0.8 * 0.25 + 0.2f) * yOff), (float) z2) > 0.0001f) {
+				points.add(new Vector3f((float) x2, (float) (y2 - (-0.8 * 0.25 + 0.2f) * yOff), (float) z2));
+			}
+			float[] colors = c.wireType.getColors();
+			Util.draw3dTube(tessellator, 0.05, points, colors[0], colors[1], colors[2], colors[3], colors[4], colors[5]);
 		}
 
 		GLRenderer.popFrame();
