@@ -18,11 +18,10 @@ public class BlockLogicChute extends BlockLogic {
 
 	@Override
 	public boolean onInteracted(World world, TilePosc tilePos, Player player, Side side, double xHit, double yHit) {
-		if (world.getTileEntity(tilePos) instanceof TileEntityChute te && te.getNumUnitsInside() > 0) {
-			te.givePlayerAllItems(world, player);
-			return true;
+		if (!world.isClientSide && world.getTileEntity(tilePos) instanceof TileEntityChute chute) {
+			player.displayChestScreen(chute, tilePos.x(), tilePos.y(), tilePos.z());
 		}
-		return false;
+		return true;
 	}
 
 	@Override

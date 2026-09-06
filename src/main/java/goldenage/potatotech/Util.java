@@ -13,12 +13,9 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.world.World;
-import net.minecraft.core.world.pos.TilePos;
 import org.joml.Vector3f;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class Util {
@@ -162,6 +159,8 @@ public class Util {
 		return new Vector3f(point).fma(rightSign, right).fma(upSign, up);
 	}
 
+
+
 	private static void addQuad(TessellatorGeneral tessellator, Vector3f a, Vector3f b, Vector3f c, Vector3f d) {
 		tessellator.addVertex(a.x, a.y, a.z);
 		tessellator.addVertex(b.x, b.y, b.z);
@@ -169,6 +168,184 @@ public class Util {
 		tessellator.addVertex(a.x, a.y, a.z);
 		tessellator.addVertex(c.x, c.y, c.z);
 		tessellator.addVertex(d.x, d.y, d.z);
+	}
+
+	public record SlotInfo(Container container, int index, int freeCapacity) {}
+
+	public static SlotInfo getContainerSlotInfo(TileEntity entity, Direction dir, ItemStack stackToInsert, short requestedColor) {
+		SlotInfo info = new SlotInfo(null, -1, 0);
+		boolean isInsertion = stackToInsert != null;
+
+		if (!(entity instanceof Container)) return info;
+
+		Container container = (Container) entity;
+		String containerName = container.getNameTranslationKey();
+
+		if (isSignalIndustriesStorageContainer(container)) {
+			info = new SlotInfo(container, 0, isInsertion ? stackToInsert.stackSize : 1);
+		} else if (FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(entity)) {
+			int slot = CatalystItemIoCompat.getActiveSlot(entity, dir, stackToInsert);
+
+			if (slot >= 0 && slot < container.getContainerSize()) {
+				ItemStack stack = container.getItem(slot);
+
+				if (isInsertion) {
+					int maxStackSize = Math.min(container.getMaxStackSize(), stackToInsert.getMaxStackSize());
+					if (stack == null) {
+						info = new SlotInfo(container, slot, maxStackSize);
+					} else if (stack.canStackWith(stackToInsert) && stack.stackSize < maxStackSize) {
+						info = new SlotInfo(container, slot, maxStackSize - stack.stackSize);
+					}
+				} else if (stack != null) {
+					info = new SlotInfo(container, slot, stack.stackSize);
+				}
+			}
+		} else if (entity instanceof TileEntityChute chute) {
+			if (isInsertion && dir == Direction.DOWN) {
+				int maxStackSize = Math.min(chute.getMaxStackSize(), stackToInsert.getMaxStackSize());
+				int emptySlot = -1;
+
+				for (int i = 0; i < chute.getContainerSize(); i++) {
+					ItemStack stack = chute.getItem(i);
+					if (stack == null) {
+						if (emptySlot < 0) emptySlot = i;
+					} else if (stack.canStackWith(stackToInsert) && stack.stackSize < maxStackSize) {
+						info = new SlotInfo(chute, i, maxStackSize - stack.stackSize);
+						break;
+					}
+				}
+
+				if (info.index() < 0 && emptySlot >= 0) {
+					info = new SlotInfo(chute, emptySlot, maxStackSize);
+				}
+			} else if (!isInsertion && dir == Direction.UP) {
+				for (int i = 0; i < chute.getContainerSize(); i++) {
+					ItemStack stack = chute.getItem(i);
+					if (stack != null) {
+						info = new SlotInfo(chute, i, stack.stackSize);
+						break;
+					}
+				}
+			}
+		} else {
+			if (containerName.equals("container.chest.name")) {
+				container = BlockLogicChest.getInventory(entity.worldObj, entity.tilePos);
+			}
+
+			if (isInsertion) {
+				if (entity instanceof TileEntityCrafter crafter) {
+					int selectedSlot = -1;
+					int selectedCount = Integer.MAX_VALUE;
+
+					for (int i = 0; i < crafter.craftMatrix.getContainerSize(); i++) {
+						ItemStack pattern = crafter.pattern.getItem(i);
+						if (pattern == null
+							|| pattern.itemID != stackToInsert.itemID
+							|| pattern.getMetadata() != stackToInsert.getMetadata()) continue;
+
+						ItemStack stack = crafter.craftMatrix.getItem(i);
+						if (stack == null) {
+							selectedSlot = i + 1;
+							selectedCount = 0;
+						} else if (selectedCount > 0
+							&& stack.itemID == stackToInsert.itemID
+							&& stack.getMetadata() == stackToInsert.getMetadata()
+							&& stack.stackSize < stack.getMaxStackSize()
+							&& stack.stackSize < selectedCount) {
+							selectedSlot = i + 1;
+							selectedCount = stack.stackSize;
+						}
+					}
+
+					if (selectedSlot >= 0) {
+						info = new SlotInfo(crafter, selectedSlot, 1);
+					}
+				} else {
+					int firstSlot = 0;
+					int endSlot = container.getContainerSize();
+					int maxStackSize = Math.min(container.getMaxStackSize(), stackToInsert.getMaxStackSize());
+					boolean allowEmptySlot = !containerName.equals("container.filter.name");
+
+					if (entity instanceof TileEntityFurnaceBlast) {
+						firstSlot = dir == Direction.UP ? 2 : dir == Direction.DOWN ? 1 : 0;
+						endSlot = firstSlot + 1;
+						maxStackSize = Math.min(maxStackSize, 8);
+					} else if (entity instanceof TileEntityFurnace) {
+						firstSlot = dir == Direction.UP ? 1 : 0;
+						endSlot = firstSlot + 1;
+						maxStackSize = Math.min(maxStackSize, 8);
+					} else if (containerName.equals("container.trommel.name")) {
+						firstSlot = dir == Direction.UP ? 4 : 0;
+						endSlot = dir == Direction.UP ? 5 : 3;
+						maxStackSize = Math.min(maxStackSize, 8);
+					} else if (entity instanceof TileEntityFlag) {
+						firstSlot = 36;
+						endSlot = 37;
+					}
+
+					int emptySlot = -1;
+					for (int i = firstSlot; i < endSlot; i++) {
+						if (container.locked(i)) continue;
+						ItemStack stack = container.getItem(i);
+
+						if (stack == null) {
+							if (allowEmptySlot && emptySlot < 0) emptySlot = i;
+						} else if (stack.canStackWith(stackToInsert) && stack.stackSize < maxStackSize) {
+							info = new SlotInfo(container, i, maxStackSize - stack.stackSize);
+							break;
+						}
+					}
+
+					if (info.index() < 0 && emptySlot >= 0) {
+						info = new SlotInfo(container, emptySlot, maxStackSize);
+					}
+				}
+			} else {
+				int firstSlot = 0;
+				int endSlot = Math.min(1, container.getContainerSize());
+				int reservedItems = 0;
+
+				if (entity instanceof TileEntityCrafter crafter) {
+					if (crafter.getItem(0) != null) {
+						container = crafter;
+						endSlot = 1;
+						reservedItems = Objects.requireNonNull(crafter.getItem(0)).stackSize - 1;
+					} else {
+						container = crafter.extraOutputs;
+						endSlot = 1;
+					}
+				} else if (entity instanceof TileEntityFurnaceBlast) {
+					firstSlot = 3;
+					endSlot = 4;
+				} else if (entity instanceof TileEntityFurnace) {
+					firstSlot = 2;
+					endSlot = 3;
+				} else if (containerName.equals("container.trommel.name")) {
+					endSlot = 4;
+				} else if (entity instanceof TileEntityFlag) {
+					firstSlot = 36;
+					endSlot = 37;
+				} else if (containerName.equals("container.chest.name")
+					|| containerName.equals("container.dispenser.name")
+					|| containerName.startsWith("container.ironchest")
+					|| containerName.equals("container.filter.name")) {
+					endSlot = container.getContainerSize();
+					if (containerName.equals("container.filter.name")) reservedItems = 1;
+				}
+
+				for (int i = firstSlot; i < endSlot; i++) {
+					ItemStack stack = container.getItem(i);
+					if (stack != null
+						&& stack.stackSize > reservedItems
+						&& (!(entity instanceof TileEntityFilter filter) || requestedColor == 0 || filter.getColorInSlot(i) == requestedColor)) {
+						info = new SlotInfo(container, i, stack.stackSize - reservedItems);
+						break;
+					}
+				}
+			}
+		}
+
+		return info;
 	}
 
 	public static ItemStack removeItemFromStack(ItemStack stack, int count) {
@@ -182,122 +359,36 @@ public class Util {
 		return null;
 	}
 
-	public static PipeStack getItemFromInventoryNoCatch(World world, int x, int y, int z, Direction dir, int stackTimer, int count) {
+	public static PipeStack getItemFromInventoryNoCatch(World world, int x, int y, int z, Direction dir, int stackTimer, int count, short requestedColor) {
 		PipeStack returnStack = null;
-
 		TileEntity te = world.getTileEntity(x, y, z);
-		if (FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(te)) {
-			return CatalystItemIoCompat.extract(te, dir, stackTimer, count);
-		}
-		if (te instanceof Container) {
-			Container inventory = (Container) te;
-			String inventoryName = inventory.getNameTranslationKey();
-			if (isSignalIndustriesStorageContainer(inventory)) {
-				ItemStack stack = extractSignalIndustriesStorageItem(inventory, count);
-				return stack == null ? null : new PipeStack(stack, dir, stackTimer);
-			}
 
-			{
-				if (Objects.equals(inventoryName, "container.chest.name")) {
-					inventory = BlockLogicChest.getInventory(world, new TilePos(x, y ,z));
+		SlotInfo slotInfo = getContainerSlotInfo(te, dir, null, requestedColor);
+
+		if (slotInfo.freeCapacity() > 0) {
+			if (isSignalIndustriesStorageContainer(slotInfo.container())) {
+				ItemStack stack = extractSignalIndustriesStorageItem(slotInfo.container(), count);
+				if (stack != null) returnStack = new PipeStack(stack, dir, stackTimer);
+			} else {
+				ItemStack stack = slotInfo.container().getItem(slotInfo.index());
+				if (stack != null) {
+					short color = te instanceof TileEntityFilter filter ? filter.getColorInSlot(slotInfo.index()) : 0;
+					ItemStack extracted = removeItemFromStack(stack, Math.min(count, slotInfo.freeCapacity()));
+					slotInfo.container().setItem(slotInfo.index(), stack.stackSize > 0 ? stack : null);
+					slotInfo.container().setChanged();
+					te.setChanged();
+					returnStack = new PipeStack(extracted, dir, stackTimer, color);
 				}
-
-				if (Objects.equals(inventoryName, "container.chest.name")
-					|| Objects.equals(inventoryName, "container.dispenser.name")
-					|| inventoryName.startsWith("container.ironchest")
-					|| Objects.equals(inventoryName, "container.filter.name")
-				) {
-					int inventorySize = inventory.getContainerSize();
-					ItemStack stack = null;
-					int j = 0;
-
-					if (!inventoryName.equals("container.filter.name")) {
-						for (; stack == null && j < inventorySize; j++) stack = inventory.getItem(j);
-					} else {
-						for (; stack == null && j < inventorySize; j++) {
-							stack = inventory.getItem(j);
-							if (stack != null && stack.stackSize <= 1) stack = null;
-						}
-					}
-
-					if (stack != null && j > 0) {
-						short color = 0;
-						if (Objects.equals(inventoryName, "container.filter.name")) {
-							TileEntityFilter filter = (TileEntityFilter) inventory;
-							color = filter.getColorInSlot(j - 1);
-						}
-
-						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer, color);
-						if (stack.stackSize <= 0) stack = null;
-						inventory.setItem(j - 1, stack);
-						return returnStack;
-					}
-
-				} else if (Objects.equals(inventoryName, "container.trommel.name")) {
-					int inventorySize = 4;
-					ItemStack stack = null;
-					int j = 0;
-					for (; stack == null && j < inventorySize; j++) stack = inventory.getItem(j);
-
-					if (stack != null && j > 0) {
-						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer);
-						if (stack.stackSize <= 0) stack = null;
-						inventory.setItem(j - 1, stack);
-						return returnStack;
-					}
-				} else if (Objects.equals(inventoryName, "container.crafter.name")) {
-					TileEntityCrafter ac = (TileEntityCrafter) te;
-					ItemStack stack = ac.removeOneResult();
-					if (stack != null) {
-						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer);
-					} else {
-						ItemStack extra = ac.extraOutputs.getItem(0);
-						if (extra != null) {
-							ItemStack r = removeItemFromStack(extra, count);
-							if (extra.stackSize <= 0) {
-								ac.extraOutputs.setItem(0, null);
-							}
-							returnStack = new PipeStack(r, dir, stackTimer);
-						}
-					}
-				} else if (te instanceof TileEntityFlag) {
-					ItemStack stack = inventory.getItem(36);
-					if (stack != null) {
-						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer);
-						if (stack.stackSize <= 0) stack = null;
-						inventory.setItem(36, stack);
-					}
-				} else if (te instanceof TileEntityFurnace || te instanceof TileEntityFurnaceBlast) {
-					int outputSlot = te instanceof TileEntityFurnaceBlast ? 3 : 2;
-					ItemStack stack = inventory.getItem(outputSlot);
-					if (stack != null) {
-						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer);
-						if (stack.stackSize <= 0) stack = null;
-						inventory.setItem(outputSlot, stack);
-					}
-				} else if (inventory.getContainerSize() > 0) {
-					ItemStack stack = inventory.getItem(0);
-					if (stack != null) {
-						returnStack = new PipeStack(removeItemFromStack(stack, count), dir, stackTimer);
-						if (stack.stackSize <= 0) stack = null;
-						inventory.setItem(0, stack);
-					}
-				}
-			}
-		} else if (te instanceof TileEntityChute && dir == Direction.UP) {
-			ItemStack stack = ((TileEntityChute)te).removeItems(count);
-			if (stack != null) {
-				returnStack = new PipeStack(stack, dir, stackTimer);
 			}
 		}
 
 		return returnStack;
 	}
 
-	public static PipeStack getItemFromInventory(World world, int x, int y, int z, Direction dir, int stackTimer, int count) {
+	public static PipeStack getItemFromInventory(World world, int x, int y, int z, Direction dir, int stackTimer, int count, short requestedColor) {
 		PipeStack result = null;
 		try {
-			result = getItemFromInventoryNoCatch(world, x, y, z, dir, stackTimer, count);
+			result = getItemFromInventoryNoCatch(world, x, y, z, dir, stackTimer, count, requestedColor);
 
 		} catch(Exception e) {
 			PotatoTech.LOGGER.error(e.getMessage());
@@ -306,300 +397,62 @@ public class Util {
 		return result;
 	}
 
-	public static void stackPipeStack(PipeStack pipeStack, ItemStack stack) {
-		if (stack.canStackWith(pipeStack.stack)) {
-			int remainder = stack.getMaxStackSize() - stack.stackSize;
-			int count = Math.min(pipeStack.stack.stackSize, remainder);
-			pipeStack.stack.stackSize -= count;
-			stack.stackSize += count;
-		}
-	}
-
-	public static boolean canStackPipeStack(PipeStack pipeStack, ItemStack stack) {
-		if (stack.canStackWith(pipeStack.stack)) {
-			int remainder = stack.getMaxStackSize() - stack.stackSize;
-			return remainder >= pipeStack.stack.stackSize;
-		}
-		return false;
-	}
-
-	public static boolean insertOnInventoryNoCatch(Container inventory, ItemStack stack, Direction direction) {
-		boolean hasInserted = false;
-		if (inventory == null) {
-			System.out.println(Arrays.toString(new NullPointerException("Null Pointer in insertOnInventory!!").getStackTrace()));
-			StringBuilder builder = new StringBuilder("Error something is null when it shouldn't be!! | Inventory: ");
-			System.out.println(builder);
-			PotatoTech.LOGGER.info(builder.toString());
-			return false;
-		}
-		int inventorySize = inventory.getContainerSize();
-		String inventoryName = inventory.getNameTranslationKey();
-
-		if (inventory instanceof TileEntityFurnace || inventory instanceof TileEntityFurnaceBlast || Objects.equals(inventoryName, "container.trommel.name")) {
-			int fuelSlot = 1;
-			int inputSlot = 0;
-
-			if (Objects.equals(inventoryName, "container.trommel.name")) {
-				fuelSlot = 4;
-				for (; inputSlot < 3; inputSlot++) {
-					ItemStack s = inventory.getItem(inputSlot);
-					if (s == null) break;
-					if (s.canStackWith(stack) && s.stackSize < s.getMaxStackSize()) break;
-				}
-			}
-
-			if (inventory instanceof TileEntityFurnaceBlast) {
-				fuelSlot = 2;
-				if (direction == Direction.DOWN) {
-					inputSlot = 1;
-				}
-			}
-
-			int targetSlot = direction == Direction.UP ? fuelSlot : inputSlot;
-			ItemStack furnaceStack = inventory.getItem(targetSlot);
-
-			if (furnaceStack == null) {
-				inventory.setItem(targetSlot, stack);
-				hasInserted = true;
-			} else {
-				int maxStackSize = 8;
-				if (furnaceStack.canStackWith(stack) && furnaceStack.stackSize < maxStackSize) {
-					furnaceStack.stackSize++;
-					inventory.setItem(targetSlot, furnaceStack);
-					hasInserted = true;
-				}
-			}
-		} else if (inventory instanceof TileEntityFlag) {
-			int targetSlot = 36;
-			ItemStack flagStack = inventory.getItem(targetSlot);
-
-			if (flagStack == null) {
-				inventory.setItem(targetSlot, stack);
-				hasInserted = true;
-			} else {
-				int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : flagStack.getMaxStackSize();
-				if (flagStack.canStackWith(stack) && flagStack.stackSize < maxStackSize) {
-					flagStack.stackSize++;
-					inventory.setItem(targetSlot, flagStack);
-					hasInserted = true;
-				}
-			}
-		} else if (Objects.equals(inventoryName, "container.crafter.name")) {
-			 TileEntityCrafter ac = (TileEntityCrafter) inventory;
-			 hasInserted = ac.insertItem(stack);
-		} else {
-			 ItemStack chestStack;
-			 for (int j = 0; j < inventorySize; j++) {
-				  if (inventoryName.equals("container.activator.name")) {
-					  TileEntityActivator activator = (TileEntityActivator) inventory;
-					  if (activator.locked(j)) {
-						  continue;
-					  }
-				  }
-
-				 chestStack = inventory.getItem(j);
-
-				  if (chestStack == null) {
-					  if (!inventoryName.equals("container.filter.name") && !inventoryName.equals("container.crafter.name")) {
-						   inventory.setItem(j, stack);
-						   hasInserted = true;
-					  }
-					  break;
-				  }
-
-				  int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : chestStack.getMaxStackSize();
-				  if (chestStack.canStackWith(stack) && chestStack.stackSize < maxStackSize) {
-					  chestStack.stackSize++;
-					  inventory.setItem(j, chestStack);
-
-					  hasInserted = true;
-					  break;
-				  }
-			 }
-		}
-
-		return hasInserted;
+	public static boolean insertOnInventoryNoCatch(TileEntity entity, ItemStack stack, Direction direction) {
+		if (entity == null || stack == null || stack.stackSize <= 0) return false;
+		return insertPipeStackOnInventory(entity, new PipeStack(stack, direction, 0), direction);
 	}
 
 	public static boolean canInsertOnInventory(World world, int x, int y, int z, Direction dir, ItemStack item) {
-		TileEntity te = world.getTileEntity(x, y, z);
-
-		if (te == null) {
-			return false;
-		}
-
-		if (!(te instanceof Container)) {
-			return false;
-		}
-
-		if (te instanceof TileEntityFilter) {
-			return ((TileEntityFilter) te).canInsertItem(item);
-		}
-
-		Container inventory = (Container)te;
-		int inventorySize = inventory.getContainerSize();
-		String inventoryName = inventory.getNameTranslationKey();
-
-		if (Objects.equals(inventoryName, "container.chest.name")
-			|| Objects.equals(inventoryName, "container.dispenser.name")
-			|| inventoryName.startsWith("container.ironchest")
-			|| Objects.equals(inventoryName, "container.filter.name")
-			|| Objects.equals(inventoryName, "container.crafter.name")
-			|| inventoryName.equals("container.activator.name")
-		) {
-			ItemStack chestStack;
-			for (int j = 0; j < inventorySize; j++) {
-				if (inventoryName.equals("container.activator.name")) {
-					TileEntityActivator activator = (TileEntityActivator) inventory;
-					if (activator.locked(j)) {
-						continue;
-					}
-				}
-
-				chestStack = inventory.getItem(j);
-				if (chestStack == null) {
-					return !inventoryName.equals("container.filter.name");
-				}
-				int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : chestStack.getMaxStackSize();
-				if (chestStack.canStackWith(item) && chestStack.stackSize < maxStackSize) {
-					return true;
-				}
-			}
-		} else if (inventory instanceof TileEntityFlag) {
-			int targetSlot = 36;
-			ItemStack flagStack = inventory.getItem(targetSlot);
-
-			if (flagStack == null) {
-				return true;
-			} else {
-				return flagStack.canStackWith(item);
-			}
-		} else {
-			int fuelSlot = 1;
-			int inputSlot = 0;
-
-			if (Objects.equals(inventoryName, "container.trommel.name")) {
-				fuelSlot = 4;
-				for (; inputSlot < 3; inputSlot++) {
-					ItemStack s = inventory.getItem(inputSlot);
-					if (s == null) break;
-					int maxStackSize = inventory.getMaxStackSize() != 64 ? inventory.getMaxStackSize() : s.getMaxStackSize();
-					if (s.canStackWith(item) && s.stackSize < maxStackSize) break;
-				}
-			}
-
-			int targetSlot = dir == Direction.UP ? fuelSlot : inputSlot;
-
-			ItemStack furnaceStack = inventory.getItem(targetSlot);
-
-			if (furnaceStack == null) {
-				return true;
-			} else {
-				return furnaceStack.canStackWith(item) && furnaceStack.stackSize < Math.min(8, item.getMaxStackSize());
-			}
-		}
-
-		return false;
+		return getContainerSlotInfo(world.getTileEntity(x, y, z), dir, item, (short)0).freeCapacity() > 0;
 	}
 
-	public static boolean insertPipeStackOnInventory(Container inventory, PipeStack pipeStack, Direction direction) {
-		if (inventory == null || pipeStack == null || pipeStack.stack == null || pipeStack.stack.stackSize <= 0) {
+	public static boolean insertPipeStackOnInventory(TileEntity entity, PipeStack pipeStack, Direction direction) {
+		if (entity == null || pipeStack == null || pipeStack.stack == null || pipeStack.stack.stackSize <= 0) {
 			return false;
-		}
-		if (isSignalIndustriesStorageContainer(inventory)) {
-			return insertSignalIndustriesStorageItem(inventory, pipeStack.stack);
-		}
-
-		String inventoryName = inventory.getNameTranslationKey();
-		if (inventory instanceof TileEntityFurnace || inventory instanceof TileEntityFurnaceBlast || Objects.equals(inventoryName, "container.trommel.name")) {
-			int targetSlot = getMachineInputSlot(inventory, inventoryName, direction, pipeStack.stack);
-			return insertIntoSlot(inventory, targetSlot, pipeStack, 8);
-		}
-		if (inventory instanceof TileEntityFlag) {
-			return insertIntoSlot(inventory, 36, pipeStack, inventory.getMaxStackSize());
-		}
-		if (Objects.equals(inventoryName, "container.crafter.name")) {
-			TileEntityCrafter crafter = (TileEntityCrafter) inventory;
-			boolean inserted = false;
-			while (pipeStack.stack.stackSize > 0) {
-				ItemStack oneItem = pipeStack.stack.copy();
-				oneItem.stackSize = 1;
-				if (!crafter.insertItem(oneItem)) {
-					break;
-				}
-				pipeStack.stack.stackSize--;
-				inserted = true;
-			}
-			return inserted;
 		}
 
 		boolean inserted = false;
-		for (int slot = 0; slot < inventory.getContainerSize() && pipeStack.stack.stackSize > 0; slot++) {
-			if (inventoryName.equals("container.activator.name") && ((TileEntityActivator) inventory).locked(slot)) {
-				continue;
-			}
-			ItemStack current = inventory.getItem(slot);
-			if (current != null) {
-				inserted |= insertIntoSlot(inventory, slot, pipeStack, getSlotCapacity(inventory, current));
-			}
-		}
-		if (Objects.equals(inventoryName, "container.filter.name")) {
-			return inserted;
-		}
-		for (int slot = 0; slot < inventory.getContainerSize() && pipeStack.stack.stackSize > 0; slot++) {
-			if (inventoryName.equals("container.activator.name") && ((TileEntityActivator) inventory).locked(slot)) {
-				continue;
-			}
-			if (inventory.getItem(slot) == null) {
-				inserted |= insertIntoSlot(inventory, slot, pipeStack, getSlotCapacity(inventory, pipeStack.stack));
+		SlotInfo firstSlot = getContainerSlotInfo(entity, direction, pipeStack.stack, (short)0);
+
+		if (firstSlot.freeCapacity() > 0) {
+			if (isSignalIndustriesStorageContainer(firstSlot.container())) {
+				inserted = insertSignalIndustriesStorageItem(firstSlot.container(), pipeStack.stack);
+			} else {
+				SlotInfo slotInfo = firstSlot;
+				while (slotInfo.freeCapacity() > 0 && pipeStack.stack.stackSize > 0) {
+					if (!insertIntoSlot(slotInfo, pipeStack)) break;
+					inserted = true;
+					slotInfo = getContainerSlotInfo(entity, direction, pipeStack.stack, (short)0);
+				}
 			}
 		}
+
+		if (inserted) entity.setChanged();
 		return inserted;
 	}
 
-	private static int getMachineInputSlot(Container inventory, String inventoryName, Direction direction, ItemStack stack) {
-		if (Objects.equals(inventoryName, "container.trommel.name")) {
-			for (int slot = 0; slot < 3; slot++) {
-				ItemStack current = inventory.getItem(slot);
-				if (current == null || (current.canStackWith(stack) && current.stackSize < 8)) {
-					return slot;
-				}
-			}
-			return 0;
-		}
-		if (inventory instanceof TileEntityFurnaceBlast) {
-			if (direction == Direction.UP) return 2;
-			return direction == Direction.DOWN ? 1 : 0;
-		}
-		return direction == Direction.UP ? 1 : 0;
-	}
-
-	private static boolean insertIntoSlot(Container inventory, int slot, PipeStack pipeStack, int capacity) {
-		ItemStack current = inventory.getItem(slot);
+	private static boolean insertIntoSlot(SlotInfo slotInfo, PipeStack pipeStack) {
+		Container inventory = slotInfo.container();
+		ItemStack current = inventory.getItem(slotInfo.index());
+		int amount = Math.min(pipeStack.stack.stackSize, slotInfo.freeCapacity());
+		if (amount <= 0) return false;
 		if (current == null) {
-			int amount = Math.min(pipeStack.stack.stackSize, capacity);
-			if (amount <= 0) return false;
 			ItemStack inserted = pipeStack.stack.copy();
 			inserted.stackSize = amount;
 			pipeStack.stack.stackSize -= amount;
-			inventory.setItem(slot, inserted);
+			inventory.setItem(slotInfo.index(), inserted);
+			inventory.setChanged();
 			return true;
 		}
-		if (!current.canStackWith(pipeStack.stack)) return false;
-		int amount = Math.min(pipeStack.stack.stackSize, capacity - current.stackSize);
-		if (amount <= 0) return false;
 		current.stackSize += amount;
 		pipeStack.stack.stackSize -= amount;
-		inventory.setItem(slot, current);
+		inventory.setItem(slotInfo.index(), current);
+		inventory.setChanged();
 		return true;
 	}
 
-	private static int getSlotCapacity(Container inventory, ItemStack stack) {
-		return Math.min(inventory.getMaxStackSize(), stack.getMaxStackSize());
-	}
-
 	private static boolean isSignalIndustriesStorageContainer(Container inventory) {
-		return Objects.equals(inventory.getNameTranslationKey(), "container.signalindustries.storageContainer");
+		return inventory.getNameTranslationKey().equals("container.signalindustries.storageContainer");
 	}
 
 	private static boolean insertSignalIndustriesStorageItem(Container inventory, ItemStack stack) {
@@ -620,10 +473,10 @@ public class Util {
 		}
 	}
 
-	public static boolean insertOnInventory(Container inventory, ItemStack stack, Direction direction) {
+	public static boolean insertOnInventory(TileEntity entity, ItemStack stack, Direction direction) {
 		boolean result = false;
 		try {
-			result = insertOnInventoryNoCatch(inventory, stack, direction);
+			result = insertOnInventoryNoCatch(entity, stack, direction);
 		} catch (Exception e) {
 			PotatoTech.LOGGER.error(e.getMessage());
 		}

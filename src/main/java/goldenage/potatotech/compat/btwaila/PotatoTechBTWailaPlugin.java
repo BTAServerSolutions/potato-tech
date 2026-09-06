@@ -18,7 +18,6 @@ import toufoumaster.btwaila.util.TextureOptions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class PotatoTechBTWailaPlugin implements BTWailaCustomTooltipPlugin {
 	@Override
@@ -122,13 +121,15 @@ class ChuteTooltip extends PotatoTechTooltip<TileEntityChute> {
 
 	@Override
 	public void drawAdvancedTooltip(TileEntityChute chute, AdvancedInfoComponent component) {
-		component.drawStringWithShadow(chute.contents.isEmpty() ? "Empty" : chute.contents.size() + " item type" + (chute.contents.size() == 1 ? "" : "s"), 0);
-		drawBar(component, chute.getNumUnitsInside(), chute.getMaxUnits(), "Capacity", 0xD6A34A);
 		List<ItemStack> stacks = new ArrayList<>();
-		for (Map.Entry<TileEntityChute.ChuteEntry, Integer> entry : chute.contents.entrySet()) {
-			TileEntityChute.ChuteEntry item = entry.getKey();
-			stacks.add(new ItemStack(item.id, entry.getValue(), item.metadata, item.tag));
+		for (int i = 0; i < chute.getContainerSize(); i++) {
+			ItemStack stack = chute.getItem(i);
+			if (stack != null) {
+				stacks.add(stack);
+			}
 		}
+		component.drawStringWithShadow(stacks.isEmpty() ? "Empty" : stacks.size() + " occupied slot" + (stacks.size() == 1 ? "" : "s"), 0);
+		drawBar(component, chute.getNumUnitsInside(), chute.getMaxUnits(), "Capacity", 0xD6A34A);
 		if (!stacks.isEmpty()) {
 			component.drawItemList(stacks.toArray(new ItemStack[0]), 0);
 		}

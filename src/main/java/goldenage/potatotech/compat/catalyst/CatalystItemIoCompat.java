@@ -17,78 +17,54 @@ public final class CatalystItemIoCompat {
 		return tileEntity instanceof Container && getItemIo(tileEntity) != null;
 	}
 
-	public static boolean hasConfiguredSide(TileEntity tileEntity, Direction direction) {
+	public static boolean canAccessSide(TileEntity tileEntity, Direction direction, boolean insertion) {
 		IItemIO itemIo = getItemIo(tileEntity);
 		if (itemIo == null) {
 			return false;
 		}
-		return itemIo.getItemIOForSide(toCatalystDirection(direction.opposite())) != Connection.NONE;
+		Connection connection = itemIo.getItemIOForSide(toCatalystDirection(direction.opposite()));
+		return insertion
+			? connection == Connection.INPUT || connection == Connection.BOTH
+			: connection == Connection.OUTPUT || connection == Connection.BOTH;
 	}
 
 	public static boolean canInsert(TileEntity tileEntity, Direction direction, ItemStack stack) {
-		if (!isItemIo(tileEntity)) {
-			return false;
-		}
-		IItemIO itemIo = getItemIo(tileEntity);
-		Connection connection = itemIo.getItemIOForSide(toCatalystDirection(direction.opposite()));
-		if (connection != Connection.INPUT && connection != Connection.BOTH) {
-			return false;
-		}
-		Container container = (Container) tileEntity;
-		int slot = itemIo.getActiveItemSlotForSide(toCatalystDirection(direction.opposite()), stack);
-		if (slot < 0 || slot >= container.getContainerSize()) {
-			return false;
-		}
-		ItemStack current = container.getItem(slot);
-		return current == null || (current.canStackWith(stack) && current.stackSize < Math.min(container.getMaxStackSize(), current.getMaxStackSize()));
+		return Util.getContainerSlotInfo(tileEntity, direction, stack, (short)0).freeCapacity() > 0;
 	}
 
 	public static boolean insert(TileEntity tileEntity, Direction direction, PipeStack pipeStack) {
-		if (!canInsert(tileEntity, direction, pipeStack.stack)) {
-			return false;
-		}
-		IItemIO itemIo = getItemIo(tileEntity);
-		Container container = (Container) tileEntity;
-		int slot = itemIo.getActiveItemSlotForSide(toCatalystDirection(direction.opposite()), pipeStack.stack);
-		ItemStack current = container.getItem(slot);
-		if (current == null) {
-			int amount = Math.min(pipeStack.stack.stackSize, Math.min(container.getMaxStackSize(), pipeStack.stack.getMaxStackSize()));
-			ItemStack inserted = pipeStack.stack.copy();
-			inserted.stackSize = amount;
-			pipeStack.stack.stackSize -= amount;
-			container.setItem(slot, inserted);
-		} else {
-			int capacity = Math.min(container.getMaxStackSize(), current.getMaxStackSize());
-			int amount = Math.min(pipeStack.stack.stackSize, capacity - current.stackSize);
-			current.stackSize += amount;
-			pipeStack.stack.stackSize -= amount;
-			container.setItem(slot, current);
-		}
-		return true;
+		return Util.insertPipeStackOnInventory(tileEntity, pipeStack, direction);
 	}
 
 	public static PipeStack extract(TileEntity tileEntity, Direction direction, int stackTimer, int count) {
-		if (!isItemIo(tileEntity)) {
-			return null;
-		}
+		return Util.getItemFromInventoryNoCatch(
+			tileEntity.worldObj,
+			tileEntity.tilePos.x,
+			tileEntity.tilePos.y,
+			tileEntity.tilePos.z,
+			direction,
+			stackTimer,
+			count,
+			(short)0
+		);
+	}
+
+	public static int getActiveSlot(TileEntity tileEntity, Direction direction, ItemStack stackToInsert) {
+		int slot = -1;
 		IItemIO itemIo = getItemIo(tileEntity);
-		sunsetsatellite.catalyst.core.util.Direction targetSide = toCatalystDirection(direction.opposite());
-		Connection connection = itemIo.getItemIOForSide(targetSide);
-		if (connection != Connection.OUTPUT && connection != Connection.BOTH) {
-			return null;
+
+		if (itemIo != null) {
+			sunsetsatellite.catalyst.core.util.Direction targetSide = toCatalystDirection(direction.opposite());
+			Connection connection = itemIo.getItemIOForSide(targetSide);
+
+			if (stackToInsert != null && (connection == Connection.INPUT || connection == Connection.BOTH)) {
+				slot = itemIo.getActiveItemSlotForSide(targetSide, stackToInsert);
+			} else if (stackToInsert == null && (connection == Connection.OUTPUT || connection == Connection.BOTH)) {
+				slot = itemIo.getActiveItemSlotForSide(targetSide);
+			}
 		}
-		Container container = (Container) tileEntity;
-		int slot = itemIo.getActiveItemSlotForSide(targetSide);
-		if (slot < 0 || slot >= container.getContainerSize()) {
-			return null;
-		}
-		ItemStack stack = container.getItem(slot);
-		if (stack == null) {
-			return null;
-		}
-		ItemStack extracted = Util.removeItemFromStack(stack, count);
-		container.setItem(slot, stack.stackSize > 0 ? stack : null);
-		return new PipeStack(extracted, direction, stackTimer);
+
+		return slot;
 	}
 
 	private static sunsetsatellite.catalyst.core.util.Direction toCatalystDirection(Direction direction) {

@@ -24,6 +24,7 @@ item.potatotech.potato_knish.desc=To be Trusted
 
 tile.potatotech.chute.name=Chute
 tile.potatotech.chute.desc=Automates item collection, gives life meaning.
+container.chute.name=Chute
 
 item.potatotech.energy_connector.name=LV Energy Connector
 item.potatotech.energy_connector.desc=Provides energy to your machines

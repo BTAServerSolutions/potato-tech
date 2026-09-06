@@ -26,7 +26,7 @@ public class BlockModelChute<T extends BlockLogic> extends BlockModelGeneric<T> 
 		boolean rendered = super.renderAttached(tessellator, worldSource, tilePos, cullFaces, overrideTexture);
 		int fillLevel = ((BlockLogicChute) block.getLogic()).getFillLevel(worldSource, tilePos);
 		if (fillLevel > 0) {
-			rendered |= fill.renderAttached(this, tessellator, worldSource, tilePos, 0, 0, 0, 0, fillLevel / 16.0, 0, false, cullFaces, overrideTexture);
+			rendered |= fill.renderAttached(this, tessellator, worldSource, tilePos, 0, 0, 0, 0, (fillLevel + 2) / 16.0, 0, false, cullFaces, overrideTexture);
 		}
 		return rendered;
 	}

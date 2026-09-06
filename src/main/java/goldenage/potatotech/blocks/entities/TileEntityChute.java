@@ -5,9 +5,7 @@ import com.mojang.nbt.tags.ListTag;
 import goldenage.potatotech.PTBlocks;
 import goldenage.potatotech.PipeStack;
 import goldenage.potatotech.Util;
-import net.minecraft.core.block.BlockLogicChest;
 import net.minecraft.core.block.entity.TileEntity;
-import net.minecraft.core.block.entity.TileEntityChest;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.EntityItem;
 import net.minecraft.core.entity.player.Player;
@@ -15,49 +13,114 @@ import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
+import net.minecraft.core.player.inventory.InventorySorter;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Direction;
-import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.pos.TilePos;
 import org.jetbrains.annotations.NotNull;
 import org.joml.primitives.AABBd;
-import org.joml.primitives.AABBdc;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 
-public class TileEntityChute extends TileEntity {
+public class TileEntityChute extends TileEntity implements Container {
 
 	public int numUnitsInside = 0;
-	public final Map<ChuteEntry, Integer> contents = new HashMap<>();
+	public int maxDropTimer = 10;
+	public int dropTimer = 0;
+	public ItemStack[] contents = new ItemStack[27];
+
+	@Override
+	public int getContainerSize() {
+		return this.contents.length;
+	}
+
+	@Override
+	public ItemStack getItem(int index) {
+		return this.contents[index];
+	}
+
+	@Override
+	public ItemStack removeItem(int index, int count) {
+		ItemStack removed = null;
+		ItemStack stack = this.contents[index];
+
+		if (stack != null && count > 0) {
+			if (stack.stackSize <= count) {
+				removed = stack;
+				this.contents[index] = null;
+			} else {
+				removed = stack.splitStack(count);
+				if (stack.stackSize <= 0) {
+					this.contents[index] = null;
+				}
+			}
+			this.setChanged();
+		}
+
+		return removed;
+	}
+
+	@Override
+	public void setItem(int index, ItemStack stack) {
+		this.contents[index] = stack;
+		if (stack != null && stack.stackSize > this.getMaxStackSize()) {
+			stack.stackSize = this.getMaxStackSize();
+		}
+		this.setChanged();
+	}
+
+	@Override
+	public String getNameTranslationKey() {
+		return "container.chute.name";
+	}
+
+	@Override
+	public int getMaxStackSize() {
+		return 64;
+	}
+
+	@Override
+	public void setChanged() {
+		super.setChanged();
+		this.updateNumUnits();
+		if (this.worldObj != null) {
+			this.worldObj.notifyBlockChange(this.tilePos, PTBlocks.chute);
+		}
+	}
+
+	@Override
+	public boolean stillValid(@NotNull Player player) {
+		if (this.worldObj.getTileEntity(tilePos) != this) {
+			return false;
+		}
+		return player.distanceToSqr((double)this.tilePos.x + 0.5, (double)this.tilePos.y + 0.5, (double)this.tilePos.z + 0.5) <= 64.0;
+	}
+
+	@Override
+	public void sort() {
+		InventorySorter.sortInventory(this.contents);
+		this.setChanged();
+	}
 
 	public void dropAllItems() {
 		Random rand = new Random();
-		for (Map.Entry<ChuteEntry, Integer> entry : this.contents.entrySet()) {
-			int stackSize;
-			ChuteEntry be = entry.getKey();
-			for (int numItems = entry.getValue(); numItems > 0; numItems -= stackSize) {
-				int maxStackSize;
-				stackSize = maxStackSize = be.getItem().getItemStackLimit(null);
-				int remainingItems = numItems - maxStackSize;
-				if (remainingItems < 0) {
-					stackSize = numItems;
-				}
-				this.dropItemStack(rand, new ItemStack(be.id, stackSize, be.metadata, be.tag));
+		for (int i = 0; i < this.contents.length; i++) {
+			if (this.contents[i] != null) {
+				this.dropItemStack(rand, this.contents[i]);
+				this.contents[i] = null;
 			}
 		}
-		this.contents.clear();
-		this.worldObj.notifyBlockChange(this.tilePos.x, this.tilePos.y, this.tilePos.z, PTBlocks.chute.id());
-		this.updateNumUnits();
+		this.setChanged();
 	}
 
 	private void updateNumUnits() {
 		this.numUnitsInside = 0;
-		for (Map.Entry<ChuteEntry, Integer> entry : this.contents.entrySet()) {
-			ChuteEntry be = entry.getKey();
-			int numItems = entry.getValue();
-			int unitsPerItem = this.getItemSizeUnits(be.getItem());
-			this.numUnitsInside += unitsPerItem * numItems;
+		for (ItemStack stack : this.contents) {
+			if (stack != null) {
+				this.numUnitsInside += this.getItemSizeUnits(stack.getItem()) * stack.stackSize;
+			}
 		}
 	}
 
@@ -70,7 +133,6 @@ public class TileEntityChute extends TileEntity {
 		float f1 = rand.nextFloat() * 0.8f + 0.1f;
 		float f2 = rand.nextFloat() * 0.8f + 0.1f;
 		EntityItem entityitem = new EntityItem(this.worldObj, (float)this.tilePos.x + f, (float)this.tilePos.y + f1, (float)this.tilePos.z + f2, itemstack);
-		float f3 = 0.05f;
 		entityitem.xd = (float)rand.nextGaussian() * 0.05f;
 		entityitem.yd = (float)rand.nextGaussian() * 0.05f + 0.25f;
 		entityitem.zd = (float)rand.nextGaussian() * 0.05f;
@@ -85,72 +147,49 @@ public class TileEntityChute extends TileEntity {
 		return 1728;
 	}
 
-	public void givePlayerAllItems(World world, Player player) {
-		List<ChuteEntry> toRemove = new ArrayList<>();
-		Iterator var4 = this.contents.entrySet().iterator();
+	public ItemStack removeItems(int count) {
+		ItemStack removed = null;
 
-		while(var4.hasNext()) {
-			Map.Entry entry = (Map.Entry)var4.next();
-			ChuteEntry basketEntry = (ChuteEntry)entry.getKey();
-			ItemStack basketEntryStack = new ItemStack(basketEntry.id, (Integer)entry.getValue(), basketEntry.metadata, basketEntry.tag);
-			player.inventory.insertItem(basketEntryStack, true);
-			this.contents.put(basketEntry, basketEntryStack.stackSize);
-			if (basketEntryStack.stackSize <= 0) {
-				toRemove.add(basketEntry);
+		if (count > 0) {
+			for (int i = 0; i < this.contents.length; i++) {
+				if (this.contents[i] != null) {
+					removed = this.removeItem(i, Math.min(count, this.contents[i].getMaxStackSize()));
+					break;
+				}
 			}
 		}
 
-		var4 = toRemove.iterator();
-
-		while(var4.hasNext()) {
-			ChuteEntry entry = (ChuteEntry)var4.next();
-			this.contents.remove(entry);
-		}
-
-		this.updateNumUnits();
-		this.worldObj.notifyBlockChange(this.tilePos.x, this.tilePos.y, this.tilePos.z, PTBlocks.chute.id());
-	}
-	public ItemStack removeOneItem() {
-		return removeItems(1);
-	}
-
-	public ItemStack removeItems(int count) {
-		ChuteEntry firstKey = null;
-		int itemCount = 0;
-		for (Map.Entry<ChuteEntry, Integer> entry : this.contents.entrySet()) {
-			firstKey = entry.getKey();
-			itemCount = entry.getValue();
-			break;
-		}
-
-		if (firstKey == null || itemCount == 0 || count <= 0) return null;
-
-		int removed = Math.min(Math.min(count, itemCount), firstKey.getItem().getItemStackLimit(null));
-		ItemStack itemStack = new ItemStack(firstKey.id, removed, firstKey.metadata, firstKey.tag);
-
-		itemCount -= removed;
-
-		if (itemCount == 0) {
-			this.contents.remove(firstKey);
-		} else {
-			this.contents.put(firstKey, itemCount);
-		}
-
-		this.worldObj.notifyBlockChange(this.tilePos.x, this.tilePos.y, this.tilePos.z, PTBlocks.chute.id());
-		this.updateNumUnits();
-
-		return itemStack;
+		return removed;
 	}
 
 	@Override
 	public void readAdditionalData(@NotNull CompoundTag tag) {
 		ListTag itemsTag = tag.getList("Items");
-		this.contents.clear();
+		this.contents = new ItemStack[this.getContainerSize()];
+
 		for (int i = 0; i < itemsTag.tagCount(); ++i) {
 			CompoundTag itemTag = (CompoundTag)itemsTag.tagAt(i);
-			ChuteEntry entry = ChuteEntry.read(itemTag);
-			short count = itemTag.getShort("Count");
-			this.contents.put(entry, (int) count);
+
+			if (itemTag.containsKey("Slot")) {
+				int slot = itemTag.getByte("Slot") & 0xFF;
+				if (slot < this.contents.length) {
+					this.contents[slot] = ItemStack.readItemStackFromNbt(itemTag);
+				}
+			} else {
+				int itemId = itemTag.getShort("id");
+				int metadata = itemTag.getShort("Damage");
+				CompoundTag data = itemTag.getCompound("Data");
+				Item item = Item.itemsList[itemId];
+				int count = itemTag.getShort("Count");
+
+				for (int slot = 0; slot < this.contents.length && count > 0; slot++) {
+					if (this.contents[slot] == null) {
+						int stackSize = Math.min(count, item.getItemStackLimit(null));
+						this.contents[slot] = new ItemStack(itemId, stackSize, metadata, data);
+						count -= stackSize;
+					}
+				}
+			}
 		}
 		this.updateNumUnits();
 	}
@@ -160,87 +199,115 @@ public class TileEntityChute extends TileEntity {
 		if (this.worldObj == null || this.worldObj.isClientSide) {
 			return;
 		}
+
 		AABBd aabb = new AABBd(this.tilePos.x, this.tilePos.y, this.tilePos.z, this.tilePos.x + 1, this.tilePos.y + 2, this.tilePos.z + 1);
 		List<EntityItem> entities = this.worldObj.getEntitiesWithinAABB(EntityItem.class, aabb);
-		boolean shouldUpdate = false;
 		if (!entities.isEmpty()) {
 			for (Entity e : entities) {
 				EntityItem entity = (EntityItem)e;
-				if (entity.item == null || entity.item.stackSize <= 0 || entity.basketPickupDelay != 0) continue;
-				shouldUpdate = this.importItemStack(entity.item);
+				if (entity.basketPickupDelay != 0) {
+					if (entity.basketPickupDelay > 0) entity.basketPickupDelay--;
+					continue;
+				}
+				if (entity.item == null || entity.item.stackSize <= 0) continue;
+				this.importItemStack(entity.item);
 				if (entity.item.stackSize > 0) continue;
 				entity.item.stackSize = 0;
 				e.outOfWorld();
 			}
 		}
-		if (shouldUpdate) {
-			this.worldObj.notifyBlockChange(this.tilePos.x, this.tilePos.y, this.tilePos.z, PTBlocks.chute.id());
-			this.updateNumUnits();
-		}
 
-		TileEntity outTe = worldObj.getTileEntity(tilePos.x, tilePos.y-1, tilePos.z) ;
+		TileEntity outTe = this.worldObj.getTileEntity(this.tilePos.x, this.tilePos.y - 1, this.tilePos.z);
 		if (outTe instanceof Container) {
-			ItemStack itemToRemove = this.removeOneItem();
-
-			if (itemToRemove != null) {
-				boolean hasInserted = false;
-
-				Container inventory;
-				if (outTe instanceof TileEntityChest) {
-					inventory = BlockLogicChest.getInventory(worldObj, new TilePos(tilePos).add(0, -1, 0));
-				} else {
-					inventory = (Container) outTe;
-				}
-
-				if (inventory != null) {
-					hasInserted = Util.insertOnInventory(inventory, itemToRemove, Direction.DOWN);
-				}
-				if (!hasInserted) {
-					importItemStack(itemToRemove);
-				}
-			}
-		} else if (outTe instanceof TileEntityChute) {
-			ItemStack itemToRemove = this.removeOneItem();
-			if (itemToRemove != null) {
-				if (!((TileEntityChute)outTe).importItemStack(itemToRemove)) {
-					this.importItemStack(itemToRemove);
+			this.dropTimer = 0;
+			for (int i = 0; i < this.contents.length; i++) {
+				if (this.contents[i] != null) {
+					ItemStack itemToInsert = this.contents[i].copy();
+					itemToInsert.stackSize = 1;
+					if (Util.insertOnInventory(outTe, itemToInsert, Direction.DOWN)) {
+						this.removeItem(i, 1);
+					}
+					break;
 				}
 			}
 		} else if (outTe instanceof TileEntityPipe pipe) {
+			this.dropTimer = 0;
 			int inputSide = Direction.UP.id;
 			if (pipe.modeBySide[inputSide] != 1 && pipe.modeBySide[inputSide] != 3 && pipe.stacks[inputSide + 1] == null) {
-				ItemStack itemToRemove = this.removeOneItem();
+				ItemStack itemToRemove = this.removeItems(pipe.maxStackSize);
 				if (itemToRemove != null) {
 					pipe.stacks[inputSide + 1] = new PipeStack(itemToRemove, Direction.UP, 0);
 					pipe.setChanged();
-					worldObj.markBlockNeedsUpdate(pipe.tilePos.x, pipe.tilePos.y, pipe.tilePos.z);
+					this.worldObj.markBlockNeedsUpdate(pipe.tilePos);
 				}
 			}
+		} else if (this.worldObj.getBlockType(new TilePos(this.tilePos.x, this.tilePos.y-1, this.tilePos.z)).id() == 0) {
+			if (this.numUnitsInside > 0) {
+				this.dropTimer++;
+				if (this.dropTimer >= this.maxDropTimer) {
+					for (int i = 0; i < this.contents.length; i++) {
+						if (this.contents[i] != null) {
+							ItemStack stack = this.removeItem(i, this.contents[i].stackSize);
+							EntityItem droppedItem = this.worldObj.dropItem(this.tilePos.x, (double)this.tilePos.y - 0.625, this.tilePos.z, stack, 0);
+							droppedItem.xd = 0;
+							droppedItem.yd = 0;
+							droppedItem.zd = 0;
+							droppedItem.basketPickupDelay = 1;
+							this.worldObj.entityJoinedWorld(droppedItem);
+							break;
+						}
+					}
+					this.dropTimer = 0;
+				}
+			} else {
+				this.dropTimer = 0;
+			}
+		} else {
+			this.dropTimer = 0;
 		}
 	}
 
 	public boolean importItemStack(ItemStack stack) {
-		ChuteEntry entry = new ChuteEntry(stack.itemID, stack.getMetadata(), stack.getData());
-		int sizeUnits = this.getItemSizeUnits(stack.getItem());
-		int freeUnits = this.getMaxUnits() - this.numUnitsInside;
-		int itemsToTake = Math.min(freeUnits / sizeUnits, stack.stackSize);
-		if (itemsToTake <= 0) {
-			return false;
+		boolean inserted = false;
+		int maxStackSize = Math.min(this.getMaxStackSize(), stack.getMaxStackSize());
+
+		for (int i = 0; i < this.contents.length && stack.stackSize > 0; i++) {
+			ItemStack contentsStack = this.contents[i];
+			if (contentsStack != null && contentsStack.canStackWith(stack) && contentsStack.stackSize < maxStackSize) {
+				int amount = Math.min(stack.stackSize, maxStackSize - contentsStack.stackSize);
+				contentsStack.stackSize += amount;
+				stack.stackSize -= amount;
+				inserted = true;
+			}
 		}
-		stack.stackSize -= itemsToTake;
-		int currentItemsInBE = this.contents.getOrDefault(entry, 0);
-		this.contents.put(entry, currentItemsInBE += itemsToTake);
-		return true;
+
+		for (int i = 0; i < this.contents.length && stack.stackSize > 0; i++) {
+			if (this.contents[i] == null) {
+				int amount = Math.min(stack.stackSize, maxStackSize);
+				ItemStack insertedStack = stack.copy();
+				insertedStack.stackSize = amount;
+				this.contents[i] = insertedStack;
+				stack.stackSize -= amount;
+				inserted = true;
+			}
+		}
+
+		if (inserted) {
+			this.setChanged();
+		}
+		return inserted;
 	}
 
 	@Override
 	public void writeAdditionalData(@NotNull CompoundTag tag) {
 		ListTag itemsTag = new ListTag();
-		for (Map.Entry<ChuteEntry, Integer> entry : this.contents.entrySet()) {
-			CompoundTag itemTag = new CompoundTag();
-			itemTag.putShort("Count", (short)entry.getValue().intValue());
-			ChuteEntry.write(itemTag, entry.getKey());
-			itemsTag.addTag(itemTag);
+		for (int i = 0; i < this.contents.length; ++i) {
+			if (this.contents[i] != null) {
+				CompoundTag itemTag = new CompoundTag();
+				itemTag.putByte("Slot", (byte)i);
+				this.contents[i].writeToNBT(itemTag);
+				itemsTag.addTag(itemTag);
+			}
 		}
 		tag.put("Items", itemsTag);
 	}
@@ -250,50 +317,4 @@ public class TileEntityChute extends TileEntity {
 		return new PacketTileEntityData(this);
 	}
 
-	public static final class ChuteEntry {
-		public final int id;
-		public final int metadata;
-		public final CompoundTag tag;
-
-		public ChuteEntry(int id, int metadata, CompoundTag tag) {
-			this.id = id;
-			this.metadata = metadata;
-			this.tag = tag;
-		}
-
-		public static ChuteEntry read(CompoundTag tag) {
-			short id = tag.getShort("id");
-			short damage = tag.getShort("Damage");
-			CompoundTag data = tag.getCompound("Data");
-			return new ChuteEntry(id, damage, data);
-		}
-
-		public static void write(CompoundTag tag, ChuteEntry entry) {
-			tag.putShort("id", (short)entry.id);
-			tag.putShort("Damage", (short)entry.metadata);
-			tag.putCompound("Data", entry.tag);
-		}
-
-		public Item getItem() {
-			return Item.itemsList[this.id];
-		}
-
-		public boolean equals(Object obj) {
-			if (!(obj instanceof ChuteEntry)) {
-				return false;
-			}
-			ChuteEntry other = (ChuteEntry)obj;
-			if (this.id != other.id || this.metadata != other.metadata) {
-				return false;
-			}
-			return this.tag.getValues().size() <= 2 && other.tag.getValues().size() <= 2;
-		}
-
-		public int hashCode() {
-			if (this.tag.getValues().size() <= 2) {
-				return Objects.hash(this.id, this.metadata);
-			}
-			return Objects.hash(this.id, this.metadata, this.tag);
-		}
-	}
 }

@@ -4,16 +4,12 @@ import com.mojang.nbt.tags.CompoundTag;
 import com.mojang.nbt.tags.ListTag;
 import goldenage.potatotech.PipeStack;
 import goldenage.potatotech.Util;
-import goldenage.potatotech.compat.catalyst.CatalystItemIoCompat;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.block.BlockLogicChest;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.net.packet.Packet;
 import net.minecraft.core.net.packet.PacketTileEntityData;
 import net.minecraft.core.player.inventory.container.Container;
 import net.minecraft.core.util.helper.Direction;
-import net.minecraft.core.world.pos.TilePos;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -175,7 +171,7 @@ public class TileEntityPipe extends TileEntity {
 			if (modeBySide[dir.id] == 2) {
 				PipeStack stack = stacks[dir.id + 1];
 				if (stack == null) {
-					stack = Util.getItemFromInventory(worldObj, tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ(), dir, 0, maxStackSize);
+					stack = Util.getItemFromInventory(worldObj, tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ(), dir, 0, maxStackSize, colorBySide[dir.id]);
 					if (stack != null) {
 						stack.timer = 0;
 						if (stack.color == 0) {
@@ -196,23 +192,15 @@ public class TileEntityPipe extends TileEntity {
 			if (stack != null && stack.direction == dir.opposite() && stack.timer >= maxPipeStackTimer) {
 				int blockId = worldObj.getBlockId(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
 				TileEntity te = worldObj.getTileEntity(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
-				if (FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(te)) {
-					if (modeBySide[dir.id] <= 1 && CatalystItemIoCompat.insert(te, dir, stack)) {
-						if (stack.stack.stackSize <= 0) {
-							stacks[dir.id + 1] = null;
-						}
-						worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
-					}
-					continue;
-				}
 				if (blockId != 0 && te instanceof Container && !(te instanceof TileEntityPipe)) {
-					if (modeBySide[dir.id] <= 1) {
-						Container inventory = (Container) te;
-						if (Objects.equals(inventory.getNameTranslationKey(), "container.chest.name")) {
-							inventory = BlockLogicChest.getInventory(worldObj, new TilePos(tilePos).add(dir));
-						}
-
-						boolean inserted = Util.insertPipeStackOnInventory(inventory, stack, dir);
+					if (modeBySide[dir.id] <= 1 && Util.canInsertOnInventory(
+						worldObj,
+						tilePos.x + dir.offsetX(),
+						tilePos.y + dir.offsetY(),
+						tilePos.z + dir.offsetZ(),
+						dir,
+						stack.stack)) {
+						boolean inserted = Util.insertPipeStackOnInventory(te, stack, dir);
 						if (inserted) {
 							if (stack.stack.stackSize <= 0) {
 								stacks[dir.id + 1] = null;
@@ -255,29 +243,21 @@ public class TileEntityPipe extends TileEntity {
 				Direction dir = Direction.fromId(i);
 				int blockId = worldObj.getBlockId(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
 				TileEntity te = worldObj.getTileEntity(tilePos.x + dir.offsetX(), tilePos.y + dir.offsetY(), tilePos.z + dir.offsetZ());
-				boolean catalystItemIo = FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(te);
-				if (stack2 == null && blockId != 0 && (te instanceof Container || te instanceof TileEntityPipe || catalystItemIo) && i != stacks[0].direction.id && modeBySide[i] < 2) {
+				if (stack2 == null && blockId != 0 && (te instanceof Container || te instanceof TileEntityPipe) && i != stacks[0].direction.id && modeBySide[i] < 2) {
 					if (te instanceof TileEntityPipe) {
 						TileEntityPipe pipe = (TileEntityPipe) te;
 						int pipeMode = pipe.modeBySide[dir.opposite().id];
 						boolean cannotMove = (pipeMode == 3) || (pipeMode == 1);
 						//cannotMove |= pipe.stacks[dir.opposite().id] != null;
 						if (cannotMove) continue;
-					} else if (catalystItemIo) {
-						if (!CatalystItemIoCompat.canInsert(te, dir, stacks[0].stack)) {
-							continue;
-						}
 					} else {
-						boolean canInsert = modeBySide[i] == 1;
-						canInsert &= !Util.canInsertOnInventory(
+						if (!Util.canInsertOnInventory(
 							worldObj,
 							tilePos.x + dir.offsetX(),
 							tilePos.y + dir.offsetY(),
 							tilePos.z + dir.offsetZ(),
 							dir,
-							stacks[0].stack);
-
-						if (canInsert) {
+							stacks[0].stack)) {
 							continue;
 						}
 					}

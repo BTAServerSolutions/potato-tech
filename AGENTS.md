@@ -238,3 +238,5 @@ When adding a pipe variant, update all interaction checks so wrench use, dyeing,
 - Avoid logging every transfer/tick. Pipe logic runs frequently.
 - Preserve optional-mod behavior: the game must start without Catalyst, BTWaila, or Signal Industries installed.
 - After changing recipes, resources, or `fabric.mod.json`, run `processResources` in addition to compilation.
+- Even though java is object-oriented prefer straight forward procedural C like code when possible, with a mix of functional code.
+- Large functions is not a problem, do not create useless small helper functions that are called only inside one function.

@@ -91,18 +91,25 @@ public class BlockModelPipe<T extends BlockLogic> extends BlockModelGeneric<T> {
 				int nz = tilePos.z() + OFFSETS[i][2];
 
 				boolean shouldConnect = false;
+				Direction direction = Direction.fromId(i);
 				TileEntity neighborTe = worldSource.getTileEntity(nx, ny, nz);
 				if (neighborTe != null) {
 					if (neighborTe instanceof TileEntityPipe neighborPipe) {
-						int opposite = Direction.fromId(i).opposite().id;
+						int opposite = direction.opposite().id;
 						if (neighborPipe.modeBySide[opposite] != 3) {
 							shouldConnect = true;
 						}
 					} else if (neighborTe instanceof TileEntityChute) {
-						shouldConnect = true;
+						if (pipe.modeBySide[i] == 1) {
+							shouldConnect = direction == Direction.DOWN;
+						} else if (pipe.modeBySide[i] == 2) {
+							shouldConnect = direction == Direction.UP;
+						} else {
+							shouldConnect = direction == Direction.DOWN || direction == Direction.UP;
+						}
 					} else if (neighborTe instanceof Container) {
 						if (FabricLoader.getInstance().isModLoaded("catalyst-core") && CatalystItemIoCompat.isItemIo(neighborTe)) {
-							shouldConnect = CatalystItemIoCompat.hasConfiguredSide(neighborTe, Direction.fromId(i));
+							shouldConnect = CatalystItemIoCompat.canAccessSide(neighborTe, direction, pipe.modeBySide[i] != 2);
 						} else {
 							shouldConnect = true;
 						}
