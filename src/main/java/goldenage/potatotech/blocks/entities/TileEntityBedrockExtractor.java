@@ -47,7 +47,7 @@ public class TileEntityBedrockExtractor extends TileEntity {
 			return;
 		}
 
-		ItemStack dust = new ItemStack(PTItems.bedrockDust);
+		ItemStack dust = new ItemStack(PTItems.oreRichDust);
 		TileEntity above = worldObj.getTileEntity(tilePos.x, tilePos.y + 1, tilePos.z);
 		if (above instanceof Container) {
 			if (Util.insertOnInventoryNoCatch(above, dust, Direction.DOWN)) {

@@ -28,8 +28,8 @@ public class PotatoTech implements ModInitializer {
 		Properties prop = new Properties();
 		prop.setProperty("starting_block_id","1999");
 		prop.setProperty("starting_item_id","17900");
-		prop.setProperty("catalyst_energy_multiplier", "2");
-		prop.setProperty("bedrock_extractor_energy_required", "512");
+		prop.setProperty("catalyst_energy_multiplier", "10");
+		prop.setProperty("bedrock_extractor_energy_required", "1024");
 		config = new ConfigHandler(MOD_ID, prop);
 		config.updateConfig();
 	}

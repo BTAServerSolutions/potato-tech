@@ -262,6 +262,7 @@ public class Util {
 					}
 				} else {
 					int firstSlot = 0;
+					int[] slotsToSkip = null;
 					int endSlot = container.getContainerSize();
 					int maxStackSize = Math.min(container.getMaxStackSize(), stackToInsert.getMaxStackSize());
 					boolean allowEmptySlot = !containerName.equals("container.filter.name");
@@ -274,6 +275,15 @@ public class Util {
 						firstSlot = dir == Direction.UP ? 1 : 0;
 						endSlot = firstSlot + 1;
 						maxStackSize = Math.min(maxStackSize, 8);
+					} else if (containerName.startsWith("tile.tile.ic2.machine")) {
+						if (containerName.equals("tile.tile.ic2.machine.induction_furnace.name")) {
+							endSlot = 4;
+							slotsToSkip = new int[2];
+							slotsToSkip[0] = 1;
+							slotsToSkip[1] = 2;
+						} else {
+							endSlot = 1;
+						}
 					} else if (containerName.equals("container.trommel.name")) {
 						firstSlot = dir == Direction.UP ? 4 : 0;
 						endSlot = dir == Direction.UP ? 5 : 3;
@@ -285,6 +295,16 @@ public class Util {
 
 					int emptySlot = -1;
 					for (int i = firstSlot; i < endSlot; i++) {
+						if (slotsToSkip != null) {
+							boolean skip = false;
+							for (int k : slotsToSkip) {
+								if (k == i) {
+									skip = true;
+									break;
+								}
+							}
+							if (skip) continue;
+						}
 						if (container.locked(i)) continue;
 						ItemStack stack = container.getItem(i);
 
@@ -304,6 +324,7 @@ public class Util {
 				int firstSlot = 0;
 				int endSlot = Math.min(1, container.getContainerSize());
 				int reservedItems = 0;
+				int slotToSkip = -1;
 
 				if (entity instanceof TileEntityCrafter crafter) {
 					if (crafter.getItem(0) != null) {
@@ -322,18 +343,29 @@ public class Util {
 					endSlot = 3;
 				} else if (containerName.equals("container.trommel.name")) {
 					endSlot = 4;
+				} else if (containerName.startsWith("tile.tile.ic2.machine")) {
+					if (containerName.equals("tile.tile.ic2.machine.induction_furnace.name")) {
+						firstSlot = 2;
+						endSlot = 5;
+						slotToSkip = 3;
+					} else {
+						firstSlot = 2;
+						endSlot = 3;
+					}
 				} else if (entity instanceof TileEntityFlag) {
 					firstSlot = 36;
 					endSlot = 37;
 				} else if (containerName.equals("container.chest.name")
 					|| containerName.equals("container.dispenser.name")
 					|| containerName.startsWith("container.ironchest")
-					|| containerName.equals("container.filter.name")) {
+					|| containerName.equals("container.filter.name"))
+				{
 					endSlot = container.getContainerSize();
 					if (containerName.equals("container.filter.name")) reservedItems = 1;
 				}
 
 				for (int i = firstSlot; i < endSlot; i++) {
+					if (i == slotToSkip) continue;
 					ItemStack stack = container.getItem(i);
 					if (stack != null
 						&& stack.stackSize > reservedItems

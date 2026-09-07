@@ -77,7 +77,7 @@ public class PTModels {
 		);
 
 		dispatcher.addDispatch(new BlockModelConnector<>(PTBlocks.energyConnector));
-		dispatcher.addDispatch(new BlockModelConnector<>(PTBlocks.energyConnectorMV, 0.24f, 0.13f, 0.10f));
+		dispatcher.addDispatch(new BlockModelConnector<>(PTBlocks.energyConnectorMV, "energy_connector_mv"));
 		dispatcher.addDispatch(
 			new BlockModelStandard<>(PTBlocks.coil)
 				.setTex("potatotech:block/coil_top", Side.TOP)
@@ -111,6 +111,13 @@ public class PTModels {
 		);
 		dispatcher.addDispatch(
 			new BlockModelStandard<>(PTBlocks.bedrockDrill).setAllTextures("potatotech:block/iron_casing_plain")
+		);
+
+		dispatcher.addDispatch(
+			new BlockModelStandard<>(PTBlocks.oreRichGravel).setAllTextures("potatotech:block/ore_rich_gravel")
+		);
+		dispatcher.addDispatch(
+			new BlockModelStandard<>(PTBlocks.oreRichSand).setAllTextures("potatotech:block/ore_rich_sand")
 		);
 	}
 

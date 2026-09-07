@@ -4,6 +4,7 @@ import goldenage.potatotech.blocks.*;
 import goldenage.potatotech.blocks.entities.*;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
+import net.minecraft.core.block.BlockLogicFallingBlock;
 import net.minecraft.core.block.material.Materials;
 import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.sound.BlockSounds;
@@ -34,6 +35,8 @@ public class PTBlocks {
 	public static Block<? extends BlockLogic> bedrockExtractor;
 	public static Block<? extends BlockLogic> bedrockDrill;
 	public static Block<? extends BlockLogic> energyConnectorMV;
+	public static Block<? extends BlockLogic> oreRichGravel;
+	public static Block<? extends BlockLogic> oreRichSand;
 
 
 	public static void init() {
@@ -183,5 +186,25 @@ public class PTBlocks {
 			.addTags(BlockTags.MINEABLE_BY_PICKAXE)
 			.build("energy_connector_mv", "energy_connector_mv", id++, block ->
 				new BlockLogicEnergyConnector(block, Materials.METAL, TileEntityEnergyConnector.MV_ENERGY_CAPACITY, TileEntityEnergyConnector.MV_BLOCK_TRANSFER_RATE));
+
+		oreRichGravel = new BlockBuilder(MOD_ID)
+			.setHardness(1.0f)
+			.setResistance(3.0f)
+			.setBlockSound(BlockSounds.SAND)
+			.addTags(BlockTags.MINEABLE_BY_SHOVEL)
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
+			.build("ore_rich_gravel", "ore_rich_gravel", id++, block ->
+				new BlockLogicCrushableFalling(block, Materials.SAND, "OreRichSand")
+			);
+
+		oreRichSand = new BlockBuilder(MOD_ID)
+			.setHardness(1.0f)
+			.setResistance(3.0f)
+			.setBlockSound(BlockSounds.SAND)
+			.addTags(BlockTags.MINEABLE_BY_SHOVEL)
+			.setCreativeInventoryPlacement(new CreativeInventoryPlacement.Category(CreativeInventoryCategory.MISCELLANEOUS))
+			.build("ore_rich_sand", "ore_rich_sand", id++, block ->
+				new BlockLogicFallingBlock(block, Materials.SAND)
+			);
 	}
 }

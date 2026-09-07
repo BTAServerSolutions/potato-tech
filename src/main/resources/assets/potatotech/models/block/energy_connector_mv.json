@@ -1,0 +1,7 @@
+{
+    "parent": "potatotech:block/energy_connector",
+    "textures": {
+        "particle": "potatotech:block/energy_connector_mv",
+        "side": "potatotech:block/energy_connector_mv"
+    }
+}

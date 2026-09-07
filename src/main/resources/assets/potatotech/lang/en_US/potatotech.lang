@@ -4,14 +4,14 @@ item.potatotech.potato.desc=Won't kill you in your sleep (: .
 item.potatotech.wrench.name=Wrench
 item.potatotech.wrench.desc=Doesn't give you a plumbing license.
 
-item.potatotech.wood_crushing_hammer.name = Wood Crushing Hammer
-item.potatotech.wood_crushing_hammer.desc = Try crushing sand!
+item.potatotech.wood_crushing_hammer.name=Wood Crushing Hammer
+item.potatotech.wood_crushing_hammer.desc=Try crushing sand!
 
-item.potatotech.stone_crushing_hammer.name = Stone Crushing Hammer
-item.potatotech.stone_crushing_hammer.desc = Try crushing sand!
+item.potatotech.stone_crushing_hammer.name=Stone Crushing Hammer
+item.potatotech.stone_crushing_hammer.desc=Try crushing sand!
 
-item.potatotech.iron_crushing_hammer.name = Iron Crushing Hammer
-item.potatotech.iron_crushing_hammer.desc = Try crushing sand!
+item.potatotech.iron_crushing_hammer.name=Iron Crushing Hammer
+item.potatotech.iron_crushing_hammer.desc=Try crushing sand!
 
 item.potatotech.diamond_crushing_hammer.name = Diamond Crushing Hammer
 item.potatotech.diamond_crushing_hammer.desc = Try crushing sand! Expensive!
@@ -50,8 +50,14 @@ item.potatotech.redstone_alloy.desc=Who needs copper anyway?
 item.potatotech.redstone_iron_mix.name=Redstone-Iron Mix
 item.potatotech.redstone_iron_mix.desc=Try melting it!
 
-item.potatotech.bedrock_dust.name=Bedrock Dust
-item.potatotech.bedrock_dust.desc=Put on a trommel
+item.potatotech.ore_rich_dust.name=Ore Rich Dust
+item.potatotech.ore_rich_dust.desc=Craft into a block
+
+tile.potatotech.ore_rich_gravel.name=Ore Rich Gravel
+tile.potatotech.ore_rich_gravel.desc=Put into a trommel
+
+tile.potatotech.ore_rich_sand.name=Ore Rich Sand
+tile.potatotech.ore_rich_sand.desc=Put into a trommel
 
 tile.potatotech.potato.name=Potato Block
 tile.potatotech.potato.desc=Not to be trusted!

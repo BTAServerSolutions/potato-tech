@@ -2,7 +2,6 @@ package goldenage.potatotech;
 
 import goldenage.potatotech.blocks.entities.TileEntityCrafter;
 import net.minecraft.core.WeightedRandomLootObject;
-import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.data.registry.Registries;
 import net.minecraft.core.data.registry.recipe.RecipeGroup;
@@ -11,7 +10,6 @@ import net.minecraft.core.data.registry.recipe.RecipeSymbol;
 import net.minecraft.core.data.registry.recipe.entry.RecipeEntryCrafting;
 import net.minecraft.core.data.registry.recipe.entry.RecipeEntryFurnace;
 import net.minecraft.core.data.registry.recipe.entry.RecipeEntryTrommel;
-import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
 import turniplabs.halplibe.helper.RecipeBuilder;
@@ -156,6 +154,11 @@ public class PTRecipes {
 			.addInput('S', Items.INGOT_IRON)
 			.create("Crafter", new ItemStack(PTBlocks.coil, 1));
 
+		RecipeBuilder.Shaped(PotatoTech.MOD_ID)
+			.setShape("GG", "GG")
+			.addInput('G', PTItems.oreRichDust)
+			.create("Ore Rich Gravel", new ItemStack(PTBlocks.oreRichGravel, 1));
+
 		RecipeBuilder.Shapeless(PotatoTech.MOD_ID)
 			.addInput(Items.INGOT_IRON)
 			.addInput(new ItemStack(Items.DUST_REDSTONE))
@@ -186,14 +189,22 @@ public class PTRecipes {
 			.create("Redstone Alloy", new ItemStack(PTItems.redstoneAlloy, 1));
 
 		RecipeBuilder.Trommel(PotatoTech.MOD_ID)
-			.setInput(PTItems.bedrockDust)
+			.setInput(PTBlocks.oreRichGravel)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.AMMO_PEBBLE), 1, 2), 100)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.FLINT), 1, 2), 100)
 			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.COAL), 1, 2), 70)
-			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.DIAMOND), 1), 10)
-			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.DUST_REDSTONE), 3, 6), 64)
-			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.DYE, 1, 4), 1, 3), 8)
 			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.ORE_RAW_IRON), 1, 2), 64)
 			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.ORE_RAW_GOLD), 1), 16)
-			.create("bedrock_dust");
+			.create("ore_rich_gravel");
+
+		RecipeBuilder.Trommel(PotatoTech.MOD_ID)
+			.setInput(PTBlocks.oreRichSand)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.OLIVINE), 1, 2), 100)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.DUST_REDSTONE), 3, 6), 64)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.QUARTZ), 1, 2), 50)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.DIAMOND), 1), 10)
+			.addEntry(new WeightedRandomLootObject(new ItemStack(Items.DYE, 1, 4), 1, 3), 8)
+			.create("ore_rich_sand");
 
 		TileEntityCrafter.updateRecipeEntriesCache();
 	}
