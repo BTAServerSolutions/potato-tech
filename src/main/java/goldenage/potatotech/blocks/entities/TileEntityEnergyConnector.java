@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class TileEntityEnergyConnector extends TileEntity {
+	public static final int MAX_WIRE_DISTANCE = 16;
+	private static final long MAX_WIRE_DISTANCE_SQUARED = (long) MAX_WIRE_DISTANCE * MAX_WIRE_DISTANCE;
 	public static class Connection {
 		public int x;
 		public int y;
@@ -83,6 +85,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 	private long blockBudgetTick = Long.MIN_VALUE;
 	private int blockTransferred;
 	private int blockDirection;
+	private boolean connectionsNeedSave;
 
 	public TileEntityEnergyConnector() {
 
@@ -109,16 +112,21 @@ public class TileEntityEnergyConnector extends TileEntity {
 		this.connections = new ArrayList<>();
 		for (int i = 0; i < nbttaglist.tagCount(); ++i) {
 			CompoundTag nbttagcompound1 = (CompoundTag)nbttaglist.tagAt(i);
-			this.connections.add(Connection.readConnectionFromNBT(nbttagcompound1));
+			Connection connection = Connection.readConnectionFromNBT(nbttagcompound1);
+			if (isValidConnection(connection) && !hasConnectionTo(connection.x, connection.y, connection.z)) {
+				this.connections.add(connection);
+			}
 		}
+		connectionsNeedSave = nbttaglist.tagCount() != this.connections.size();
 		energy = Math.max(0, nbttagcompound.getInteger("energy"));
 	}
 
 	@Override
 	public void writeAdditionalData(CompoundTag nbttagcompound) {
 		ListTag nbttaglist = new ListTag();
+		Set<ConnectorPos> writtenConnections = new HashSet<>();
 		for (Connection connection : this.connections) {
-			if (connection == null) continue;
+			if (!isValidConnection(connection) || !writtenConnections.add(new ConnectorPos(connection.x, connection.y, connection.z))) continue;
 			CompoundTag nbttagcompound1 = new CompoundTag();
 			connection.writeToNBT(nbttagcompound1);
 			nbttaglist.addTag(nbttagcompound1);
@@ -135,39 +143,48 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (worldObj == null || worldObj.isClientSide) {
 			return false;
 		}
-		TilePos connectPos = new TilePos(xi, yi, zi);
+		if (!isWithinWireDistance(tilePos.x, tilePos.y, tilePos.z, xi, yi, zi)) {
+			return false;
+		}
 
 		TileEntity te = worldObj.getTileEntity(xi, yi, zi);
 
 		if (!(te instanceof TileEntityEnergyConnector)) return false;
-
-		boolean hasConnection = false;
-		for (Connection c: connections) {
-			if (c.x == xi && c.y == yi && c.z == zi) {
-				hasConnection = true;
-				break;
-			}
-		}
-		if (hasConnection) return false;
-
-		for (Connection c: ((TileEntityEnergyConnector) te).connections) {
-			if (c.x == tilePos.x && c.y == tilePos.y && c.z == tilePos.z) {
-				hasConnection = true;
-				break;
-			}
-		}
-
-		if (hasConnection) return false;
+		TileEntityEnergyConnector other = (TileEntityEnergyConnector) te;
+		if (hasConnectionTo(xi, yi, zi) || other.hasConnectionTo(tilePos.x, tilePos.y, tilePos.z)) return false;
 
 		connections.add(new Connection(xi, yi, zi, wireType));
-		((TileEntityEnergyConnector) te).connections.add(new Connection(tilePos.x, tilePos.y, tilePos.z, wireType));
+		other.connections.add(new Connection(tilePos.x, tilePos.y, tilePos.z, wireType));
 		this.setChanged();
-		((TileEntityEnergyConnector) te).setChanged();
+		other.setChanged();
 		worldObj.markBlockNeedsUpdate(tilePos.x, tilePos.y, tilePos.z);
 		worldObj.markBlockNeedsUpdate(xi, yi, zi);
 		PotatoTech.LOGGER.info("Added connection on: " + xi + " " + yi + " " + zi);
 
 		return true;
+	}
+
+	public static boolean isWithinWireDistance(int x1, int y1, int z1, int x2, int y2, int z2) {
+		long dx = (long) x2 - x1;
+		long dy = (long) y2 - y1;
+		long dz = (long) z2 - z1;
+		return dx * dx + dy * dy + dz * dz <= MAX_WIRE_DISTANCE_SQUARED;
+	}
+
+	private boolean isValidConnection(Connection connection) {
+		return connection != null
+			&& connection.wireType != null
+			&& isWithinWireDistance(tilePos.x, tilePos.y, tilePos.z, connection.x, connection.y, connection.z)
+			&& (connection.x != tilePos.x || connection.y != tilePos.y || connection.z != tilePos.z);
+	}
+
+	private boolean hasConnectionTo(int x, int y, int z) {
+		for (Connection connection : connections) {
+			if (connection != null && connection.x == x && connection.y == y && connection.z == z) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void removeConnection(int xi, int yi, int zi) {
@@ -193,6 +210,7 @@ public class TileEntityEnergyConnector extends TileEntity {
 
 		ArrayList<Connection> connectionsCopy = new ArrayList<>(connections);
 		for (Connection c: connectionsCopy) {
+			if (!isValidConnection(c)) continue;
 			wireCounts.merge(c.wireType, 1, Integer::sum);
 			TileEntity te = worldObj.getTileEntity(c.x, c.y, c.z);
 			if (te instanceof TileEntityEnergyConnector && removeConnection) {
@@ -261,6 +279,10 @@ public class TileEntityEnergyConnector extends TileEntity {
 		if (worldObj == null || worldObj.isClientSide) {
 			return;
 		}
+		if (connectionsNeedSave) {
+			connectionsNeedSave = false;
+			setChanged();
+		}
 		processNetwork();
 	}
 
@@ -303,8 +325,13 @@ public class TileEntityEnergyConnector extends TileEntity {
 			TileEntityEnergyConnector connector = pending.removeFirst();
 			result.add(connector);
 			for (Connection connection : connector.connections) {
+				if (!connector.isValidConnection(connection)) {
+					continue;
+				}
 				TileEntity target = worldObj.getTileEntity(connection.x, connection.y, connection.z);
-				if (target instanceof TileEntityEnergyConnector targetConnector && visited.add(targetConnector.position())) {
+				if (target instanceof TileEntityEnergyConnector targetConnector
+					&& targetConnector.hasConnectionTo(connector.tilePos.x, connector.tilePos.y, connector.tilePos.z)
+					&& visited.add(targetConnector.position())) {
 					pending.addLast(targetConnector);
 				}
 			}
@@ -480,9 +507,13 @@ public class TileEntityEnergyConnector extends TileEntity {
 		Set<WireEdgeKey> processedEdges = new HashSet<>();
 		for (TileEntityEnergyConnector connector : network) {
 			for (Connection connection : connector.connections) {
+				if (!connector.isValidConnection(connection)) {
+					continue;
+				}
 				TileEntity target = worldObj.getTileEntity(connection.x, connection.y, connection.z);
 				if (!(target instanceof TileEntityEnergyConnector other)
 					|| !members.contains(other)
+					|| !other.hasConnectionTo(connector.tilePos.x, connector.tilePos.y, connector.tilePos.z)
 					|| !processedEdges.add(WireEdgeKey.of(connector, other))) {
 					continue;
 				}

@@ -31,6 +31,10 @@ public class TileEntityRendererEnergyConnector extends TileEntityRenderer<TileEn
 		GLRenderer.modelM4f().translate((float) x + 0.5f, (float) y + 0.5f, (float) z + 0.5f);
 
 		for (TileEntityEnergyConnector.Connection c : tileEntity.connections){
+			if (c == null || c.wireType == null || !TileEntityEnergyConnector.isWithinWireDistance(
+				tileEntity.tilePos.x, tileEntity.tilePos.y, tileEntity.tilePos.z, c.x, c.y, c.z)) {
+				continue;
+			}
 			double x2 = c.x - tileEntity.tilePos.x;
 			double y2 = c.y - tileEntity.tilePos.y;
 			double z2 = c.z - tileEntity.tilePos.z;
@@ -38,6 +42,9 @@ public class TileEntityRendererEnergyConnector extends TileEntityRenderer<TileEn
 			if (x2 > 0 || x2 == 0 && y2 > 0 || x2 == 0 && y2 == 0 && z2 > 0) continue;
 
 			double dist = Math.sqrt(x2*x2 + y2*y2 + z2*z2);
+			if (dist <= 0.0) {
+				continue;
+			}
 			double yOff = Math.log(dist + 0.15);
 
 			double t_increment = 0.25 / dist;

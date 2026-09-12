@@ -253,7 +253,6 @@ public class TileEntityChute extends TileEntity implements Container {
 							droppedItem.yd = 0;
 							droppedItem.zd = 0;
 							droppedItem.basketPickupDelay = 1;
-							this.worldObj.entityJoinedWorld(droppedItem);
 							break;
 						}
 					}

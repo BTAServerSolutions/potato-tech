@@ -42,10 +42,16 @@ public class ItemWireSpool extends Item {
 			if (connected) {
 				TileEntity te = connectorTile;
 				if (te instanceof TileEntityEnergyConnector) {
-					selfStack.getData().putBoolean("connected", false);
 					int x = selfStack.getData().getInteger("x");
 					int y = selfStack.getData().getInteger("y");
 					int z = selfStack.getData().getInteger("z");
+					if (!TileEntityEnergyConnector.isWithinWireDistance(blockX, blockY, blockZ, x, y, z)) {
+						if (player != null) {
+							player.sendMessage("Energy wires can be at most " + TileEntityEnergyConnector.MAX_WIRE_DISTANCE + " blocks long.");
+						}
+						return true;
+					}
+					selfStack.getData().putBoolean("connected", false);
 					boolean connectedSuccessfully = ((TileEntityEnergyConnector) te).addConnection(x, y, z, wireType);
 					if (connectedSuccessfully) {
 						selfStack.consumeItem(player);
